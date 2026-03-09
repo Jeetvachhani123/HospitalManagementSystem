@@ -1,4 +1,4 @@
-﻿using HospitalMS.Models.Enums;
+using HospitalMS.Models.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace HospitalMS.Web.ViewModels;
@@ -113,6 +113,8 @@ public class AppointmentTimelineItem
 public class RescheduleAppointmentViewModel
 {
     public int AppointmentId { get; set; }
+
+    public int DoctorId { get; set; }
 
     public string DoctorName { get; set; } = string.Empty;
 

@@ -1,4 +1,4 @@
-﻿using HospitalMS.BL.DTOs.Appointment;
+using HospitalMS.BL.DTOs.Appointment;
 using HospitalMS.BL.Interfaces.Services;
 using HospitalMS.BL.Services;
 using HospitalMS.Web.ViewModels;
@@ -386,19 +386,54 @@ public class AppointmentController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    // reschedule appointment
-    [HttpPost]
-    public async Task<IActionResult> Reschedule(int appointmentId, DateTime newDate, TimeSpan newStartTime, TimeSpan newEndTime)
+    // show reschedule form
+    [HttpGet]
+    public async Task<IActionResult> Reschedule(int id)
     {
+        var appointment = await _appointmentService.GetByIdAsync(id);
+        if (appointment == null)
+            return NotFound();
+        // only allow rescheduling of Scheduled or Confirmed appointments
+        if (appointment.Status == "Completed" || appointment.Status == "Cancelled")
+        {
+            TempData["ErrorMessage"] = "Only scheduled or confirmed appointments can be rescheduled.";
+            return RedirectToAction(nameof(Details), new { id });
+        }
+        var model = new RescheduleAppointmentViewModel
+        {
+            AppointmentId = appointment.Id,
+            DoctorName = appointment.DoctorName,
+            DoctorId = appointment.DoctorId,
+            CurrentDate = appointment.AppointmentDate,
+            CurrentStartTime = appointment.StartTime,
+            NewDate = appointment.AppointmentDate.AddDays(1),
+            NewStartTime = appointment.StartTime,
+            NewEndTime = appointment.EndTime
+        };
+        return View(model);
+    }
+
+    // reschedule appointment (submit)
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Reschedule(RescheduleAppointmentViewModel model)
+    {
+        if (!ModelState.IsValid)
+            return View(model);
+        if (model.NewEndTime <= model.NewStartTime)
+        {
+            ModelState.AddModelError("", "End time must be after start time.");
+            return View(model);
+        }
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        var result = await _workflowService.RescheduleAppointmentAsync(appointmentId, userId, newDate, newStartTime, newEndTime);
+        var result = await _workflowService.RescheduleAppointmentAsync(model.AppointmentId, userId, model.NewDate, model.NewStartTime, model.NewEndTime);
         if (result == null)
         {
-            TempData["ErrorMessage"] = "Failed to reschedule appointment. The new time slot may be unavailable.";
-            return RedirectToAction(nameof(Index));
+            ModelState.AddModelError("", "Failed to reschedule. The selected time slot may be unavailable.");
+            return View(model);
         }
         TempData["SuccessMessage"] = "Appointment rescheduled successfully!";
-        return RedirectToAction(nameof(Index));
+        return RedirectToAction(nameof(Details), new { id = model.AppointmentId });
     }
 
     // appointment details

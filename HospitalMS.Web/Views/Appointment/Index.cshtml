@@ -140,6 +140,9 @@
                                             }
                                             @if (appt.Status == "Scheduled" || appt.Status == "Confirmed")
                                             {
+                                                <a asp-action="Reschedule" asp-route-id="@appt.Id" class="btn btn-sm btn-outline-warning" title="Reschedule">
+                                                    <i class="bi bi-calendar2-week"></i>
+                                                </a>
                                                 <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#cancelModal" data-appt-id="@appt.Id" title="Cancel">
                                                     <i class="bi bi-x-circle"></i>
                                                 </button>
