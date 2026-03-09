@@ -1,0 +1,97 @@
+@model HospitalMS.Web.ViewModels.CreateMedicalRecordViewModel
+@{
+    ViewData["Title"] = "Add Medical Record";
+}
+<div class="container py-5">
+    <div class="row mb-5 justify-content-center">
+        <div class="col-lg-8 text-center text-lg-start">
+            <h2 class="display-6 fw-bold text-gray-800">Add Clinical Entry</h2>
+            <p class="text-muted lead mb-0">Record a new diagnosis, treatment, or visit.</p>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header bg-primary bg-opacity-10 py-3 border-bottom-0">
+                    <div class="d-flex align-items-center">
+                        <div class="avatar-circle bg-white text-primary rounded-circle me-3 fw-bold d-flex align-items-center justify-content-center border" style="width: 48px; height: 48px; font-size: 1.25rem;">
+                            <i class="bi bi-file-earmark-plus-fill"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold text-primary mb-0">Record Details</h5>
+                            <small class="text-muted">For Patient: <strong>@Model.PatientName</strong></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-4 bg-white">
+                    <form asp-action="Create" method="post" enctype="multipart/form-data">
+                        <input type="hidden" asp-for="PatientId" />
+                        <input type="hidden" asp-for="PatientName" />
+                        @if (ViewData.ModelState.ErrorCount > 0)
+                        {
+                            <div class="alert alert-danger border-0 shadow-sm mb-4">
+                                <ul class="mb-0 ps-3">
+                                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                                    {
+                                        <li>@error.ErrorMessage</li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="RecordDate" class="form-label fw-bold text-muted small text-uppercase">Visit Date *</label>
+                                <input asp-for="RecordDate" type="date" class="form-control bg-light-subtle" />
+                                <span asp-validation-for="RecordDate" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="RecordType" class="form-label fw-bold text-muted small text-uppercase">Record Type *</label>
+                                <select asp-for="RecordType" class="form-select bg-light-subtle">
+                                    <option value="Consultation">Consultation</option>
+                                    <option value="General Checkup">General Checkup</option>
+                                    <option value="Surgery">Surgery</option>
+                                    <option value="Lab Result">Lab Result</option>
+                                    <option value="Prescription">Prescription Only</option>
+                                </select>
+                                <span asp-validation-for="RecordType" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                        </div>
+                        <hr class="my-4 opacity-25" />
+                        <div class="mb-4">
+                            <label asp-for="Diagnosis" class="form-label fw-bold text-muted small text-uppercase"><i class="bi bi-stethoscope me-1 text-primary"></i>Diagnosis</label>
+                            <textarea asp-for="Diagnosis" class="form-control bg-light-subtle" rows="3" placeholder="Enter clinical diagnosis..."></textarea>
+                            <span asp-validation-for="Diagnosis" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                        <div class="mb-4 bg-success bg-opacity-10 p-4 rounded-3 border border-success border-opacity-25 shadow-sm">
+                            <label asp-for="Prescription" class="form-label fw-bold text-muted small text-uppercase"><i class="bi bi-prescription2 me-1 text-success"></i>Treatment Plan / Rx</label>
+                            <textarea asp-for="Prescription" class="form-control border-0 bg-white shadow-sm" rows="4" placeholder="Medication, dosage, duration..."></textarea>
+                            <span asp-validation-for="Prescription" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                        <div class="mb-4">
+                            <label asp-for="Notes" class="form-label fw-bold text-muted small text-uppercase">Private Notes</label>
+                            <textarea asp-for="Notes" class="form-control bg-light-subtle" rows="2" placeholder="Internal observations..."></textarea>
+                            <span asp-validation-for="Notes" class="text-danger small mt-1 d-block"></span>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-muted small text-uppercase">File Attachment</label>
+                            <div class="input-group">
+                                <input type="file" class="form-control bg-light-subtle" id="customFile" asp-for="Attachment">
+                                <label class="input-group-text bg-light-subtle border-start-0" for="customFile"><i class="bi bi-paperclip"></i></label>
+                            </div>
+                            <div class="form-text text-muted small">Max file size: 5MB. Formats: PDF, JPG, PNG.</div>
+                        </div>
+                        <div class="d-flex justify-content-end gap-3 align-items-center mt-5">
+                            <a href="javascript:history.back()" class="btn btn-light rounded-pill px-4 fw-bold text-muted">Cancel</a>
+                            <button type="submit" class="btn btn-primary rounded-pill px-5 py-2 fw-bold shadow-sm hover-lift transition-all">
+                                <i class="bi bi-check2-circle me-2"></i> Save Record
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

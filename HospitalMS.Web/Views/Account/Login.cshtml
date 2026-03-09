@@ -1,0 +1,152 @@
+@model HospitalMS.BL.DTOs.Auth.LoginDto
+@{
+    ViewData["Title"] = "Sign In";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign In - Hospital Management System</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            overflow: hidden;
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .login-header {
+            background-color: #fff;
+            padding: 2.5rem 2rem 1rem;
+            text-align: center;
+        }
+
+        .login-body {
+            background-color: #fff;
+            padding: 2rem;
+        }
+
+        .form-control {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+            .form-control:focus {
+                box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+            }
+
+        .btn-primary {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .brand-logo {
+            width: 64px;
+            height: 64px;
+            background-color: #e7f1ff;
+            color: #0d6efd;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            margin: 0 auto 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="login-header">
+            <div class="brand-logo">
+                <i class="bi bi-hospital-fill"></i>
+            </div>
+            <h4 class="fw-bold text-dark mb-1">Welcome Back</h4>
+            <p class="text-muted mb-0 small">Sign in to your account</p>
+        </div>
+        <div class="login-body">
+            <form asp-action="Login" method="post" id="loginForm">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small mb-3 border-0 bg-danger-subtle text-danger rounded-3"></div>
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label small fw-bold text-muted text-uppercase">Email Address</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-envelope"></i></span>
+                        <input asp-for="Email" class="form-control border-start-0 ps-0" placeholder="name@example.com" autofocus />
+                    </div>
+                    <span asp-validation-for="Email" class="text-danger small mt-1 d-block"></span>
+                </div>
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <label asp-for="Password" class="form-label small fw-bold text-muted text-uppercase mb-0">Password</label>
+                        <a href="javascript:alert('Please contact your system administrator to reset your password.');" class="small text-decoration-none text-primary fw-bold" tabindex="-1">Forgot?</a>
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-lock"></i></span>
+                        <input asp-for="Password" type="password" class="form-control border-start-0 border-end-0 ps-0" id="passwordInput" placeholder="Enter your password" />
+                        <span class="input-group-text bg-white border-start-0" style="cursor:pointer;" id="togglePassword">
+                            <i class="bi bi-eye text-muted" id="eyeIcon"></i>
+                        </span>
+                    </div>
+                    <span asp-validation-for="Password" class="text-danger small mt-1 d-block"></span>
+                </div>
+                <div class="d-grid mb-4">
+                    <button type="submit" class="btn btn-primary shadow-sm" id="submitBtn">
+                        <span id="btnText">Sign In</span>
+                        <span id="btnSpinner" class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true" style="display:none;"></span>
+                    </button>
+                </div>
+                <div class="text-center">
+                    <p class="text-muted small mb-0">Don't have an account? <a asp-action="Register" class="text-primary fw-bold text-decoration-none">Create Account</a></p>
+                </div>
+            </form>
+        </div>
+        <div class="bg-light py-3 text-center border-top">
+            <a asp-controller="Home" asp-action="Index" class="small text-muted text-decoration-none"><i class="bi bi-arrow-left me-1"></i> Back to Home</a>
+        </div>
+    </div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#togglePassword').on('click', function() {
+                const input = $('#passwordInput');
+                const icon = $('#eyeIcon');
+                if (input.attr('type') === 'password') {
+                    input.attr('type', 'text');
+                    icon.removeClass('bi-eye').addClass('bi-eye-slash');
+                } else {
+                    input.attr('type', 'password');
+                    icon.removeClass('bi-eye-slash').addClass('bi-eye');
+                }
+            });
+            $('#loginForm').on('submit', function() {
+                if($(this).valid()) {
+                    $('#submitBtn').prop('disabled', true);
+                    $('#btnText').text('Signing In...');
+                    $('#btnSpinner').show();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

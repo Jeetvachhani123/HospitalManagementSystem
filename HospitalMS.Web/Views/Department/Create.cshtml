@@ -1,0 +1,79 @@
+@model HospitalMS.BL.DTOs.Department.CreateDepartmentDto
+@{
+    ViewData["Title"] = "New Department";
+}
+<div class="container py-5">
+    <div class="row mb-5 justify-content-center">
+        <div class="col-lg-8 text-center text-lg-start">
+            <h2 class="display-6 fw-bold text-gray-800">Establish Department</h2>
+            <p class="text-muted lead mb-0">Create a new organizational unit.</p>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header bg-primary bg-opacity-10 py-3 border-bottom-0">
+                    <div class="d-flex align-items-center">
+                        <div class="avatar-circle bg-white text-primary rounded-circle me-3 fw-bold d-flex align-items-center justify-content-center border" style="width: 48px; height: 48px; font-size: 1.25rem;">
+                            <i class="bi bi-building-add"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold text-primary mb-0">Unit Details</h5>
+                            <small class="text-muted">Enter department specifics.</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-4 bg-white">
+                    <form asp-action="Create" method="post">
+                        @if (ViewData.ModelState.ErrorCount > 0)
+                        {
+                            <div class="alert alert-danger border-0 shadow-sm mb-4">
+                                <ul class="mb-0 ps-3">
+                                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                                    {
+                                        <li>@error.ErrorMessage</li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-12">
+                                <label asp-for="Name" class="form-label fw-bold text-muted small text-uppercase">Department Name *</label>
+                                <input asp-for="Name" class="form-control bg-light-subtle" placeholder="e.g. Pediatrics" />
+                                <span asp-validation-for="Name" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                            <div class="col-md-12">
+                                <label asp-for="Description" class="form-label fw-bold text-muted small text-uppercase">Description</label>
+                                <textarea asp-for="Description" class="form-control bg-light-subtle" rows="3" placeholder="Primary function or specialization..."></textarea>
+                                <span asp-validation-for="Description" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Location" class="form-label fw-bold text-muted small text-uppercase">Physical Location</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-geo-alt"></i></span>
+                                    <input asp-for="Location" class="form-control border-start-0 bg-light-subtle" placeholder="Building, Floor, Room" />
+                                </div>
+                                <span asp-validation-for="Location" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                            <div class="col-md-6 d-flex align-items-end">
+                                <div class="form-check form-switch mb-2 ms-2">
+                                    <input class="form-check-input" type="checkbox" asp-for="IsActive" role="switch" checked>
+                                    <label class="form-check-label fw-bold text-dark ms-2" asp-for="IsActive">Active Status</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end gap-3 align-items-center mt-5 pt-3 border-top border-light">
+                            <a asp-action="Index" class="btn btn-light rounded-pill px-4 fw-bold text-muted">Cancel</a>
+                            <button type="submit" class="btn btn-primary rounded-pill px-5 py-2 fw-bold shadow-sm hover-lift transition-all">
+                                <i class="bi bi-check-lg me-2"></i> Create Unit
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

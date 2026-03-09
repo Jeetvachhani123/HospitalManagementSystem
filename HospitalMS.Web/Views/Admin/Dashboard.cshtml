@@ -1,0 +1,285 @@
+﻿@model HospitalMS.Web.ViewModels.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 fw-bold text-gray-800">Administrator Dashboard</h1>
+            <p class="text-muted mb-0">Overview of hospital performance and daily activities.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-download me-1"></i> Export Report
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                    <li><a class="dropdown-item" href="javascript:void(0);" data-export="pdf"><i class="bi bi-file-earmark-pdf text-danger me-2"></i> PDF</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0);" data-export="excel"><i class="bi bi-file-earmark-excel text-success me-2"></i> Excel</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="javascript:void(0);" data-export="print"><i class="bi bi-printer text-primary me-2"></i> Print</a></li>
+                </ul>
+            </div>
+            <a asp-controller="Appointment" asp-action="Index" class="btn btn-primary btn-sm" id="btnNewAppointment">
+                <i class="bi bi-eye me-1"></i> All Appointment
+            </a>
+        </div>
+    </div>
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card dashboard-card border-0 shadow-sm h-100 border-start border-4 border-primary" data-type="Doctors" style="cursor:pointer;">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="text-uppercase text-primary small fw-bold mb-1">
+                                Total Doctors
+                            </div>
+                            <div class="h3 mb-0 fw-bold text-gray-800">
+                                @Model.TotalDoctors
+                            </div>
+                        </div>
+                        <div class="fs-1 text-gray-300 text-primary opacity-25">
+                            <i class="bi bi-person-badge"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card dashboard-card border-0 shadow-sm h-100 border-start border-4 border-success" data-type="Patients" style="cursor:pointer;">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="text-uppercase text-success small fw-bold mb-1">
+                                Total Patients
+                            </div>
+                            <div class="h3 mb-0 fw-bold text-gray-800">
+                                @Model.TotalPatients
+                            </div>
+                        </div>
+                        <div class="fs-1 text-gray-300 text-success opacity-25">
+                            <i class="bi bi-people"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card dashboard-card border-0 shadow-sm h-100 border-start border-4 border-info" data-type="TodayAppointments" style="cursor:pointer;">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="text-uppercase text-info small fw-bold mb-1">
+                                Appointments (Today)
+                            </div>
+                            <div class="h3 mb-0 fw-bold text-gray-800">
+                                @Model.AppointmentsToday
+                            </div>
+                        </div>
+                        <div class="fs-1 text-gray-300 text-info opacity-25">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card dashboard-card border-0 shadow-sm h-100 border-start border-4 border-warning" data-type="PendingApprovals" style="cursor:pointer;">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="text-uppercase text-warning small fw-bold mb-1">
+                                Pending Approvals
+                            </div>
+                            <div class="h3 mb-0 fw-bold text-gray-800">
+                                @Model.PendingApprovals
+                            </div>
+                        </div>
+                        <div class="fs-1 text-gray-300 text-warning opacity-25">
+                            <i class="bi bi-hourglass-split"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white py-3 d-flex flex-row align-items-center justify-content-between border-bottom">
+                    <h6 class="m-0 fw-bold text-primary">Appointment Overview</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-center align-items-center h-100 text-muted" style="min-height: 300px;">
+                        <canvas id="appointmentChart" height="100"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white py-3 d-flex align-items-center justify-content-between border-bottom">
+                    <h6 class="m-0 fw-bold text-primary">Recent Appointments</h6>
+                    <a asp-controller="Appointment" asp-action="Index" class="small text-decoration-none">View All</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        @if (Model.RecentAppointments != null && Model.RecentAppointments.Any())
+                        {
+                            foreach (var appt in Model.RecentAppointments)
+                            {
+                                <div class="list-group-item d-flex align-items-center px-4 py-3 border-0 border-bottom">
+                                    <div class="me-3">
+                                        <div class="icon-circle bg-light text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                            <i class="bi bi-calendar4-event"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-0 text-dark fw-bold" style="font-size: 0.9rem;">@appt.PatientName</h6>
+                                        <small class="text-muted d-block">With Dr. @appt.DoctorName</small>
+                                    </div>
+                                    <div class="text-end">
+                                        <small class="text-muted d-block">@appt.AppointmentDate.ToString("MMM dd")</small>
+                                        <span class="badge bg-@(appt.Status == "Confirmed" ? "success" : appt.Status == "Pending" ? "warning" : "secondary") rounded-pill" style="font-size: 0.65rem;">
+                                            @appt.Status
+                                        </span>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="p-4 text-center text-muted">
+                                <i class="bi bi-inbox fs-4 d-block mb-2 opacity-50"></i>
+                                No recent activity
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="card-footer bg-white text-center py-3 border-0">
+                    <a asp-controller="Appointment" asp-action="History" class="btn btn-sm btn-light w-100 text-muted fw-bold">View Full Activity Log</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="detailsModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">Details</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="modalContent" style="max-height:500px; overflow-y:auto;">
+                        Loading...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row g-4 mt-2">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <h6 class="text-muted text-uppercase small fw-bold">Completion Rate</h6>
+                    <div class="display-6 fw-bold text-dark my-2">@Model.CompletionRate.ToString("0")%</div>
+                    <div class="progress" style="height: 5px;">
+                        <div class="progress-bar bg-info" role="progressbar" style="width: @Model.CompletionRate.ToString("0", System.Globalization.CultureInfo.InvariantCulture)%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <h6 class="text-muted text-uppercase small fw-bold">No-Show Rate</h6>
+                    <div class="display-6 fw-bold text-danger my-2">@Model.NoShowRate.ToString("0")%</div>
+                    <div class="progress" style="height: 5px;">
+                        <div class="progress-bar bg-danger" role="progressbar" style="width: @Model.NoShowRate.ToString("0", System.Globalization.CultureInfo.InvariantCulture)%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="~/js/dashboard-export.js"></script>
+    <script>
+        document.querySelectorAll('[data-export]').forEach(function (el) {
+            el.addEventListener('click', function (e) {
+                e.preventDefault();
+                exportReport(this.getAttribute('data-export'));
+            });
+        });
+        document.querySelectorAll('.dashboard-card').forEach(function (card) {
+            card.addEventListener('click', function () {
+                var type = this.getAttribute('data-type');
+                fetch('/Admin/GetCardDetails?type=' + type)
+                    .then(function (res) { return res.json(); })
+                    .then(function (data) {
+                        var html = '';
+                        if (!data || data.length === 0) {
+                            html = "<div class='text-center text-muted py-4'>No records found</div>";
+                        } else {
+                            html += "<div class='table-responsive'>";
+                            html += "<table class='table table-hover align-middle'>";
+                            html += "<thead class='table-light'><tr>";
+                            if (type === 'Doctors') {
+                                html += '<th>Name</th><th>Email</th><th>Specialization</th><th>Experience</th>';
+                            } else if (type === 'Patients') {
+                                html += '<th>Name</th><th>Email</th><th>Phone</th><th>Blood Group</th>';
+                            } else {
+                                html += '<th>Patient</th><th>Doctor</th><th>Date</th><th>Status</th>';
+                            }
+                            html += '</tr></thead><tbody>';
+                            data.forEach(function (item) {
+                                html += '<tr>';
+                                if (type === 'Doctors') {
+                                    html += '<td>' + item.name + '</td><td>' + item.email + '</td><td>' + item.specialization + '</td><td>' + item.experience + ' yrs</td>';
+                                } else if (type === 'Patients') {
+                                    html += '<td>' + item.name + '</td><td>' + item.email + '</td><td>' + item.phone + '</td><td>' + item.bloodGroup + '</td>';
+                                } else {
+                                    html += '<td>' + item.patient + '</td><td>' + item.doctor + '</td><td>' + item.date + '</td><td><span class="badge bg-secondary">' + item.status + '</span></td>';
+                                }
+                                html += '</tr>';
+                            });
+                            html += '</tbody></table></div>';
+                        }
+                        document.getElementById('modalContent').innerHTML = html;
+                        var modal = new bootstrap.Modal(document.getElementById('detailsModal'));
+                        modal.show();
+                    });
+            });
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('/Admin/GetMonthlyTrend')
+                .then(function (res) { return res.json(); })
+                .then(function (data) {
+                    var labels = data.map(function (x) { return x.month; });
+                    var total = data.map(function (x) { return x.totalAppointments; });
+                    var completed = data.map(function (x) { return x.completedAppointments; });
+                    var cancelled = data.map(function (x) { return x.cancelledAppointments; });
+                    var ctx = document.getElementById('appointmentChart').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [
+                                { label: 'Total', data: total, backgroundColor: '#0d6efd' },
+                                { label: 'Completed', data: completed, backgroundColor: '#198754' },
+                                { label: 'Cancelled', data: cancelled, backgroundColor: '#dc3545' }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: { legend: { position: 'top' } }
+                        }
+                    });
+                });
+        });
+    </script>
+}

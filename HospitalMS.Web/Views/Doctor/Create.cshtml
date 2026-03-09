@@ -1,0 +1,119 @@
+@model HospitalMS.Web.ViewModels.DoctorCreateViewModel
+@{
+    ViewData["Title"] = "New Doctor Registration";
+}
+<div class="container py-5">
+    <div class="row mb-5 justify-content-center">
+        <div class="col-lg-8 text-center">
+            <h2 class="display-6 fw-bold text-gray-800">Add New Doctor</h2>
+            <p class="text-muted lead mb-0">Create a new medical professional account.</p>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header bg-primary bg-opacity-10 py-3 border-bottom-0">
+                    <div class="d-flex align-items-center">
+                        <div class="avatar-circle bg-white text-primary rounded-circle me-3 fw-bold d-flex align-items-center justify-content-center border" style="width: 48px; height: 48px; font-size: 1.25rem;">
+                            <i class="bi bi-person-plus-fill"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold text-primary mb-0">Doctor Details</h5>
+                            <small class="text-muted">Fill in all required fields.</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-4 bg-white">
+                    <form asp-action="Create" method="post">
+                        @if (ViewData.ModelState.ErrorCount > 0)
+                        {
+                            <div class="alert alert-danger border-0 shadow-sm mb-4">
+                                <ul class="mb-0 ps-3">
+                                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                                    {
+                                        <li>@error.ErrorMessage</li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="FirstName" class="form-label fw-bold text-muted small text-uppercase">First Name *</label>
+                                <input asp-for="FirstName" class="form-control bg-light-subtle" placeholder="John" />
+                                <span asp-validation-for="FirstName" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="LastName" class="form-label fw-bold text-muted small text-uppercase">Last Name *</label>
+                                <input asp-for="LastName" class="form-control bg-light-subtle" placeholder="Doe" />
+                                <span asp-validation-for="LastName" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Email" class="form-label fw-bold text-muted small text-uppercase">Email *</label>
+                                <input asp-for="Email" class="form-control bg-light-subtle" placeholder="doctor@hospital.com" />
+                                <span asp-validation-for="Email" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Password" class="form-label fw-bold text-muted small text-uppercase">Password *</label>
+                                <input asp-for="Password" type="password" class="form-control bg-light-subtle" placeholder="Secure Password" />
+                                <span asp-validation-for="Password" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="PhoneNumber" class="form-label fw-bold text-muted small text-uppercase">Phone</label>
+                                <input asp-for="PhoneNumber" class="form-control bg-light-subtle" placeholder="+1 (555) 000-0000" />
+                                <span asp-validation-for="PhoneNumber" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="LicenseNumber" class="form-label fw-bold text-muted small text-uppercase">License Number *</label>
+                                <input asp-for="LicenseNumber" class="form-control bg-light-subtle" placeholder="LIC-123456" />
+                                <span asp-validation-for="LicenseNumber" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                        </div>
+                        <hr class="my-4 opacity-25" />
+                        <h6 class="fw-bold text-dark mb-4"><i class="bi bi-briefcase me-2 text-primary"></i>Employment Details</h6>
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="Specialization" class="form-label fw-bold text-muted small text-uppercase">Specialization *</label>
+                                <input asp-for="Specialization" class="form-control bg-light-subtle" placeholder="e.g. Neurology" />
+                                <span asp-validation-for="Specialization" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="DepartmentId" class="form-label fw-bold text-muted small text-uppercase">Department</label>
+                                <select asp-for="DepartmentId" class="form-select bg-light-subtle" asp-items="ViewBag.Departments">
+                                    <option value="">-- Select Department --</option>
+                                </select>
+                                <span asp-validation-for="DepartmentId" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="YearsOfExperience" class="form-label fw-bold text-muted small text-uppercase">Experience (Years)</label>
+                                <input asp-for="YearsOfExperience" type="number" class="form-control bg-light-subtle" min="0" />
+                                <span asp-validation-for="YearsOfExperience" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="ConsultationFee" class="form-label fw-bold text-muted small text-uppercase">Fee ($)</label>
+                                <input asp-for="ConsultationFee" type="number" step="0.01" class="form-control bg-light-subtle" />
+                                <span asp-validation-for="ConsultationFee" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <label asp-for="Qualifications" class="form-label fw-bold text-muted small text-uppercase">Qualifications</label>
+                            <textarea asp-for="Qualifications" class="form-control bg-light-subtle" rows="2" placeholder="Degrees, Certifications..."></textarea>
+                        </div>
+                        <div class="mt-4">
+                            <label asp-for="Bio" class="form-label fw-bold text-muted small text-uppercase">Bio / Profile Summary</label>
+                            <textarea asp-for="Bio" class="form-control bg-light-subtle" rows="3" placeholder="Short description..."></textarea>
+                        </div>
+                        <div class="d-flex justify-content-end gap-3 align-items-center mt-5">
+                            <a asp-action="Index" class="btn btn-light rounded-pill px-4 fw-bold text-muted">Cancel</a>
+                            <button type="submit" class="btn btn-primary rounded-pill px-5 py-2 fw-bold shadow-sm hover-lift transition-all">
+                                <i class="bi bi-person-plus me-2"></i> Register Doctor
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

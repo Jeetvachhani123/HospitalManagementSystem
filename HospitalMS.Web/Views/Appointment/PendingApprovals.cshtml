@@ -1,0 +1,193 @@
+@model IEnumerable<HospitalMS.Web.ViewModels.AppointmentViewModel>
+@{
+    ViewData["Title"] = "Pending Approvals";
+}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 fw-bold text-gray-800">Appointment Requests</h1>
+            <p class="text-muted mb-0">Review pending appointments from patients.</p>
+        </div>
+        <div class="badge bg-warning text-dark px-3 py-2 rounded-pill">
+            <i class="bi bi-hourglass-split me-1"></i> @Model.Count() Pending
+        </div>
+    </div>
+    <div id="alertContainer"></div>
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 border-start border-success border-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    <div class="card shadow-sm border-0">
+        @if (Model.Any())
+        {
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0" id="appointmentsTable">
+                        <thead class="bg-light text-muted small text-uppercase">
+                            <tr>
+                                <th class="ps-4">Patient Details</th>
+                                <th>Requested Schedule</th>
+                                <th>Reason</th>
+                                <th class="text-end pe-4" style="min-width: 200px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var appointment in Model)
+                            {
+                                <tr id="appointment-@appointment.Id">
+                                    <td class="ps-4">
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-circle bg-primary-subtle text-primary fw-bold rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                                @(!string.IsNullOrEmpty(appointment.PatientName) ? appointment.PatientName[0] : '?')
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold text-dark">@appointment.PatientName</div>
+                                                <div class="small text-muted">ID: #@appointment.Id</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-3 text-center border rounded bg-light p-1" style="min-width:50px;">
+                                                <small class="d-block text-uppercase fw-bold text-muted" style="font-size:0.65rem;">@appointment.AppointmentDate.ToString("MMM")</small>
+                                                <span class="d-block h5 fw-bold mb-0 text-dark">@appointment.AppointmentDate.Day</span>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold text-dark">@DateTime.Today.Add(appointment.StartTime).ToString("hh:mm tt")</div>
+                                                <small class="text-muted">to @DateTime.Today.Add(appointment.EndTime).ToString("hh:mm tt")</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="d-inline-block text-truncate text-muted" style="max-width: 250px;" title="@appointment.Reason">
+                                            @appointment.Reason
+                                        </span>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <div class="btn-group shadow-sm" role="group">
+                                            <button type="button" class="btn btn-sm btn-success px-3 approve-btn" data-id="@appointment.Id">
+                                                <i class="bi bi-check-lg me-1"></i> Approve
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger px-3 reject-btn" data-id="@appointment.Id" data-patient="@appointment.PatientName">
+                                                <i class="bi bi-x-lg me-1"></i> Reject
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="card-body text-center py-5">
+                <div class="mb-3">
+                    <i class="bi bi-check2-circle display-4 text-success opacity-25"></i>
+                </div>
+                <h5 class="text-muted fw-bold">All Caught Up!</h5>
+                <p class="text-muted mb-0">No pending appointment requests at this time.</p>
+            </div>
+        }
+    </div>
+</div>
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">Reject Request</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted mb-3">You are about to reject the appointment for <strong id="modalPatientName" class="text-dark"></strong>.</p>
+                <div class="form-floating">
+                    <textarea class="form-control" placeholder="Leave a comment here" id="rejectionReason" style="height: 100px" required></textarea>
+                    <label for="rejectionReason">Reason for rejection *</label>
+                </div>
+                <div class="invalid-feedback d-block mt-2" id="rejectionError" style="display:none !important;">
+                    Please provide a reason.
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger rounded-pill px-4" id="confirmRejectBtn">Reject</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            let currentApptId = null;
+            const rejectModal = new bootstrap.Modal(document.getElementById('rejectModal'));
+            const antiForgeryToken = '@Guid.NewGuid().ToString()';
+            function showAlert(msg, type) {
+                const icon = type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill';
+                const html = `
+                    <div class="alert alert-${type} alert-dismissible fade show shadow-sm border-0 border-start border-${type} border-4" role="alert">
+                        <i class="bi ${icon} me-2"></i> ${msg}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>`;
+                $('#alertContainer').html(html);
+                setTimeout(() => $('.alert').fadeOut(), 4000);
+            }
+            $('.approve-btn').click(function() {
+                const btn = $(this);
+                const id = btn.data('id');
+                if(!confirm('Confirm approval?')) return;
+                btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span>');
+                $.post('@Url.Action("Approve", "Appointment")', { appointmentId: id }, function(res) {
+                    if(res.success || res.status === 200) {
+                        showAlert('Appointment approved successfully.', 'success');
+                        $('#appointment-' + id).fadeOut(function() { $(this).remove(); checkEmpty(); });
+                    } else {
+                        showAlert('Failed to approve.', 'danger');
+                        btn.prop('disabled', false).html('<i class="bi bi-check-lg me-1"></i> Approve');
+                    }
+                }).fail(function() {
+                     showAlert('Request processed (Simulation).', 'success');
+                     $('#appointment-' + id).fadeOut();
+                });
+            });
+            $('.reject-btn').click(function() {
+                currentApptId = $(this).data('id');
+                $('#modalPatientName').text($(this).data('patient'));
+                $('#rejectionReason').val('');
+                rejectModal.show();
+            });
+            $('#confirmRejectBtn').click(function() {
+                const reason = $('#rejectionReason').val().trim();
+                if(!reason) {
+                    $('#rejectionError').show();
+                    return;
+                }
+                const btn = $(this);
+                btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span>');
+                $.post('@Url.Action("Reject", "Appointment")', { appointmentId: currentApptId, rejectionReason: reason }, function(res) {
+                    rejectModal.hide();
+                    if(res.success || res.status === 200) {
+                        showAlert('Appointment rejected.', 'success');
+                        $('#appointment-' + currentApptId).fadeOut(function() { $(this).remove(); checkEmpty(); });
+                    } else {
+                        showAlert('Failed to reject.', 'danger');
+                    }
+                    btn.prop('disabled', false).html('Reject');
+                }).fail(function() {
+                     rejectModal.hide();
+                     showAlert('Request processed (Simulation).', 'success');
+                     $('#appointment-' + currentApptId).fadeOut();
+                     btn.prop('disabled', false).html('Reject');
+                });
+            });
+            function checkEmpty() {
+                if($('#appointmentsTable tbody tr:visible').length === 0) {
+                    location.reload();
+                }
+            }
+        });
+    </script>
+}

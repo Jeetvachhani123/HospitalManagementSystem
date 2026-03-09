@@ -1,0 +1,150 @@
+@model HospitalMS.Web.ViewModels.DoctorDashboardViewModel
+@{
+    ViewData["Title"] = "Doctor Dashboard";
+}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 fw-bold text-gray-800">Welcome, Dr. @Model.Doctor.FullName</h1>
+            <p class="text-muted mb-0">Here's your schedule and activity overview for today.</p>
+        </div>
+        <div>
+            <a asp-controller="Appointment" asp-action="Index" class="btn btn-outline-primary me-2">
+                <i class="bi bi-calendar-week me-1"></i> Full Schedule
+            </a>
+            <a asp-controller="Doctor" asp-action="ManageWorkingHours" class="btn btn-outline-secondary">
+                <i class="bi bi-gear me-1"></i> Availability
+            </a>
+        </div>
+    </div>
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-primary text-white h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-white-50 small text-uppercase fw-bold">Appointments Today</div>
+                            <div class="display-6 fw-bold">@Model.TodayAppointmentsCount</div>
+                        </div>
+                        <i class="bi bi-calendar-day fs-1 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-warning text-dark h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-dark-50 small text-uppercase fw-bold">Pending Requests</div>
+                            <div class="display-6 fw-bold">@Model.PendingApprovalsCount</div>
+                        </div>
+                        <i class="bi bi-bell fs-1 opacity-50"></i>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a asp-controller="Appointment" asp-action="PendingApprovals" class="text-dark small stretched-link fw-bold text-decoration-none">Review Requests &rarr;</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-success text-white h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-white-50 small text-uppercase fw-bold">Total Patients Treated</div>
+                            <div class="display-6 fw-bold">@Model.TotalPatientsTreated</div>
+                        </div>
+                        <i class="bi bi-people fs-1 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 fw-bold text-primary">Today's Schedule</h6>
+                    <span class="badge bg-light text-primary border border-primary-subtle">@DateTime.Now.ToString("dd MMM yyyy")</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light text-muted small text-uppercase">
+                                <tr>
+                                    <th class="ps-4">Time</th>
+                                    <th>Patient</th>
+                                    <th>Status</th>
+                                    <th class="text-end pe-4">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.UpcomingAppointments != null && Model.UpcomingAppointments.Any())
+                                {
+                                    foreach (var appt in Model.UpcomingAppointments)
+                                    {
+                                        <tr>
+                                            <td class="ps-4 fw-bold text-dark">
+                                                @DateTime.Today.Add(appt.StartTime).ToString("hh:mm") <small class="text-muted">@DateTime.Today.Add(appt.StartTime).ToString("tt")</small>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-circle bg-light text-primary rounded-circle me-2 fw-bold d-flex align-items-center justify-content-center" style="width:32px;height:32px;">
+                                                        @(!string.IsNullOrEmpty(appt.PatientName) ? appt.PatientName[0] : '?')
+                                                    </div>
+                                                    <div>@appt.PatientName</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-@(appt.Status == "Confirmed" ? "success" : "info") bg-opacity-10 text-@(appt.Status == "Confirmed" ? "success" : "info") border border-@(appt.Status == "Confirmed" ? "success" : "info")-subtle rounded-pill">
+                                                    @appt.Status
+                                                </span>
+                                            </td>
+                                            <td class="text-end pe-4">
+                                                <a asp-controller="Appointment" asp-action="Details" asp-route-id="@appt.Id" class="btn btn-sm btn-outline-primary">View</a>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="4" class="text-center py-5 text-muted">
+                                            <i class="bi bi-calendar-check display-4 opacity-25"></i>
+                                            <p class="mt-2">No appointments scheduled for today.</p>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white py-3 border-bottom">
+                    <h6 class="m-0 fw-bold text-secondary">Quick Actions</h6>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a asp-controller="Appointment" asp-action="PendingApprovals" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
+                        <div>
+                            <i class="bi bi-check-circle me-2 text-warning"></i> Approve Requests
+                        </div>
+                        @if (Model.PendingApprovalsCount > 0)
+                        {
+                            <span class="badge bg-danger rounded-pill">@Model.PendingApprovalsCount</span>
+                        }
+                    </a>
+                    <a asp-controller="Doctor" asp-action="ManageWorkingHours" class="list-group-item list-group-item-action py-3">
+                        <i class="bi bi-clock me-2 text-primary"></i> Update My Hours
+                    </a>
+                    <a asp-controller="Appointment" asp-action="History" class="list-group-item list-group-item-action py-3">
+                        <i class="bi bi-archive me-2 text-secondary"></i> View Past Records
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

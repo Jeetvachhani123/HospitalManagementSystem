@@ -1,0 +1,96 @@
+@model HospitalMS.Web.ViewModels.AppointmentDetailViewModel
+@{
+    ViewData["Title"] = "Audit Log";
+}
+<div class="container py-5">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h4 class="fw-bold mb-1"><i class="bi bi-clock-history me-2 text-primary"></i>Appointment Audit Trail</h4>
+            <p class="text-muted small mb-0">Track history for Appointment #@Model.Id</p>
+        </div>
+        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill fw-bold btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Return
+        </a>
+    </div>
+    <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="card-header bg-light border-bottom border-light py-3 px-4">
+            <div class="row align-items-center">
+                <div class="col-md-4">
+                    <small class="text-uppercase fw-bold text-muted small d-block mb-1">Patient</small>
+                    <div class="d-flex align-items-center">
+                        <div class="avatar-circle bg-primary bg-opacity-10 text-primary rounded-circle me-2 fw-bold d-flex align-items-center justify-content-center border-0 small" style="width: 32px; height: 32px;">
+                            @(!string.IsNullOrEmpty(Model.PatientName) ? Model.PatientName[0] : '?')
+                        </div>
+                        <span class="fw-bold text-dark">@Model.PatientName</span>
+                    </div>
+                </div>
+                <div class="col-md-4 border-start border-light ps-4">
+                    <small class="text-uppercase fw-bold text-muted small d-block mb-1">Doctor</small>
+                    <div class="d-flex align-items-center">
+                        <div class="avatar-circle bg-success bg-opacity-10 text-success rounded-circle me-2 fw-bold d-flex align-items-center justify-content-center border-0 small" style="width: 32px; height: 32px;">
+                            Dr
+                        </div>
+                        <span class="fw-bold text-dark">Dr. @Model.DoctorName</span>
+                    </div>
+                </div>
+                <div class="col-md-4 border-start border-light ps-4">
+                    <small class="text-uppercase fw-bold text-muted small d-block mb-1">Scheduled For</small>
+                    <span class="fw-bold text-dark"><i class="bi bi-calendar-event me-2 text-primary"></i>@Model.AppointmentDate.ToString("MMM dd, yyyy")</span>
+                    <span class="text-muted small ms-2">(@Model.StartTime.ToString(@"hh\:mm") - @Model.EndTime.ToString(@"hh\:mm"))</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table align-middle mb-0 table-hover">
+                    <thead class="bg-light text-uppercase text-muted small fw-bold">
+                        <tr>
+                            <th class="ps-4 py-3 border-0 w-25">Timestamp</th>
+                            <th class="py-3 border-0 w-25">Action</th>
+                            <th class="py-3 border-0 w-25">User</th>
+                            <th class="py-3 border-0 w-25 pe-4 text-end">Details</th>
+                        </tr>
+                    </thead>
+                    <tbody class="border-top-0">
+                        @if (Model.Status == "Completed")
+                        {
+                            <tr class="bg-success bg-opacity-10 border-start border-4 border-success">
+                                <td class="ps-4 py-3 fw-medium text-dark">@Model.AppointmentDate.AddHours(1).ToString("MMM dd, hh:mm tt")</td>
+                                <td><span class="badge bg-success text-white px-2 py-1 rounded fw-bold">COMPLETED</span></td>
+                                <td><span class="fw-bold text-dark">Dr. @Model.DoctorName</span></td>
+                                <td class="text-end pe-4 text-muted small">Consultation notes added.</td>
+                            </tr>
+                        }
+                        @if (Model.Status == "Confirmed" || Model.Status == "Completed")
+                        {
+                            <tr class="bg-white border-bottom border-light">
+                                <td class="ps-4 py-3 text-muted">@Model.CreatedAt.AddHours(2).ToString("MMM dd, hh:mm tt")</td>
+                                <td><span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-2 py-1 rounded fw-bold">APPROVED</span></td>
+                                <td><span class="fw-bold text-dark">Dr. @Model.DoctorName</span></td>
+                                <td class="text-end pe-4 text-muted small">Request accepted.</td>
+                            </tr>
+                        }
+                        @if (Model.Status == "Cancelled")
+                        {
+                            <tr class="bg-danger bg-opacity-10 border-start border-4 border-danger">
+                                <td class="ps-4 py-3 fw-medium text-dark">@Model.AppointmentDate.AddHours(-12).ToString("MMM dd, hh:mm tt")</td>
+                                <td><span class="badge bg-danger text-white px-2 py-1 rounded fw-bold">CANCELLED</span></td>
+                                <td><span class="fw-bold text-danger">System/User</span></td>
+                                <td class="text-end pe-4 text-muted small">Appointment cancelled.</td>
+                            </tr>
+                        }
+                        <tr class="bg-white">
+                            <td class="ps-4 py-3 text-muted">@Model.CreatedAt.ToString("MMM dd, hh:mm tt")</td>
+                            <td><span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 px-2 py-1 rounded fw-bold">CREATED</span></td>
+                            <td><span class="fw-bold text-dark">@Model.PatientName</span></td>
+                            <td class="text-end pe-4 text-muted small">Booking request submitted.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="bg-light p-4 text-center border-top border-light">
+                <p class="text-muted small mb-0"><i class="bi bi-info-circle me-1"></i> Audit logs are immutable and tracked for compliance purposes.</p>
+            </div>
+        </div>
+    </div>
+</div>

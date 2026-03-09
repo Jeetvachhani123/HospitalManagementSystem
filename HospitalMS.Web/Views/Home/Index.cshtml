@@ -1,0 +1,176 @@
+@{
+    ViewData["Title"] = "Modern Healthcare";
+    bool isAuthenticated = User.Identity?.IsAuthenticated == true;
+}
+<div class="position-relative overflow-hidden bg-white">
+    <div class="row min-vh-75 align-items-center">
+        <div class="col-lg-6 ps-lg-5 py-5 z-2 position-relative">
+            <div class="ps-lg-5 pe-4">
+                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-10 rounded-pill px-3 py-2 mb-4 fw-bold">
+                    <i class="bi bi-stars me-2"></i>Next-Gen Hospital Management
+                </span>
+                <h1 class="display-3 fw-bold text-dark lh-tight mb-4">
+                    Healthcare Reimagined for <span class="text-primary position-relative d-inline-block">
+                        everyone.
+                        <svg class="position-absolute w-100 h-100 start-0 top-0 text-primary opacity-25 z-n1" viewBox="0 0 200 9" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"><path d="M2.00025 6.99997C2.00025 6.99997 96.6853 -2.35564 198.003 2.00001" stroke="currentColor" stroke-width="3"></path></svg>
+                    </span>
+                </h1>
+                <p class="lead text-muted mb-5 pe-lg-5">
+                    Experience seamless patient care, efficient scheduling, and secure medical records. Connecting doctors and patients with technology that cares.
+                </p>
+                <div class="d-flex flex-column flex-sm-row gap-3">
+                    @if (!isAuthenticated)
+                    {
+                        <a asp-controller="Account" asp-action="Register" class="btn btn-primary btn-lg rounded-pill px-5 py-3 fw-bold shadow-lg hover-lift transition-all">
+                            Get Started Free <i class="bi bi-arrow-right ms-2"></i>
+                        </a>
+                        <a asp-controller="Account" asp-action="Login" class="btn btn-outline-secondary btn-lg rounded-pill px-5 py-3 fw-bold border-2 hover-shadow transition-all">
+                            Sign In
+                        </a>
+                    }
+                    else
+                    {
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-primary btn-lg rounded-pill px-5 py-3 fw-bold shadow-lg hover-lift transition-all">
+                                <i class="bi bi-grid-fill me-2"></i>Go to Dashboard
+                            </a>
+                        }
+                        else if (User.IsInRole("Doctor"))
+                        {
+                            <a asp-controller="Doctor" asp-action="Dashboard" class="btn btn-primary btn-lg rounded-pill px-5 py-3 fw-bold shadow-lg hover-lift transition-all">
+                                <i class="bi bi-calendar-check-fill me-2"></i>My Practice
+                            </a>
+                        }
+                        else
+                        {
+                            <a asp-controller="Patient" asp-action="Dashboard" class="btn btn-primary btn-lg rounded-pill px-5 py-3 fw-bold shadow-lg hover-lift transition-all">
+                                <i class="bi bi-person-fill me-2"></i>My Health Portal
+                            </a>
+                        }
+                    }
+                </div>
+                <div class="mt-5 d-flex align-items-center text-muted small">
+                    <div class="d-flex me-3">
+                        <div class="avatar-group-item rounded-circle border border-2 border-white bg-secondary" style="width: 32px; height: 32px; margin-right: -8px; z-index: 3;"></div>
+                        <div class="avatar-group-item rounded-circle border border-2 border-white bg-primary" style="width: 32px; height: 32px; margin-right: -8px; z-index: 2;"></div>
+                        <div class="avatar-group-item rounded-circle border border-2 border-white bg-success" style="width: 32px; height: 32px; z-index: 1;"></div>
+                    </div>
+                    <span>Trusted by <span class="fw-bold text-dark">500+</span> healthcare professionals</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 position-relative min-vh-50 h-100 bg-light d-none d-lg-block" style="border-bottom-left-radius: 5rem;">
+            <div class="position-absolute top-0 end-0 w-100 h-100 bg-primary opacity-10" style="background-image: radial-gradient(#444cf7 0.5px, transparent 0.5px); background-size: 24px 24px;"></div>
+            <div class="position-absolute top-50 start-50 translate-middle text-center w-75">
+                <div class="card shadow-lg border-0 rounded-4 overflow-hidden mb-4 animate-float">
+                    <div class="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <div class="spinner-grow spinner-grow-sm text-success me-2" role="status"></div>
+                            <span class="fw-bold small text-uppercase text-muted">Live Status</span>
+                        </div>
+                        <i class="bi bi-three-dots text-muted"></i>
+                    </div>
+                    <div class="card-body p-4 text-start">
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="bg-primary bg-opacity-10 p-3 rounded-circle me-3">
+                                <i class="bi bi-calendar-check text-primary fs-4"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-0">Upcoming Appointment</h6>
+                                <small class="text-muted">Dr. Sarah Jenkins - Cardiology</small>
+                            </div>
+                            <span class="ms-auto badge bg-primary rounded-pill">Today</span>
+                        </div>
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar bg-primary w-75" role="progressbar"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="py-5 bg-white">
+    <div class="container py-5">
+        <div class="text-center mb-5 mw-md mx-auto" style="max-width: 700px;">
+            <span class="text-primary fw-bold text-uppercase small letter-spacing-2">Why Choose Us</span>
+            <h2 class="display-6 fw-bold mt-2">Comprehensive Features for modern needs</h2>
+            <p class="text-muted lead">Everything you need to manage your specialized medical practice or personal health journey.</p>
+        </div>
+        <div class="row g-4 row-cols-1 row-cols-md-3">
+            <div class="col">
+                <div class="card h-100 border-0 shadow-sm rounded-4 p-4 hover-lift transition-all">
+                    <div class="card-body">
+                        <div class="mb-4 bg-primary bg-opacity-10 text-primary rounded-3 d-inline-flex p-3">
+                            <i class="bi bi-calendar-range fs-3"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">Smart Scheduling</h4>
+                        <p class="text-muted mb-0">Book appointments instantly, manage availability, and reduce no-shows with automated reminders and calendar integration.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100 border-0 shadow-sm rounded-4 p-4 hover-lift transition-all">
+                    <div class="card-body">
+                        <div class="mb-4 bg-success bg-opacity-10 text-success rounded-3 d-inline-flex p-3">
+                            <i class="bi bi-file-earmark-medical fs-3"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">Digital Records</h4>
+                        <p class="text-muted mb-0">Access complete medical histories, lab results, and prescriptions securely from anywhere. Paperless and efficient.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100 border-0 shadow-sm rounded-4 p-4 hover-lift transition-all">
+                    <div class="card-body">
+                        <div class="mb-4 bg-info bg-opacity-10 text-info rounded-3 d-inline-flex p-3">
+                            <i class="bi bi-credit-card-2-front fs-3"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">Seamless Billing</h4>
+                        <p class="text-muted mb-0">Transparent invoicing and secure payment processing. Track expenses and revenue with detailed financial reports.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="bg-primary bg-gradient text-white py-5">
+    <div class="container py-5 text-center">
+        <h2 class="display-5 fw-bold mb-3">Ready to transform your healthcare experience?</h2>
+        <p class="lead text-white-50 mb-4 mx-auto" style="max-width: 600px;">Join thousands of doctors and patients already using our platform for better outcomes.</p>
+        @if (!isAuthenticated)
+        {
+            <a asp-controller="Account" asp-action="Register" class="btn btn-light btn-lg rounded-pill px-5 fw-bold shadow-lg text-primary hover-lift">Get Started Now</a>
+        }
+    </div>
+</div>
+<style>
+    .hover-lift:hover {
+        transform: translateY(-5px);
+    }
+
+    .transition-all {
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    .animate-float {
+        animation: float 6s ease-in-out infinite;
+    }
+
+    @@keyframes float {
+        0% {
+            transform: translateY(0px);
+        }
+        50% {
+            transform: translateY(-20px);
+        }
+        100% {
+            transform: translateY(0px);
+        }
+    }
+
+    .letter-spacing-2 {
+        letter-spacing: 2px;
+    }
+</style>

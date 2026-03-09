@@ -1,0 +1,159 @@
+@model HospitalMS.Web.ViewModels.DoctorViewModel
+@{
+    ViewData["Title"] = "Doctor Profile";
+}
+<div class="container py-5">
+    <div class="mb-4 d-flex justify-content-between align-items-center">
+        <a asp-action="Index" class="btn btn-link text-decoration-none text-muted ps-0">
+            <i class="bi bi-arrow-left me-2"></i>Back to Directory
+        </a>
+        @if (User.IsInRole("Admin"))
+        {
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <i class="bi bi-gear-fill me-1"></i> Admin Actions
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                    <li><a class="dropdown-item" asp-action="Edit" asp-route-id="@Model.Id"><i class="bi bi-pencil me-2 text-warning"></i>Edit Profile</a></li>
+                    <li><a class="dropdown-item" asp-action="ManageWorkingHours" asp-route-id="@Model.Id"><i class="bi bi-clock me-2 text-info"></i>Manage Schedule</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <button class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                            <i class="bi bi-trash me-2"></i>Delete Doctor
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        }
+    </div>
+    <div class="row g-4 justify-content-center">
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden text-center h-100 position-relative">
+                <div class="card-header bg-gradient-primary text-white border-0 py-5" style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);">
+                    <div class="avatar-circle mx-auto bg-white text-primary fw-bold shadow-sm d-flex align-items-center justify-content-center rounded-circle border border-4 border-white mb-3" style="width: 120px; height: 120px; font-size: 3rem;">
+                        @Model.FullName.Substring(0, 1)
+                    </div>
+                    <h3 class="fw-bold mb-0">Dr. @Model.FullName</h3>
+                    <p class="text-white-50 mb-0">@Model.Specialization</p>
+                </div>
+                <div class="card-body p-4 bg-white relative">
+                    <span class="badge rounded-pill position-absolute top-0 start-50 translate-middle shadow-sm @(Model.IsAvailable ? "bg-success" : "bg-danger")">
+                        @(Model.IsAvailable ? "Available Now" : "Unavailable")
+                    </span>
+                    <div class="d-flex justify-content-center gap-3 mb-4 mt-3">
+                        <div class="text-center px-3">
+                            <h5 class="fw-bold text-dark mb-0">@Model.YearsOfExperience</h5>
+                            <small class="text-muted text-uppercase" style="font-size: 0.7rem;">Years Exp.</small>
+                        </div>
+                        <div class="vr opacity-25"></div>
+                        <div class="text-center px-3">
+                            <span class="h5 mb-0 text-dark">₹@Model.ConsultationFee</span>
+                            <small class="text-muted text-uppercase" style="font-size: 0.7rem;">Fee</small>
+                        </div>
+                    </div>
+                    <ul class="list-group list-group-flush text-start small mt-4">
+                        <li class="list-group-item px-0 py-3 border-bottom border-light">
+                            <i class="bi bi-person-badge me-3 text-primary fs-5"></i>
+                            <span class="text-muted">License:</span>
+                            <span class="fw-bold text-dark float-end">@Model.LicenseNumber</span>
+                        </li>
+                        <li class="list-group-item px-0 py-3 border-bottom border-light">
+                            <i class="bi bi-envelope me-3 text-primary fs-5"></i>
+                            <span class="text-muted">Email:</span>
+                            <a href="mailto:@Model.Email" class="fw-bold text-primary text-decoration-none float-end text-truncate" style="max-width: 160px;">@Model.Email</a>
+                        </li>
+                        <li class="list-group-item px-0 py-3 border-light">
+                            <i class="bi bi-telephone me-3 text-primary fs-5"></i>
+                            <span class="text-muted">Phone:</span>
+                            <span class="fw-bold text-dark float-end">@Model.PhoneNumber</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4 rounded-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold text-dark mb-3"><i class="bi bi-person-lines-fill me-2 text-primary"></i>Biography</h5>
+                    @if (!string.IsNullOrEmpty(Model.Bio))
+                    {
+                        <p class="text-muted lh-lg mb-0">@Model.Bio</p>
+                    }
+                    else
+                    {
+                        <p class="text-muted fst-italic mb-0">No biography provided.</p>
+                    }
+                </div>
+            </div>
+            <div class="card border-0 shadow-sm mb-4 rounded-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold text-dark mb-3"><i class="bi bi-mortarboard me-2 text-warning"></i>Qualifications</h5>
+                    @if (!string.IsNullOrEmpty(Model.Qualifications))
+                    {
+                        <p class="text-muted lh-lg mb-0">@Model.Qualifications</p>
+                    }
+                    else
+                    {
+                        <p class="text-muted fst-italic mb-0">No qualifications listed.</p>
+                    }
+                </div>
+            </div>
+            <div class="card border-0 bg-primary bg-opacity-10 shadow-none rounded-4 p-4 text-center text-lg-start">
+                <div class="d-lg-flex align-items-center justify-content-between">
+                    <div class="mb-3 mb-lg-0">
+                        <h4 class="fw-bold text-primary mb-1">Book an Appointment</h4>
+                        <p class="text-muted mb-0 small">Schedule a consultation directly with Dr. @Model.FullName.</p>
+                    </div>
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        if (User.IsInRole("Patient"))
+                        {
+                            if (Model.IsAvailable)
+                            {
+                                <a asp-controller="Appointment" asp-action="Request" asp-route-doctorId="@Model.Id" class="btn btn-primary px-5 py-2 fw-bold rounded-pill shadow-sm">
+                                    Book Now <i class="bi bi-chevron-right ms-1"></i>
+                                </a>
+                            }
+                            else
+                            {
+                                <button class="btn btn-secondary px-5 py-2 fw-bold rounded-pill shadow-sm" disabled>
+                                    Unavailable <i class="bi bi-slash-circle ms-1"></i>
+                                </button>
+                            }
+                        }
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Context.Request.Path" class="btn btn-outline-primary px-5 py-2 fw-bold rounded-pill">
+                            Login to Book
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@if (User.IsInRole("Admin"))
+{
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-danger text-white border-0">
+                    <h5 class="modal-title"><i class="bi bi-exclamation-triangle-fill me-2"></i>Delete Doctor Profile</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4 text-center">
+                    <p class="mb-0 text-muted">Are you strictly sure you want to delete <strong>Dr. @Model.FullName</strong>?</p>
+                    <p class="small text-danger fw-bold mt-2">This action is permanent and cannot be undone.</p>
+                </div>
+                <div class="modal-footer border-0 bg-light justify-content-center pb-4">
+                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Cancel</button>
+                    <form asp-action="Delete" method="post">
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <button type="submit" class="btn btn-danger px-4 fw-bold">Delete Permanently</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}

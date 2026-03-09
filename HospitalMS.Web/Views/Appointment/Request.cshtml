@@ -1,0 +1,171 @@
+@model HospitalMS.Web.ViewModels.AppointmentRequestViewModel
+@{
+    ViewData["Title"] = "Request Appointment";
+}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="text-center mb-5">
+                <h1 class="display-5 fw-bold text-primary">Book Your Appointment</h1>
+                <p class="lead text-muted">Complete the simple steps below to schedule your visit</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="mb-3">
+                                <div class="avatar-circle bg-primary text-white d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 80px; height: 80px; font-size: 2rem;">
+                                    @(!string.IsNullOrEmpty(Model.DoctorName) ? Model.DoctorName[0] : '?')
+                                </div>
+                            </div>
+                            <h4 class="mb-1">Dr. @Model.DoctorName</h4>
+                            <p class="text-primary fw-bold mb-2">@Model.Specialization</p>
+                            <hr class="w-100 my-3" />
+                            <div class="d-flex justify-content-between align-items-center mb-0 w-100 px-3">
+                                <span class="text-muted">Consultation Fee</span>
+                                <span class="h5 mb-0 text-dark">₹@Model.ConsultationFee</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white py-3 border-bottom-0">
+                            <h5 class="mb-0 fw-bold">Appointment Details</h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <form asp-action="Request" method="post" id="appointmentForm">
+                                <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3"></div>
+                                <input type="hidden" asp-for="DoctorId" />
+                                <input type="hidden" asp-for="DoctorName" />
+                                <input type="hidden" asp-for="Specialization" />
+                                <input type="hidden" asp-for="ConsultationFee" />
+                                <input type="hidden" asp-for="StartTime" id="startTimeHidden" />
+                                <input type="hidden" asp-for="EndTime" id="endTimeHidden" />
+                                <div class="mb-4">
+                                    <label asp-for="AppointmentDate" class="form-label text-muted small text-uppercase fw-bold">1. Select Date</label>
+                                    <div class="input-group input-group-lg">
+                                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-calendar-event"></i></span>
+                                        <input asp-for="AppointmentDate" class="form-control border-start-0 ps-0" type="date" id="appointmentDate" min="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                                    </div>
+                                    <span asp-validation-for="AppointmentDate" class="text-danger small"></span>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label text-muted small text-uppercase fw-bold">2. Select Time Slot</label>
+                                    <div id="loadingSlots" class="text-center py-4 bg-light rounded-3" style="display:none;">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        <p class="text-muted mt-2 small mb-0">Finding available slots...</p>
+                                    </div>
+                                    <div id="slotsContainer" style="display:none;">
+                                        <div id="slotsList" class="row g-2"></div>
+                                        <div class="form-text mt-2"><i class="bi bi-info-circle me-1"></i> Green slots are available. Select one to proceed.</div>
+                                    </div>
+                                    <div id="initialStateMessage" class="text-center py-4 bg-light rounded-3">
+                                        <p class="text-muted mb-0 small">Please select a date above to view available times.</p>
+                                    </div>
+                                    <div id="noSlotsMessage" class="alert alert-warning d-flex align-items-center" role="alert" style="display:none;">
+                                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                        <div>No available slots for this date. Please try another day.</div>
+                                    </div>
+                                    <span asp-validation-for="StartTime" class="text-danger small d-block mt-1"></span>
+                                </div>
+                                <div class="mb-4">
+                                    <label asp-for="Reason" class="form-label text-muted small text-uppercase fw-bold">3. Reason for Visit</label>
+                                    <textarea asp-for="Reason" class="form-control" rows="3" placeholder="Briefly describe your symptoms or reason for consultation..."></textarea>
+                                    <span asp-validation-for="Reason" class="text-danger small"></span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mt-5 pt-3 border-top">
+                                    <a asp-controller="Doctor" asp-action="Index" class="btn btn-link text-muted text-decoration-none px-0">
+                                        Cancel
+                                    </a>
+                                    <button type="submit" class="btn btn-primary px-5 py-2" id="submitBtn" disabled>
+                                        Confirm Booking
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function() {
+            let selectedSlot = null;
+            if ($('#appointmentDate').val()) {
+                $('#appointmentDate').trigger('change');
+            }
+            $('#appointmentDate').on('change', function() {
+                const date = $(this).val();
+                const doctorId = $('#DoctorId').val();
+                if (!date) {
+                    $('#initialStateMessage').show();
+                    $('#slotsContainer').hide();
+                    return;
+                }
+                $('#initialStateMessage').hide();
+                $('#loadingSlots').show();
+                $('#slotsContainer').hide();
+                $('#noSlotsMessage').hide();
+                $('#submitBtn').prop('disabled', true);
+                selectedSlot = null;
+                $.ajax({
+                    url: '@Url.Action("GetAvailableSlots", "Appointment")',
+                    type: 'GET',
+                    data: { doctorId: doctorId, date: date },
+                    success: function(response) {
+                        $('#loadingSlots').hide();
+                        if (response.success && response.slots && response.slots.length > 0) {
+                            displaySlots(response.slots);
+                            $('#slotsContainer').fadeIn();
+                        } else {
+                            if (response.message) {
+                                $('#noSlotsMessage').text(response.message);
+                            }
+                            $('#noSlotsMessage').fadeIn();
+                        }
+                    },
+                    error: function() {
+                        $('#loadingSlots').hide();
+                        alert('Could not retrieve time slots. Please try again.');
+                    }
+                });
+            });
+            function displaySlots(slots) {
+                const container = $('#slotsList');
+                container.empty();
+                slots.forEach(function(slot) {
+                    const isAvailable = slot.available === true;
+                    const btnClass = isAvailable ? 'btn-outline-success' : 'btn-light text-muted border-0';
+                    const disabledAttr = isAvailable ? '' : 'disabled';
+                    const col = `<div class="col-4 col-sm-3 col-md-4 col-lg-3">
+                            <button type="button"
+                                    class="btn ${btnClass} w-100 py-2 slot-btn"
+                                    data-start="${slot.start}"
+                                    data-end="${slot.end}"
+                                    ${disabledAttr}>
+                                ${slot.display || slot.start}
+                            </button>
+                        </div`;
+                    container.append(col);
+                });
+                $('.slot-btn').on('click', function() {
+                    $('.slot-btn').removeClass('active bg-success text-white').addClass('btn-outline-success');
+                    $(this).removeClass('btn-outline-success').addClass('active bg-success text-white');
+                    selectedSlot = {
+                        start: $(this).data('start'),
+                        end: $(this).data('end')
+                    };
+                    $('#startTimeHidden').val(selectedSlot.start);
+                    $('#endTimeHidden').val(selectedSlot.end);
+                    $('#submitBtn').prop('disabled', false);
+                });
+            }
+        });
+    </script>
+}

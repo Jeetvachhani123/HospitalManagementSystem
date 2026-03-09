@@ -1,0 +1,109 @@
+@model HospitalMS.Web.ViewModels.WorkingHoursViewModel
+@{
+    ViewData["Title"] = "Manage Working Hours";
+}
+<div class="container py-5">
+    <div class="row mb-5 justify-content-center">
+        <div class="col-lg-10 text-center text-lg-start">
+            <h2 class="display-6 fw-bold text-gray-800">Clinic Schedule</h2>
+            <p class="text-muted lead mb-0">Set weekly availability for patient appointments.</p>
+        </div>
+    </div>
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success border-0 shadow-sm alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2 text-success"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header bg-primary bg-opacity-10 py-3 border-bottom-0">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <div class="avatar-circle bg-white text-primary rounded-circle me-3 fw-bold d-flex align-items-center justify-content-center border" style="width: 40px; height: 40px; font-size: 1.1rem;">
+                                <i class="bi bi-calendar-range"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold text-primary mb-0">Weekly Hours</h5>
+                                <small class="text-muted">Dr. @Model.DoctorName</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <form asp-action="ManageWorkingHours" method="post">
+                        <input type="hidden" asp-for="DoctorId" />
+                        <input type="hidden" asp-for="DoctorName" />
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="bg-light text-uppercase text-muted small fw-bold">
+                                    <tr>
+                                        <th class="ps-4 py-3" style="width: 20%;">Weekday</th>
+                                        <th class="py-3 text-center" style="width: 15%;">Active</th>
+                                        <th class="py-3" style="width: 30%;">Start Time</th>
+                                        <th class="py-3 pe-4" style="width: 30%;">End Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (int i = 0; i < Model.WorkingDays.Count; i++)
+                                    {
+                                        <tr class="@(Model.WorkingDays[i].IsWorkingDay ? "bg-white" : "bg-light opacity-50") transition-colors" id="row-@i">
+                                            <td class="ps-4 fw-bold text-dark">
+                                                @Model.WorkingDays[i].DayName
+                                                <input type="hidden" asp-for="WorkingDays[i].Id" />
+                                                <input type="hidden" asp-for="WorkingDays[i].DayOfWeek" />
+                                                <input type="hidden" asp-for="WorkingDays[i].DayName" />
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="form-check form-switch d-flex justify-content-center">
+                                                    <input class="form-check-input working-day-toggle shadow-none" type="checkbox" asp-for="WorkingDays[i].IsWorkingDay" data-row-index="@i" style="transform: scale(1.2);">
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="input-group input-group-sm">
+                                                    <span class="input-group-text bg-transparent border-end-0 text-muted"><i class="bi bi-clock"></i></span>
+                                                    <input type="time" class="form-control border-start-0 time-input rounded-end" asp-for="WorkingDays[i].StartTime" disabled="@(!Model.WorkingDays[i].IsWorkingDay)" />
+                                                </div>
+                                            </td>
+                                            <td class="pe-4">
+                                                <div class="input-group input-group-sm">
+                                                    <span class="input-group-text bg-transparent border-end-0 text-muted"><i class="bi bi-clock-history"></i></span>
+                                                    <input type="time" class="form-control border-start-0 time-input rounded-end" asp-for="WorkingDays[i].EndTime" disabled="@(!Model.WorkingDays[i].IsWorkingDay)" />
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="card-footer bg-white border-top-0 py-4 pe-4 text-end">
+                            <a asp-controller="Doctor" asp-action="Dashboard" class="btn btn-light rounded-pill px-4 fw-bold text-muted me-2">Cancel</a>
+                            <button type="submit" class="btn btn-primary rounded-pill px-5 fw-bold shadow-sm hover-lift transition-all">
+                                <i class="bi bi-check2-circle me-2"></i> Update Schedule
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('.working-day-toggle').change(function() {
+                var index = $(this).data('row-index');
+                var isChecked = $(this).is(':checked');
+                var row = $('#row-' + index);
+                row.find('.time-input').prop('disabled', !isChecked);
+                if (isChecked) {
+                    row.removeClass('bg-light opacity-50').addClass('bg-white');
+                } else {
+                    row.removeClass('bg-white').addClass('bg-light opacity-50');
+                }
+            });
+        });
+    </script>
+}

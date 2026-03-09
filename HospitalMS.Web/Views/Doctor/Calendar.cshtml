@@ -1,0 +1,163 @@
+@using System.Globalization
+@model HospitalMS.Web.ViewModels.CalendarViewModel
+@{
+    ViewData["Title"] = "Appointment Calendar";
+}
+<div class="container-fluid py-4 min-vh-100 bg-light">
+    <div class="row align-items-center mb-4">
+        <div class="col-md-6">
+            <h2 class="h4 fw-bold text-gray-800"><i class="bi bi-calendar-event me-2 text-primary"></i>Appointment Calendar</h2>
+            <p class="text-muted small mb-0">View and manage your weekly and monthly schedule.</p>
+        </div>
+        <div class="col-md-6 text-end">
+            <div class="btn-group shadow-sm" role="group">
+                <a href="@Url.Action("Calendar", new { month = Model.CurrentMonth - 1, year = Model.CurrentYear })" class="btn btn-white border"><i class="bi bi-chevron-left"></i></a>
+                <span class="btn btn-white border px-4 fw-bold text-dark">
+                    @CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(Model.CurrentMonth) @Model.CurrentYear
+                </span>
+                <a href="@Url.Action("Calendar", new { month = Model.CurrentMonth + 1, year = Model.CurrentYear })" class="btn btn-white border"><i class="bi bi-chevron-right"></i></a>
+            </div>
+            <a href="@Url.Action("Calendar")" class="btn btn-primary shadow-sm ms-2 fw-bold"><i class="bi bi-calendar-day me-1"></i> Today</a>
+        </div>
+    </div>
+    <div class="row g-4 h-100">
+        <div class="col-lg-9 h-100">
+            <div class="card border-0 shadow-sm h-100 rounded-4 overflow-hidden">
+                <div class="card-body p-0">
+                    <div class="table-responsive h-100">
+                        <table class="table table-bordered mb-0 h-100 w-100" style="table-layout: fixed;">
+                            <thead class="bg-light text-center text-uppercase text-muted small fw-bold">
+                                <tr>
+                                    <th class="py-3 border-bottom w-14">Sun</th>
+                                    <th class="py-3 border-bottom w-14">Mon</th>
+                                    <th class="py-3 border-bottom w-14">Tue</th>
+                                    <th class="py-3 border-bottom w-14">Wed</th>
+                                    <th class="py-3 border-bottom w-14">Thu</th>
+                                    <th class="py-3 border-bottom w-14">Fri</th>
+                                    <th class="py-3 border-bottom w-14">Sat</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    int dayIndex = 0;
+                                    var rowHeight = "min-height: 120px; height: 140px;";
+                                }
+                                @while (dayIndex < Model.Days.Count)
+                                {
+                                    <tr>
+                                        @for (int i = 0; i < 7; i++)
+                                        {
+                                            if (dayIndex < Model.Days.Count)
+                                            {
+                                                var day = Model.Days[dayIndex];
+                                                <td class="p-2 border align-top position-relative transition-all @(day.IsCurrentMonth ? "bg-white" : "bg-light opacity-50") @(day.HasAppointments ? "bg-primary bg-opacity-10" : "") hover-shadow" style="@rowHeight cursor: pointer;" onclick="location.href='@Url.Action("Index", "Appointment", new { date = new DateTime(Model.CurrentYear, Model.CurrentMonth, day.Day).ToString("yyyy-MM-dd") })'">
+                                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                                        <span class="fw-bold fs-6 @(day.IsCurrentMonth ? "text-dark" : "text-muted")">@day.Day</span>
+                                                        @if (day.HasAppointments)
+                                                        {
+                                                            <span class="badge bg-primary rounded-pill small">@day.AppointmentCount</span>
+                                                        }
+                                                    </div>
+                                                    <div class="d-flex flex-column gap-1 overflow-hidden" style="max-height: 90px;">
+                                                        @foreach (var apt in day.Appointments.Take(3))
+                                                        {
+                                                            <div class="d-flex align-items-center bg-white border rounded px-2 py-1 small shadow-sm text-truncate" title="@apt.PatientName - @apt.Reason">
+                                                                <div class="rounded-circle bg-@(apt.Status == "Confirmed" ? "success" : "warning") me-2" style="width: 6px; height: 6px;"></div>
+                                                                <span class="fw-bold me-1">@apt.StartTime.ToString(@"hh\:mm")</span>
+                                                                <span class="text-muted text-truncate w-100">@apt.PatientName</span>
+                                                            </div>
+                                                        }
+                                                        @if (day.Appointments.Count > 3)
+                                                        {
+                                                            <div class="text-center small text-primary fw-bold mt-1">
+                                                                +@(day.Appointments.Count - 3) more
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                </td>
+                                                dayIndex++;
+                                            }
+                                        }
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 mb-4 bg-primary text-white overflow-hidden position-relative">
+                <div class="card-body p-4 position-relative z-1">
+                    <h5 class="fw-bold mb-1">Dr. @Model.DoctorName</h5>
+                    <p class="mb-3 text-white-50">Monthly Overview</p>
+                    <h2 class="display-4 fw-bold mb-0">@Model.TotalAppointments</h2>
+                    <small class="text-white-50">Total Appointments</small>
+                </div>
+                <i class="bi bi-calendar-check position-absolute bottom-0 end-0 opacity-25" style="font-size: 8rem; margin-bottom: -1rem; margin-right: -1rem;"></i>
+            </div>
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100" style="max-height: 600px;">
+                <div class="card-header bg-white py-3 border-bottom">
+                    <h6 class="fw-bold mb-0 text-uppercase small text-muted"><i class="bi bi-list-task me-2 text-primary"></i>Upcoming Schedule</h6>
+                </div>
+                <div class="card-body p-0 overflow-auto">
+                    @if (Model.UpcomingAppointments.Any())
+                    {
+                        <div class="list-group list-group-flush">
+                            @foreach (var apt in Model.UpcomingAppointments)
+                            {
+                                <div class="list-group-item border-0 border-bottom px-4 py-3 hover-bg-light transition-colors">
+                                    <div class="d-flex justify-content-between align-items-start mb-1">
+                                        <h6 class="fw-bold text-dark mb-0">@apt.PatientName</h6>
+                                        <small class="text-muted fw-bold">@apt.StartTime.ToString(@"hh\:mm")</small>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-1">
+                                        <i class="bi bi-calendar me-2 text-muted small"></i>
+                                        <small class="text-muted">@apt.AppointmentDate.ToString("ddd, MMM dd")</small>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mt-2">
+                                        <span class="badge rounded-pill bg-light text-dark border px-2">@apt.Status</span>
+                                        <a href="@Url.Action("Details", "Appointment", new { id = apt.Id })" class="btn btn-link btn-sm p-0 text-decoration-none small fw-bold">View</a>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5 px-4">
+                            <i class="bi bi-calendar-x text-muted opacity-50 display-4 mb-3 d-block"></i>
+                            <p class="text-muted small mb-0">No upcoming appointments scheduled.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    .w-14 {
+        width: 14.28%;
+    }
+
+    .hover-shadow:hover {
+        box-shadow: inset 0 0 0 2px var(--bs-primary);
+        z-index: 10;
+    }
+
+    .hover-bg-light:hover {
+        background-color: var(--bs-light);
+    }
+
+    .transition-colors {
+        transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .calendar-event {
+        pointer-events: none;
+    }
+</style>
+@section Scripts {
+    <script>
+    </script>
+}

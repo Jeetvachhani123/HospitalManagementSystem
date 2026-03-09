@@ -1,0 +1,98 @@
+﻿@model HospitalMS.Web.ViewModels.InvoiceViewModel
+@{
+    ViewData["Title"] = "Invoice Details";
+    var statusClass = Model.IsPaid ? "bg-success" : (Model.DueDate < DateTime.Today ? "bg-danger" : "bg-warning");
+    var statusText = Model.IsPaid ? "Paid" : (Model.DueDate < DateTime.Today ? "Overdue" : "Pending");
+}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header bg-dark text-white p-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 class="h4 mb-0 fw-bold">Invoice Details</h2>
+                        <small class="text-white-50">Invoice #@Model.Id</small>
+                    </div>
+                    <span class="badge @statusClass p-2 rounded-pill text-uppercase px-3" style="font-size: 0.75rem; letter-spacing: 1px;">
+                        @statusText
+                    </span>
+                </div>
+                <div class="card-body p-5 bg-white">
+                    <div class="row mb-5">
+                        <div class="col-sm-6 mb-4 mb-sm-0">
+                            <h5 class="fw-bold text-uppercase text-muted small mb-3">Billed To:</h5>
+                            <h4 class="fw-bold text-dark mb-1">@Model.PatientName</h4>
+                        </div>
+                        <div class="col-sm-6 text-sm-end">
+                            <h5 class="fw-bold text-uppercase text-muted small mb-3">Service Provider:</h5>
+                            <h4 class="fw-bold text-dark mb-1">@Model.DoctorName</h4>
+                            <p class="text-muted small mb-0">Hospital Management System</p>
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-sm-6">
+                            <div class="mb-3">
+                                <label class="text-uppercase text-muted small fw-bold d-block">Issue Date</label>
+                                <span class="fw-bold text-dark">@Model.IssueDate.ToString("MMM dd, yyyy")</span>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 text-sm-end">
+                            <div class="mb-3">
+                                <label class="text-uppercase text-muted small fw-bold d-block">Due Date</label>
+                                <span class="fw-bold text-dark">@Model.DueDate.ToString("MMM dd, yyyy")</span>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="my-4 opacity-10">
+                    <div class="d-flex justify-content-between align-items-center mb-5">
+                        <h4 class="fw-bold text-uppercase text-muted mb-0">Total Amount</h4>
+                        <h1 class="display-4 fw-bold text-primary mb-0">$@Model.Amount.ToString("N2")</h1>
+                    </div>
+                    @if (!Model.IsPaid && User.IsInRole("Patient"))
+                    {
+                        <div class="d-grid gap-2">
+                            <a asp-action="Pay" asp-route-id="@Model.Id" class="btn btn-success btn-lg py-3 rounded-pill shadow fw-bold text-uppercase hover-lift">
+                                <i class="bi bi-credit-card-fill me-2"></i> Pay Now
+                            </a>
+                        </div>
+                    }
+                    else if (Model.IsPaid)
+                    {
+                        <div class="alert alert-success d-flex align-items-center rounded-3 border-0 shadow-sm" role="alert">
+                            <i class="bi bi-check-circle-fill fs-4 me-3"></i>
+                            <div>
+                                <h6 class="fw-bold mb-0">Payment Received</h6>
+                                <small>Thank you! This invoice has been fully paid.</small>
+                            </div>
+                        </div>
+                    }
+                    else if (!Model.IsPaid && User.IsInRole("Admin"))
+                    {
+                        <div class="alert alert-warning d-flex align-items-center rounded-3 border-0 shadow-sm" role="alert">
+                            <i class="bi bi-hourglass-split fs-4 me-3"></i>
+                            <div>
+                                <h6 class="fw-bold mb-0">Payment Pending</h6>
+                                <small>Waiting for patient to settle the invoice.</small>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="card-footer bg-light p-4 text-center border-top-0">
+                    <a asp-action="Index" class="btn btn-link text-decoration-none text-muted fw-bold">
+                        <i class="bi bi-arrow-left me-1"></i> Back to Invoices
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    .hover-lift {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .hover-lift:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+        }
+</style>

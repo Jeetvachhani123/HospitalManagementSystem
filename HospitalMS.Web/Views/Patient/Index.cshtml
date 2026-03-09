@@ -1,0 +1,202 @@
+@model HospitalMS.Web.ViewModels.PatientListViewModel
+@{
+    ViewData["Title"] = "Patient Directory";
+}
+<div class="container-fluid px-4 py-4 min-vh-100 bg-light">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3">
+        <div>
+            <h2 class="h3 fw-bold text-gray-800 mb-0">Patient Registry</h2>
+            <p class="text-muted small mb-0">Search and manage patient health records.</p>
+        </div>
+        @if (User.IsInRole("Admin"))
+        {
+            <a asp-action="Create" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold hover-lift transition-all">
+                <i class="bi bi-person-plus me-2"></i>New Patient
+            </a>
+        }
+    </div>
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success border-0 shadow-sm alert-dismissible fade show mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2 text-success"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+        <div class="card-body p-4 bg-white">
+            <form method="get" asp-action="Index" class="row g-3 align-items-center">
+                <div class="col-md-10">
+                    <div class="input-group input-group-lg border rounded-pill overflow-hidden">
+                        <span class="input-group-text bg-white border-0 ps-4"><i class="bi bi-search text-muted"></i></span>
+                        <input type="text" name="searchQuery" value="@Model.SearchQuery" class="form-control border-0 shadow-none" placeholder="Search by name, partial email, or MRN..." />
+                        @if (!string.IsNullOrWhiteSpace(Model.SearchQuery))
+                        {
+                            <a asp-action="Index" class="btn btn-white border-0 text-muted pe-4" title="Clear Search"><i class="bi bi-x-circle-fill"></i></a>
+                        }
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-dark w-100 btn-lg rounded-pill fw-bold">Search</button>
+                </div>
+            </form>
+            @if (!string.IsNullOrWhiteSpace(Model.SearchQuery))
+            {
+                <div class="mt-3 ps-2">
+                    <small class="text-muted">Showing results for <span class="fw-bold text-dark">"@Model.SearchQuery"</span> (@Model.TotalCount found)</small>
+                </div>
+            }
+        </div>
+    </div>
+    @if (Model.Patients.Any())
+    {
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" style="min-width: 800px;">
+                    <thead class="bg-light text-uppercase text-muted small fw-bold border-bottom-0">
+                        <tr>
+                            <th class="ps-4 py-3 border-0">Patient Name</th>
+                            <th class="py-3 border-0">Contact</th>
+                            <th class="py-3 border-0">Demographics</th>
+                            <th class="py-3 border-0">Medical Status</th>
+                            <th class="py-3 border-0 text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="border-top-0">
+                        @foreach (var patient in Model.Patients)
+                        {
+                            <tr class="hover-bg-light transition-colors">
+                                <td class="ps-4 py-3 position-relative">
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-circle bg-primary bg-opacity-10 text-primary rounded-circle me-3 fw-bold d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                            @patient.FullName.Substring(0, 1)
+                                        </div>
+                                        <div>
+                                            <a asp-controller="Patient" asp-action="Details" asp-route-id="@patient.Id" class="text-dark fw-bold text-decoration-none stretched-link">@patient.FullName</a>
+                                            <small class="d-block text-muted" style="font-size: 0.75rem;">ID: #@patient.Id</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex flex-column small">
+                                        <span class="text-dark mb-1"><i class="bi bi-envelope me-2 text-muted"></i>@patient.Email</span>
+                                        <span class="text-muted"><i class="bi bi-telephone me-2 text-muted"></i>@patient.PhoneNumber</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <span class="badge bg-light text-dark border fw-normal">@patient.Age yrs</span>
+                                        <span class="badge bg-light text-dark border fw-normal">@patient.Gender</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge @(string.IsNullOrEmpty(patient.BloodGroup) ? "bg-light text-muted border" : "bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25") fw-medium px-2 py-1">
+                                        <i class="bi bi-droplet-fill me-1"></i> @(string.IsNullOrEmpty(patient.BloodGroup) ? "Unknown" : patient.BloodGroup)
+                                    </span>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <div class="dropdown">
+                                        <button class="btn btn-light btn-sm rounded-circle shadow-sm" type="button" data-bs-toggle="dropdown" data-bs-boundary="viewport">
+                                            <i class="bi bi-three-dots-vertical text-muted"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg">
+                                            <li><a class="dropdown-item fw-medium" asp-controller="Patient" asp-action="Details" asp-route-id="@patient.Id"><i class="bi bi-person-lines-fill me-2 text-primary"></i>View Details</a></li>
+                                            @if (User.IsInRole("Admin") || User.IsInRole("Doctor"))
+                                            {
+                                                <li><a class="dropdown-item fw-medium" asp-controller="MedicalRecord" asp-action="Index" asp-route-patientId="@patient.Id"><i class="bi bi-file-medical me-2 text-info"></i>Health Records</a></li>
+                                            }
+                                            @if (User.IsInRole("Admin"))
+                                            {
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li><a class="dropdown-item fw-medium" asp-action="Edit" asp-route-id="@patient.Id"><i class="bi bi-pencil me-2 text-warning"></i>Edit Profile</a></li>
+                                                <li>
+                                                    <button class="dropdown-item fw-medium text-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-patient-id="@patient.Id" data-patient-name="@patient.FullName">
+                                                        <i class="bi bi-trash me-2"></i>Delete
+                                                    </button>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            @if (Model.TotalPages > 1)
+            {
+                <div class="card-footer bg-white border-top-0 py-4 d-flex justify-content-center">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination pagination-sm mb-0 gap-1">
+                            <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+                                <a class="page-link border-0 rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 32px; height: 32px;" asp-action="Index" asp-route-page="@(Model.CurrentPage - 1)" asp-route-searchQuery="@Model.SearchQuery"><i class="bi bi-chevron-left"></i></a>
+                            </li>
+                            @for (int i = 1; i <= Model.TotalPages; i++)
+                            {
+                                <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                                    <a class="page-link border-0 rounded-circle d-flex align-items-center justify-content-center shadow-sm mx-1 @(i == Model.CurrentPage ? "bg-primary text-white" : "bg-white text-dark")" style="width: 32px; height: 32px;" asp-action="Index" asp-route-page="@i" asp-route-searchQuery="@Model.SearchQuery">@i</a>
+                                </li>
+                            }
+                            <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+                                <a class="page-link border-0 rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 32px; height: 32px;" asp-action="Index" asp-route-page="@(Model.CurrentPage + 1)" asp-route-searchQuery="@Model.SearchQuery"><i class="bi bi-chevron-right"></i></a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <div class="bg-white rounded-circle shadow-sm d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                <i class="bi bi-people text-muted opacity-50 display-6"></i>
+            </div>
+            <h5 class="fw-bold text-dark">No Patients Found</h5>
+            <p class="text-muted small">Try adjusting your search criteria or add a new patient.</p>
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-action="Create" class="btn btn-outline-primary rounded-pill px-4 mt-2">Add New Patient</a>
+            }
+        </div>
+    }
+</div>
+@if (User.IsInRole("Admin"))
+{
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-danger text-white border-0">
+                    <h5 class="modal-title"><i class="bi bi-exclamation-octagon-fill me-2"></i>Delete Confirmation</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <p class="mb-0 text-muted">You are about to delete the record for: <strong class="text-dark" id="patientNameToDelete"></strong></p>
+                    <p class="small text-danger fw-bold mt-2">This will remove all demographic and medical data permanently!</p>
+                </div>
+                <div class="modal-footer border-0 bg-light">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                    <form asp-action="Delete" method="post" id="deleteForm">
+                        <input type="hidden" name="id" id="patientIdToDelete" />
+                        <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm">Delete Record</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var deleteModal = document.getElementById('deleteModal');
+            if (deleteModal) {
+                deleteModal.addEventListener('show.bs.modal', function (event) {
+                    var button = event.relatedTarget;
+                    var patientId = button.getAttribute('data-patient-id');
+                    var patientName = button.getAttribute('data-patient-name');
+                    document.getElementById('patientIdToDelete').value = patientId;
+                    document.getElementById('patientNameToDelete').textContent = patientName;
+                });
+            }
+        });
+    </script>
+}

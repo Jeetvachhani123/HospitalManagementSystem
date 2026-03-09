@@ -1,0 +1,88 @@
+@model HospitalMS.Web.ViewModels.AppointmentDetailViewModel
+@{
+    ViewData["Title"] = "Appointment Status";
+}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="fw-bold text-gray-800"><i class="bi bi-diagram-3-fill me-2 text-primary"></i>Status Timeline</h4>
+                <a asp-controller="Appointment" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 btn-sm fw-bold">
+                    <i class="bi bi-arrow-left me-1"></i>Back
+                </a>
+            </div>
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden position-relative">
+                <div class="card-header bg-white border-bottom-0 py-4">
+                    <div class="d-flex align-items-center">
+                        <div class="avatar-circle bg-primary bg-opacity-10 text-primary rounded-circle me-3 fw-bold d-flex align-items-center justify-content-center border" style="width: 48px; height: 48px; font-size: 1.25rem;">
+                            <i class="bi bi-calendar-range"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold text-primary mb-0">Appointment #@Model.Id</h5>
+                            <small class="text-muted">Dr. @Model.DoctorName & @Model.PatientName</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-5 pt-0 position-relative">
+                    <div class="timeline position-relative ps-4 border-start border-2 border-light ms-3">
+                        <div class="timeline-item mb-5 position-relative">
+                            <span class="timeline-marker position-absolute top-0 start-0 translate-middle bg-primary border border-4 border-white rounded-circle shadow-sm" style="width: 16px; height: 16px; margin-left: -1px;"></span>
+                            <div class="ps-4">
+                                <h6 class="fw-bold text-dark mb-1">Appointment Requested</h6>
+                                <p class="text-muted small mb-0">You initiated a booking request.</p>
+                                <span class="badge bg-light text-muted border px-2 py-1 small mt-2">@Model.CreatedAt.ToString("MMM dd, hh:mm tt")</span>
+                            </div>
+                        </div>
+                        <div class="timeline-item mb-5 position-relative">
+                            @if (Model.Status == "Pending")
+                            {
+                                <span class="timeline-marker position-absolute top-0 start-0 translate-middle bg-warning border border-4 border-white rounded-circle shadow-sm" style="width: 16px; height: 16px; margin-left: -1px;"></span>
+                                <div class="ps-4">
+                                    <h6 class="fw-bold text-dark mb-1">Awaiting Approvals</h6>
+                                    <p class="text-muted small mb-0">Doctor is reviewing your request.</p>
+                                    <div class="spinner-border spinner-border-sm text-warning mt-2" role="status"></div>
+                                </div>
+                            }
+                            else if (Model.Status == "Cancelled")
+                            {
+                                <span class="timeline-marker position-absolute top-0 start-0 translate-middle bg-danger border border-4 border-white rounded-circle shadow-sm" style="width: 16px; height: 16px; margin-left: -1px;"></span>
+                                <div class="ps-4">
+                                    <h6 class="fw-bold text-danger mb-1">Cancelled</h6>
+                                    <p class="text-muted small mb-0">Appointment was cancelled.</p>
+                                </div>
+                            }
+                            else
+                            {
+                                <span class="timeline-marker position-absolute top-0 start-0 translate-middle bg-success border border-4 border-white rounded-circle shadow-sm" style="width: 16px; height: 16px; margin-left: -1px;"></span>
+                                <div class="ps-4">
+                                    <h6 class="fw-bold text-dark mb-1">Confirmed</h6>
+                                    <p class="text-muted small mb-0">Request approved by Dr. @Model.DoctorName.</p>
+                                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-1 small mt-2">Active</span>
+                                </div>
+                            }
+                        </div>
+                        <div class="timeline-item position-relative">
+                            @if (Model.Status == "Completed")
+                            {
+                                <span class="timeline-marker position-absolute top-0 start-0 translate-middle bg-primary border border-4 border-white rounded-circle shadow-sm" style="width: 16px; height: 16px; margin-left: -1px;"></span>
+                                <div class="ps-4">
+                                    <h6 class="fw-bold text-dark mb-1">Visit Completed</h6>
+                                    <p class="text-muted small mb-0">Consultation finished. Records updated.</p>
+                                    <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-link btn-sm px-0 fw-bold text-decoration-none">View Medical Report <i class="bi bi-arrow-right"></i></a>
+                                </div>
+                            }
+                            else
+                            {
+                                <span class="timeline-marker position-absolute top-0 start-0 translate-middle bg-light border border-4 border-white rounded-circle shadow-sm" style="width: 16px; height: 16px; margin-left: -1px;"></span>
+                                <div class="ps-4 opacity-50">
+                                    <h6 class="fw-bold text-dark mb-1">Completion</h6>
+                                    <p class="text-muted small mb-0">Pending consultation.</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

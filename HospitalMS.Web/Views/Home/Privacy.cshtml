@@ -1,0 +1,44 @@
+@{
+    ViewData["Title"] = "Privacy Policy";
+}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 text-center mb-5">
+            <h1 class="display-5 fw-bold text-gray-800">Privacy & Data Security</h1>
+            <p class="lead text-muted">Your trust is our priority. We are committed to protecting your personal health information.</p>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card border-0 shadow-sm rounded-4 p-5">
+                <div class="mb-4">
+                    <h4 class="fw-bold mb-3"><i class="bi bi-shield-lock me-2 text-primary"></i>Data Protection</h4>
+                    <p class="text-muted">
+                        We employ industry-standard encryption protocols (SSL/TLS) to secure all data transmitted between your device and our servers.
+                        Your medical records, personal details, and payment information are stored in compliant, encrypted databases.
+                    </p>
+                </div>
+                <div class="mb-4">
+                    <h4 class="fw-bold mb-3"><i class="bi bi-person-check me-2 text-success"></i>Patient Confidentiality</h4>
+                    <p class="text-muted">
+                        We strictly adhere to HIPAA and GDPR regulations. Your medical history is accessible only to authorized healthcare providers directly involved in your care.
+                        We do not sell or share your personal data with third-party advertisers.
+                    </p>
+                </div>
+                <div class="mb-4">
+                    <h4 class="fw-bold mb-3"><i class="bi bi-cookie me-2 text-warning"></i>Cookie Usage</h4>
+                    <p class="text-muted">
+                        We use essential cookies to maintain your session security and improve site performance.
+                        You can manage your cookie preferences through your browser settings at any time.
+                    </p>
+                </div>
+                <div class="bg-light p-4 rounded-3 text-center mt-5">
+                    <p class="mb-0 text-muted small">
+                        Last updated: <span class="fw-bold text-dark">@DateTime.Now.ToString("MMMM dd, yyyy")</span><br>
+                        For questions regarding this policy, please contact our Data Protection Officer at <a href="mailto:privacy@hospitalms.com" class="text-primary fw-bold">privacy@hospitalms.com</a>.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

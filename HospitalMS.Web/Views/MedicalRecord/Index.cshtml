@@ -1,0 +1,176 @@
+@model IEnumerable<HospitalMS.Web.ViewModels.MedicalRecordDisplayViewModel>
+@{
+    ViewData["Title"] = "Patient History";
+    int patientId = ViewBag.PatientId as int? ?? 0;
+    string patientName = ViewBag.PatientName as string ?? "Unknown";
+    bool canEdit = (User.IsInRole("Doctor") || User.IsInRole("Admin")) && patientId > 0;
+}
+<div class="container-fluid py-4 min-vh-100 bg-light">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-5 gap-3">
+        <div>
+            <h2 class="h3 fw-bold text-gray-800 mb-0">Medical History</h2>
+            @if (patientId > 0)
+            {
+                <p class="text-muted small mb-0">Clinical records for <a asp-controller="Patient" asp-action="Details" asp-route-id="@patientId" class="text-decoration-none fw-bold text-primary">@patientName</a></p>
+            }
+            else
+            {
+                <p class="text-muted small mb-0">Please select a patient to view their records.</p>
+            }
+        </div>
+        @if (canEdit)
+        {
+            <a asp-action="Create" asp-route-patientId="@patientId" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm hover-lift transition-all">
+                <i class="bi bi-file-earmark-plus me-2"></i>Add Record
+            </a>
+        }
+    </div>
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success border-0 shadow-sm alert-dismissible fade show mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2 text-success"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <div class="bg-white rounded-circle shadow-sm d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                <i class="bi bi-journal-medical text-muted opacity-50 display-4"></i>
+            </div>
+            @if (patientId > 0)
+            {
+                <h4 class="text-muted fw-normal">No Records Found</h4>
+                <p class="text-muted small">Start documenting patient history by adding a new record.</p>
+            }
+            else
+            {
+                <h4 class="fw-bold mb-3">Select Patient</h4>
+                <p class="text-muted mb-4">Choose a patient from the list below to view and manage their medical records.</p>
+                <form method="get" asp-action="Index" class="d-grid gap-3 mx-auto" style="max-width: 400px;">
+                    <div class="form-floating text-start">
+                        <select name="patientId" class="form-select border-0 bg-light fw-bold shadow-sm" id="patientSelect" required>
+                            <option value="" selected disabled>Select a patient...</option>
+                            @if (ViewBag.Patients != null)
+                            {
+                                foreach (var p in (List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)ViewBag.Patients)
+                                {
+                                    <option value="@p.Value">@p.Text</option>
+                                }
+                            }
+                        </select>
+                        <label for="patientSelect">Patient Name</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold shadow-sm hover-lift transition-all">
+                        View Medical History
+                    </button>
+                </form>
+                <div class="mt-4 pt-3 border-top">
+                    <small class="text-muted">Or find via directory</small>
+                    <div class="mt-2">
+                        <a asp-controller="Patient" asp-action="Index" class="btn btn-outline-secondary rounded-pill btn-sm px-3">Go to Patient Directory</a>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+                <div class="timeline position-relative ps-4 ps-md-5 border-start border-2 border-light ms-3 ms-md-5">
+                    @foreach (var record in Model.OrderByDescending(r => r.RecordDate))
+                    {
+                        var typeInfo = record.RecordType switch
+                        {
+                            "Surgery" => new { Color = "danger", Icon = "bi-bandaid-fill" },
+                            "Prescription" => new { Color = "success", Icon = "bi-capsule-pill" },
+                            "Lab Result" => new { Color = "info", Icon = "bi-clipboard-data-fill" },
+                            "Consultation" => new { Color = "primary", Icon = "bi-person-lines-fill" },
+                            _ => new { Color = "secondary", Icon = "bi-file-earmark-medical-fill" }
+                        };
+                        <div class="timeline-item mb-5 position-relative">
+                            <div class="position-absolute top-0 start-0 translate-middle rounded-circle bg-white border border-4 border-white shadow-sm d-flex align-items-center justify-content-center text-@typeInfo.Color"
+                                 style="width: 48px; height: 48px; margin-left: -2px; z-index: 2;">
+                                <i class="bi @typeInfo.Icon fs-5"></i>
+                            </div>
+                            <div class="card border-0 shadow-sm rounded-4 overflow-hidden hover-shadow transition-all bg-white ms-4">
+                                <div class="card-header bg-@typeInfo.Color bg-opacity-10 border-bottom-0 py-3 px-4 d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <small class="text-uppercase fw-bold text-@typeInfo.Color opacity-75 d-block mb-1" style="font-size: 0.7rem;">@record.RecordType</small>
+                                        <h6 class="fw-bold text-dark mb-0">@record.RecordDate.ToString("MMMM dd, yyyy")</h6>
+                                    </div>
+                                    @if (canEdit)
+                                    {
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-link text-muted p-0" type="button" data-bs-toggle="dropdown">
+                                                <i class="bi bi-three-dots"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg small">
+                                                <li>
+                                                    <form asp-action="Delete" asp-route-id="@record.Id" asp-route-patientId="@patientId" method="post" onsubmit="return confirm('Strictly delete this record?');">
+                                                        <button type="submit" class="dropdown-item text-danger fw-medium">
+                                                            <i class="bi bi-trash me-2"></i>Delete Entry
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="card-body p-4">
+                                    @if (!string.IsNullOrEmpty(record.Diagnosis))
+                                    {
+                                        <div class="mb-4">
+                                            <h6 class="fw-bold text-dark small text-uppercase mb-2"><i class="bi bi-stethoscope me-2 text-muted"></i>Diagnosis</h6>
+                                            <p class="text-muted mb-0 lh-base">@record.Diagnosis</p>
+                                        </div>
+                                    }
+                                    @if (!string.IsNullOrEmpty(record.Prescription))
+                                    {
+                                        <div class="bg-success bg-opacity-10 p-3 rounded-3 border border-success border-opacity-25 mb-4 position-relative">
+                                            <i class="bi bi-prescription2 position-absolute top-0 end-0 m-2 text-success opacity-25 fs-4"></i>
+                                            <h6 class="fw-bold text-success small text-uppercase mb-2">Prescription</h6>
+                                            <p class="text-dark mb-0 fst-italic small">@record.Prescription</p>
+                                        </div>
+                                    }
+                                    @if (!string.IsNullOrEmpty(record.Notes))
+                                    {
+                                        <div class="mb-3">
+                                            <h6 class="fw-bold text-dark small text-uppercase mb-2"><i class="bi bi-sticky me-2 text-muted"></i>Notes</h6>
+                                            <p class="text-muted small mb-0 bg-light p-3 rounded-3">@record.Notes</p>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="card-footer bg-white border-top border-light py-3 px-4 d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-circle bg-light text-secondary rounded-circle d-flex align-items-center justify-content-center me-2 small fw-bold" style="width: 24px; height: 24px;">
+                                            Dr
+                                        </div>
+                                        <span class="text-muted small fw-medium">Dr. @record.DoctorName</span>
+                                    </div>
+                                    @if (!string.IsNullOrEmpty(record.AttachmentPath))
+                                    {
+                                        <a href="@record.AttachmentPath" target="_blank" class="btn btn-outline-secondary btn-sm rounded-pill px-3 fw-bold small">
+                                            <i class="bi bi-paperclip me-1"></i> Attachment
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+<style>
+    .hover-shadow:hover {
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+        transform: translateY(-2px);
+    }
+
+    .transition-all {
+        transition: all 0.2s ease-in-out;
+    }
+</style>

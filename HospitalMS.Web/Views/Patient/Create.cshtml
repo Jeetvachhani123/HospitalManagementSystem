@@ -1,0 +1,123 @@
+@model HospitalMS.Web.ViewModels.PatientRegistrationViewModel
+@{
+    ViewData["Title"] = "Create New Patient";
+}
+<div class="container py-5">
+    <div class="row mb-5 justify-content-center">
+        <div class="col-lg-8 text-center text-lg-start">
+            <h2 class="display-6 fw-bold text-gray-800">New Patient Registration</h2>
+            <p class="text-muted lead mb-0">Create a new patient record.</p>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header bg-primary bg-opacity-10 py-3 border-bottom-0">
+                    <div class="d-flex align-items-center">
+                        <div class="avatar-circle bg-white text-primary rounded-circle me-3 fw-bold d-flex align-items-center justify-content-center border" style="width: 48px; height: 48px; font-size: 1.25rem;">
+                            <i class="bi bi-person-plus"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold text-primary mb-0">Patient Profile</h5>
+                            <small class="text-muted">Enter core patient details.</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-4 bg-white">
+                    <form asp-action="Create" method="post">
+                        @if (ViewData.ModelState.ErrorCount > 0)
+                        {
+                            <div class="alert alert-danger border-0 shadow-sm mb-4">
+                                <ul class="mb-0 ps-3">
+                                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                                    {
+                                        <li>@error.ErrorMessage</li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="FirstName" class="form-label fw-bold text-muted small text-uppercase">First Name *</label>
+                                <input asp-for="FirstName" class="form-control bg-light-subtle" placeholder="Jane" />
+                                <span asp-validation-for="FirstName" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="LastName" class="form-label fw-bold text-muted small text-uppercase">Last Name *</label>
+                                <input asp-for="LastName" class="form-control bg-light-subtle" placeholder="Doe" />
+                                <span asp-validation-for="LastName" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="DateOfBirth" class="form-label fw-bold text-muted small text-uppercase">Date of Birth *</label>
+                                <input asp-for="DateOfBirth" type="date" class="form-control bg-light-subtle" />
+                                <span asp-validation-for="DateOfBirth" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Gender" class="form-label fw-bold text-muted small text-uppercase">Gender</label>
+                                <select asp-for="Gender" class="form-select bg-light-subtle">
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                                <span asp-validation-for="Gender" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                        </div>
+                        <hr class="my-4 opacity-25" />
+                        <h6 class="fw-bold text-dark mb-4"><i class="bi bi-telephone me-2 text-info"></i>Contact Information</h6>
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="Email" class="form-label fw-bold text-muted small text-uppercase">Email Address *</label>
+                                <input asp-for="Email" type="email" class="form-control bg-light-subtle" placeholder="patient@example.com" />
+                                <span asp-validation-for="Email" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="PhoneNumber" class="form-label fw-bold text-muted small text-uppercase">Phone</label>
+                                <input asp-for="PhoneNumber" class="form-control bg-light-subtle" placeholder="+1 (555) 000-0000" />
+                                <span asp-validation-for="PhoneNumber" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                        </div>
+                        <hr class="my-4 opacity-25" />
+                        <h6 class="fw-bold text-dark mb-4"><i class="bi bi-heart-pulse me-2 text-danger"></i>Health Details</h6>
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="BloodGroup" class="form-label fw-bold text-muted small text-uppercase">Blood Group</label>
+                                <select asp-for="BloodGroup" class="form-select bg-light-subtle">
+                                    <option value="">Select Group</option>
+                                    <option value="A+">A+</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B+">B+</option>
+                                    <option value="B-">B-</option>
+                                    <option value="AB+">AB+</option>
+                                    <option value="AB-">AB-</option>
+                                    <option value="O+">O+</option>
+                                    <option value="O-">O-</option>
+                                </select>
+                                <span asp-validation-for="BloodGroup" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                        </div>
+                        <div class="bg-light p-4 rounded border-0 mb-4">
+                            <h6 class="fw-bold text-dark mb-3"><i class="bi bi-shield-lock me-2 text-success"></i>Account Security</h6>
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <label asp-for="Password" class="form-label fw-bold text-muted small text-uppercase">Password *</label>
+                                    <input asp-for="Password" type="password" class="form-control bg-white" placeholder="Secure Password" />
+                                    <span asp-validation-for="Password" class="text-danger small mt-1 d-block"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end gap-3 align-items-center mt-5">
+                            <a asp-action="Index" class="btn btn-light rounded-pill px-4 fw-bold text-muted">Cancel</a>
+                            <button type="submit" class="btn btn-primary rounded-pill px-5 py-2 fw-bold shadow-sm hover-lift transition-all">
+                                <i class="bi bi-person-plus-fill me-2"></i> Register Patient
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,168 @@
+@model HospitalMS.Web.ViewModels.PatientViewModel
+@{
+    ViewData["Title"] = "Patient Medical Profile";
+}
+<div class="container py-5">
+    <div class="mb-5 d-flex justify-content-between align-items-center">
+        <a asp-action="Index" class="btn btn-link text-decoration-none text-muted ps-0">
+            <i class="bi bi-arrow-left me-2"></i>Back to Patient List
+        </a>
+        @if (User.IsInRole("Admin"))
+        {
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary btn-sm dropdown-toggle rounded-pill px-3" type="button" data-bs-toggle="dropdown">
+                    <i class="bi bi-gear-fill me-1"></i> Actions
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                    <li><a class="dropdown-item" asp-action="Edit" asp-route-id="@Model.Id"><i class="bi bi-pencil me-2 text-warning"></i>Edit Details</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <button class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                            <i class="bi bi-trash me-2"></i>Delete Record
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        }
+    </div>
+    <div class="row g-5">
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden text-center h-100 position-relative">
+                <div class="card-header bg-gradient-success text-white border-0 py-5" style="background: linear-gradient(135deg, #198754 0%, #20c997 100%);">
+                    <div class="avatar-circle mx-auto bg-white text-success fw-bold shadow-sm d-flex align-items-center justify-content-center rounded-circle border border-4 border-white mb-3" style="width: 100px; height: 100px; font-size: 2.5rem;">
+                        @Model.FullName.Substring(0, 1)
+                    </div>
+                    <h3 class="fw-bold mb-0">@Model.FullName</h3>
+                    <p class="text-white-50 mb-0">Patient ID: @Model.Id</p>
+                </div>
+                <div class="card-body p-4 bg-white relative">
+                    <div class="row g-2 justify-content-center mb-4 mt-2">
+                        <div class="col-auto">
+                            <span class="badge bg-light text-dark border px-3 py-2 rounded-pill fw-medium">
+                                <i class="bi bi-gender-ambiguous me-1 text-muted"></i> @Model.Gender
+                            </span>
+                        </div>
+                        <div class="col-auto">
+                            <span class="badge bg-light text-dark border px-3 py-2 rounded-pill fw-medium">
+                                <i class="bi bi-calendar3 me-1 text-muted"></i> @Model.Age Years
+                            </span>
+                        </div>
+                        <div class="col-auto">
+                            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-3 py-2 rounded-pill fw-medium">
+                                <i class="bi bi-droplet-fill me-1"></i> @Model.BloodGroup
+                            </span>
+                        </div>
+                    </div>
+                    <div class="text-start mt-4">
+                        <label class="text-muted text-uppercase fw-bold small mb-3 border-bottom pb-2 w-100 d-block">Contact Details</label>
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-light rounded-circle p-2 me-3"><i class="bi bi-envelope text-primary"></i></div>
+                            <div class="overflow-hidden">
+                                <small class="d-block text-muted">Email Address</small>
+                                <a href="mailto:@Model.Email" class="text-dark fw-bold text-decoration-none text-truncate d-block">@Model.Email</a>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-light rounded-circle p-2 me-3"><i class="bi bi-telephone text-primary"></i></div>
+                            <div>
+                                <small class="d-block text-muted">Phone Number</small>
+                                <span class="fw-bold text-dark">@Model.PhoneNumber</span>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-light rounded-circle p-2 me-3"><i class="bi bi-cake text-primary"></i></div>
+                            <div>
+                                <small class="d-block text-muted">Date of Birth</small>
+                                <span class="fw-bold text-dark">@Model.DateOfBirth.ToString("MMMM dd, yyyy")</span>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-light rounded-circle p-2 me-3"><i class="bi bi-person-exclamation text-danger"></i></div>
+                            <div>
+                                <small class="d-block text-muted">Emergency Contact</small>
+                                <span class="fw-bold text-dark">@(string.IsNullOrEmpty(Model.EmergencyContact) ? "Not listed" : Model.EmergencyContact)</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-grid mt-4">
+                        @if (User.IsInRole("Admin") || User.IsInRole("Doctor"))
+                        {
+                            <a asp-controller="MedicalRecord" asp-action="Index" asp-route-patientId="@Model.Id" class="btn btn-outline-primary fw-bold py-2 rounded-pill">
+                                <i class="bi bi-file-earmark-medical me-2"></i> View Medical Records
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4 rounded-4 h-100">
+                <div class="card-header bg-white py-4 border-bottom-0">
+                    <h5 class="fw-bold text-dark mb-0"><i class="bi bi-clipboard-pulse me-2 text-primary"></i>Clinical Overview</h5>
+                </div>
+                <div class="card-body px-4 pb-5 pt-0">
+                    <div class="mb-5">
+                        <label class="text-muted text-uppercase fw-bold small mb-2"><i class="bi bi-clock-history me-2"></i>Medical History</label>
+                        @if (!string.IsNullOrEmpty(Model.MedicalHistory))
+                        {
+                            <div class="p-4 bg-light bg-opacity-50 rounded-3 border-start border-4 border-primary shadow-sm">
+                                <p class="mb-0 text-dark lh-lg">@Model.MedicalHistory</p>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-4 bg-light rounded-3">
+                                <p class="text-muted mb-0 fst-italic">No significant medical history recorded.</p>
+                            </div>
+                        }
+                    </div>
+                    <div>
+                        <label class="text-muted text-uppercase fw-bold small mb-2"><i class="bi bi-exclamation-triangle me-2 text-warning"></i>Allergies & Contraindications</label>
+                        @if (!string.IsNullOrEmpty(Model.Allergies))
+                        {
+                            <div class="p-4 bg-danger bg-opacity-10 rounded-3 border border-danger border-opacity-25 shadow-sm">
+                                <div class="d-flex align-items-start">
+                                    <i class="bi bi-shield-exclamation text-danger fs-4 me-3"></i>
+                                    <div>
+                                        <h6 class="fw-bold text-danger mb-1">Warning: Known Allergies</h6>
+                                        <p class="mb-0 text-dark">@Model.Allergies</p>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="p-3 bg-success bg-opacity-10 rounded-3 border border-success border-opacity-25 d-flex align-items-center text-success">
+                                <i class="bi bi-check-circle-fill me-2"></i> No known allergies on file.
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@if (User.IsInRole("Admin"))
+{
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-danger text-white border-0">
+                    <h5 class="modal-title"><i class="bi bi-person-x-fill me-2"></i>Delete Patient Record</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4 text-center">
+                    <p class="mb-0 text-muted">Are you securely confident you want to delete <strong>@Model.FullName</strong>?</p>
+                    <p class="small text-danger fw-bold mt-2">All medical history, appointments, and contact data will be erased.</p>
+                </div>
+                <div class="modal-footer border-0 bg-light justify-content-center pb-4">
+                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Cancel</button>
+                    <form asp-action="Delete" method="post">
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <button type="submit" class="btn btn-danger px-4 fw-bold">Confirm Deletion</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
