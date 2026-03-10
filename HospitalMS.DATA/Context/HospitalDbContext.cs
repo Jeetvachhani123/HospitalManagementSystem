@@ -68,7 +68,7 @@ public class HospitalDbContext : DbContext
             {
                 case EntityState.Added:
                     entry.Entity.CreatedAt = now;
-                    entry.Entity.UpdatedAt = null;
+                    entry.Entity.UpdatedAt = now;  
                     break;
                 case EntityState.Modified:
                     entry.Entity.UpdatedAt = now;
