@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using HospitalMS.BL.DTOs.Appointment;
 using HospitalMS.BL.DTOs.Doctor;
 using HospitalMS.BL.DTOs.Patient;
@@ -91,32 +91,27 @@ public class AppointmentService : IAppointmentService
             throw new ConflictException($"The doctor already has an appointment scheduled during this time slot " + $"({appointmentDto.AppointmentDate:yyyy-MM-dd} {appointmentDto.StartTime} - {appointmentDto.EndTime})");
         }
         var appointment = new Appointment { PatientId = appointmentDto.PatientId, DoctorId = appointmentDto.DoctorId, AppointmentDate = appointmentDto.AppointmentDate, StartTime = appointmentDto.StartTime, EndTime = appointmentDto.EndTime, Reason = appointmentDto.Reason, Status = AppointmentStatus.Scheduled, ApprovalStatus = AppointmentApprovalStatus.Pending };
-        using var transaction = await _unitOfWork.BeginTransactionAsync(cancellationToken);
         try
         {
-            await _unitOfWork.Appointments.AddAsync(appointment, cancellationToken);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
-            var history = new AppointmentStatusHistory
+            await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
-                AppointmentId = appointment.Id,
-                NewStatus = appointment.Status,
-                NewApprovalStatus = appointment.ApprovalStatus,
-                ChangedBy = $"PatientId:{appointmentDto.PatientId}",
-                ChangeReason = "Appointment Created"
-            };
-            await _unitOfWork.AppointmentStatusHistories.AddAsync(history, cancellationToken);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
-            transaction.Commit();
+                await _unitOfWork.Appointments.AddAsync(appointment, cancellationToken);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+                var history = new AppointmentStatusHistory
+                {
+                    AppointmentId = appointment.Id,
+                    NewStatus = appointment.Status,
+                    NewApprovalStatus = appointment.ApprovalStatus,
+                    ChangedBy = $"PatientId:{appointmentDto.PatientId}",
+                    ChangeReason = "Appointment Created"
+                };
+                await _unitOfWork.AppointmentStatusHistories.AddAsync(history, cancellationToken);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+            }, cancellationToken);
         }
         catch (Exception ex) when (ex.GetType().Name == "DbUpdateException")
         {
-            transaction.Rollback();
             throw new ConflictException("SchedulingConflict", "The selected time slot was just booked by another user. Please choose a different time.");
-        }
-        catch
-        {
-            transaction.Rollback();
-            throw;
         }
         appointment = await _unitOfWork.Appointments.GetByIdAsync(appointment.Id, cancellationToken) ?? throw new NotFoundException("Appointment", appointment.Id);
         return MapToAppointmentResponse(appointment);

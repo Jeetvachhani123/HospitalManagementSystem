@@ -25,21 +25,21 @@ public class UserRegistrationCoordinator
             _logger.LogWarning("Registration failed: Email {Email} already exists", registerDto.Email);
             return null;
         }
-        using var transaction = await _unitOfWork.BeginTransactionAsync();
         try
         {
-            var user = new User { Email = registerDto.Email, PasswordHash = passwordHasher(registerDto.Password), FirstName = registerDto.FirstName, LastName = registerDto.LastName, PhoneNumber = registerDto.PhoneNumber, Role = UserRole.Patient, IsActive = true };
-            await _unitOfWork.Users.AddAsync(user);
-            await _unitOfWork.SaveChangesAsync();
-            await CreatePatientProfileAsync(user, registerDto);
-            await _unitOfWork.SaveChangesAsync();
-            transaction.Commit();
-            _logger.LogInformation("Successfully registered user {UserId} ({Email}) with role {Role}", user.Id, user.Email, user.Role);
-            return user;
+            return await _unitOfWork.ExecuteInTransactionAsync(async () =>
+            {
+                var user = new User { Email = registerDto.Email, PasswordHash = passwordHasher(registerDto.Password), FirstName = registerDto.FirstName, LastName = registerDto.LastName, PhoneNumber = registerDto.PhoneNumber, Role = UserRole.Patient, IsActive = true };
+                await _unitOfWork.Users.AddAsync(user);
+                await _unitOfWork.SaveChangesAsync();
+                await CreatePatientProfileAsync(user, registerDto);
+                await _unitOfWork.SaveChangesAsync();
+                _logger.LogInformation("Successfully registered user {UserId} ({Email}) with role {Role}", user.Id, user.Email, user.Role);
+                return user;
+            });
         }
         catch (Exception ex)
         {
-            transaction.Rollback();
             _logger.LogError(ex, "Failed to create profile for user. Rolled back transaction.");
             throw;
         }

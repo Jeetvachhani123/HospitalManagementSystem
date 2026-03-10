@@ -27,4 +27,7 @@ public interface IUnitOfWork : IDisposable
     int SaveChanges();
 
     Task<System.Data.IDbTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default);
+
+    Task<T> ExecuteInTransactionAsync<T>(Func<Task<T>> action, CancellationToken cancellationToken = default);
+    Task ExecuteInTransactionAsync(Func<Task> action, CancellationToken cancellationToken = default);
 }

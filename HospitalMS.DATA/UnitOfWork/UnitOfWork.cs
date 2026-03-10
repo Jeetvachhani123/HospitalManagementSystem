@@ -1,7 +1,8 @@
-﻿using HospitalMS.BL.Interfaces;
+using HospitalMS.BL.Interfaces;
 using HospitalMS.BL.Interfaces.Repositories;
 using HospitalMS.DATA.Context;
 using HospitalMS.DATA.Repositories;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -49,6 +50,29 @@ public class UnitOfWork : IUnitOfWork
     {
         var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
         return transaction.GetDbTransaction();
+    }
+
+    public Task<T> ExecuteInTransactionAsync<T>(Func<Task<T>> action, CancellationToken cancellationToken = default)
+    {
+        var strategy = _context.Database.CreateExecutionStrategy();
+        return strategy.ExecuteAsync(async () =>
+        {
+            await using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+            var result = await action();
+            await transaction.CommitAsync(cancellationToken);
+            return result;
+        });
+    }
+
+    public Task ExecuteInTransactionAsync(Func<Task> action, CancellationToken cancellationToken = default)
+    {
+        var strategy = _context.Database.CreateExecutionStrategy();
+        return strategy.ExecuteAsync(async () =>
+        {
+            await using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+            await action();
+            await transaction.CommitAsync(cancellationToken);
+        });
     }
 
     // save changes async

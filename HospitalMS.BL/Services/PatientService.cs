@@ -47,8 +47,7 @@ public class PatientService : IPatientService
         {
             return null;
         }
-        using var transaction = await _unitOfWork.BeginTransactionAsync();
-        try
+        return await _unitOfWork.ExecuteInTransactionAsync(async () =>
         {
             var user = new User { Email = patientDto.Email, PasswordHash = HashPassword(patientDto.Password), FirstName = patientDto.FirstName, LastName = patientDto.LastName, PhoneNumber = patientDto.PhoneNumber, Role = UserRole.Patient, IsActive = true };
             await _unitOfWork.Users.AddAsync(user);
@@ -56,15 +55,9 @@ public class PatientService : IPatientService
             var patient = new Patient { UserId = user.Id, DateOfBirth = patientDto.DateOfBirth, BloodGroup = patientDto.BloodGroup, Gender = patientDto.Gender, EmergencyContact = patientDto.EmergencyContact };
             await _unitOfWork.Patients.AddAsync(patient);
             await _unitOfWork.SaveChangesAsync();
-            transaction.Commit();
             patient = await _unitOfWork.Patients.GetByIdAsync(patient.Id);
             return patient == null ? null : MapToPatientResponse(patient);
-        }
-        catch
-        {
-            transaction.Rollback();
-            throw;
-        }
+        });
     }
 
     // delete patient

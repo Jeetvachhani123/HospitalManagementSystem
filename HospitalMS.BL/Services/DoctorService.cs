@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using HospitalMS.BL.DTOs.Doctor;
 using HospitalMS.BL.Interfaces;
 using HospitalMS.BL.Interfaces.Services;
@@ -59,8 +59,7 @@ public class DoctorService : IDoctorService
     {
         if (await _unitOfWork.Users.EmailExistsAsync(doctorDto.Email)) return null;
         if (await _unitOfWork.Doctors.LicenseNumberExistsAsync(doctorDto.LicenseNumber)) return null;
-        using var transaction = await _unitOfWork.BeginTransactionAsync();
-        try
+        return await _unitOfWork.ExecuteInTransactionAsync(async () =>
         {
             var user = new User { Email = doctorDto.Email, PasswordHash = HashPassword(doctorDto.Password), FirstName = doctorDto.FirstName, LastName = doctorDto.LastName, PhoneNumber = doctorDto.PhoneNumber, Role = UserRole.Doctor, IsActive = true };
             await _unitOfWork.Users.AddAsync(user);
@@ -69,15 +68,9 @@ public class DoctorService : IDoctorService
             await _unitOfWork.Doctors.AddAsync(doctor);
             await _unitOfWork.SaveChangesAsync();
             await CreateDefaultWorkingHoursAsync(doctor.Id);
-            transaction.Commit();
             doctor = await _unitOfWork.Doctors.GetByIdAsync(doctor.Id);
             return doctor == null ? null : MapToDoctorResponse(doctor);
-        }
-        catch
-        {
-            transaction.Rollback();
-            throw;
-        }
+        });
     }
 
     // create default working hours
