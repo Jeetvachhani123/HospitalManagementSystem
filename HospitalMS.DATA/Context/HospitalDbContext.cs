@@ -1,3 +1,4 @@
+using HospitalMS.BL.Interfaces;
 using HospitalMS.Models.Base;
 using HospitalMS.Models.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -7,8 +8,11 @@ namespace HospitalMS.DATA.Context;
 
 public class HospitalDbContext : DbContext
 {
-    public HospitalDbContext(DbContextOptions<HospitalDbContext> options) : base(options)
+    private readonly ICurrentUserService? _currentUserService;
+
+    public HospitalDbContext(DbContextOptions<HospitalDbContext> options, ICurrentUserService? currentUserService = null) : base(options)
     {
+        _currentUserService = currentUserService;
     }
 
     public DbSet<User> Users { get; set; }
@@ -62,6 +66,8 @@ public class HospitalDbContext : DbContext
     private void UpdateAuditFields()
     {
         var now = DateTime.UtcNow;
+        var userId = _currentUserService?.UserId;
+
         foreach (var entry in ChangeTracker.Entries<BaseEntity>())
         {
             switch (entry.State)
@@ -72,6 +78,21 @@ public class HospitalDbContext : DbContext
                     break;
                 case EntityState.Modified:
                     entry.Entity.UpdatedAt = now;
+                    break;
+            }
+        }
+
+        foreach (var entry in ChangeTracker.Entries<AuditableEntity>())
+        {
+            switch (entry.State)
+            {
+                case EntityState.Added:
+                    if (!string.IsNullOrEmpty(userId))
+                        entry.Entity.CreatedBy = userId;
+                    break;
+                case EntityState.Modified:
+                    if (!string.IsNullOrEmpty(userId))
+                        entry.Entity.UpdatedBy = userId;
                     break;
             }
         }
