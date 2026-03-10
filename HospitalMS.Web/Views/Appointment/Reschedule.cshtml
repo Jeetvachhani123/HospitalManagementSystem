@@ -2,14 +2,12 @@
 @{
     ViewData["Title"] = "Reschedule Appointment";
 }
-
 <div class="container py-4" style="max-width: 680px;">
     <div class="mb-4">
         <a asp-action="Details" asp-route-id="@Model.AppointmentId" class="text-decoration-none text-muted">
             <i class="bi bi-arrow-left me-1"></i> Back to Appointment Details
         </a>
     </div>
-
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-header bg-white border-bottom py-3 d-flex align-items-center gap-2">
             <div class="bg-warning bg-opacity-10 text-warning rounded-circle d-flex align-items-center justify-content-center" style="width:40px;height:40px;">
@@ -21,7 +19,6 @@
             </div>
         </div>
         <div class="card-body p-4">
-
             <div class="alert alert-light border rounded-3 mb-4 p-3">
                 <p class="mb-1 small text-muted text-uppercase fw-bold">Current Appointment</p>
                 <div class="d-flex align-items-center gap-3">
@@ -29,9 +26,7 @@
                     <span><i class="bi bi-clock me-1 text-primary"></i> @DateTime.Today.Add(Model.CurrentStartTime).ToString("hh:mm tt")</span>
                 </div>
             </div>
-
             <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" style="display:@(ViewData.ModelState.IsValid ? "none" : "block")"></div>
-
             <form asp-action="Reschedule" method="post" id="rescheduleForm">
                 @Html.AntiForgeryToken()
                 <input type="hidden" asp-for="AppointmentId" />
@@ -39,13 +34,11 @@
                 <input type="hidden" asp-for="DoctorName" />
                 <input type="hidden" asp-for="CurrentDate" />
                 <input type="hidden" asp-for="CurrentStartTime" />
-
                 <div class="mb-3">
                     <label asp-for="NewDate" class="form-label fw-bold">New Appointment Date <span class="text-danger">*</span></label>
                     <input asp-for="NewDate" type="date" class="form-control form-control-lg" id="newDateInput" min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" value="@Model.NewDate.ToString("yyyy-MM-dd")" />
                     <span asp-validation-for="NewDate" class="text-danger small"></span>
                 </div>
-
                 <div class="mb-3">
                     <label class="form-label fw-bold">Available Time Slots <span class="text-danger">*</span></label>
                     <div id="slotsContainer" class="d-flex flex-wrap gap-2 mt-1 mb-2">
@@ -57,7 +50,6 @@
                     <input type="hidden" asp-for="NewEndTime" id="newEndTimeHidden" />
                     <span asp-validation-for="NewStartTime" class="text-danger small"></span>
                 </div>
-
                 <div class="d-grid mt-4">
                     <button type="submit" class="btn btn-warning fw-bold py-2" id="submitBtn" disabled>
                         <i class="bi bi-calendar-check me-2"></i> Confirm Reschedule
@@ -67,79 +59,69 @@
         </div>
     </div>
 </div>
-
 @section Scripts {
-<script>
-    const doctorId = @Model.DoctorId;
-    const dateInput = document.getElementById('newDateInput');
-    const slotsContainer = document.getElementById('slotsContainer');
-    const slotsPlaceholder = document.getElementById('slotsPlaceholder');
-    const startHidden = document.getElementById('newStartTimeHidden');
-    const endHidden = document.getElementById('newEndTimeHidden');
-    const submitBtn = document.getElementById('submitBtn');
-
-    function clearSlots() {
-        slotsContainer.innerHTML = '';
-        slotsPlaceholder && slotsContainer.appendChild(slotsPlaceholder);
-        startHidden.value = '';
-        endHidden.value = '';
-        submitBtn.disabled = true;
-    }
-
-    function renderSlots(slots) {
-        slotsContainer.innerHTML = '';
-
-        if (!slots || slots.length === 0) {
-            slotsContainer.innerHTML = '<span class="text-danger small"><i class="bi bi-exclamation-circle me-1"></i>No available slots for this date.</span>';
-            return;
+    <script>
+        const doctorId = @Model.DoctorId;
+        const dateInput = document.getElementById('newDateInput');
+        const slotsContainer = document.getElementById('slotsContainer');
+        const slotsPlaceholder = document.getElementById('slotsPlaceholder');
+        const startHidden = document.getElementById('newStartTimeHidden');
+        const endHidden = document.getElementById('newEndTimeHidden');
+        const submitBtn = document.getElementById('submitBtn');
+        function clearSlots() {
+            slotsContainer.innerHTML = '';
+            slotsPlaceholder && slotsContainer.appendChild(slotsPlaceholder);
+            startHidden.value = '';
+            endHidden.value = '';
+            submitBtn.disabled = true;
         }
-
-        slots.forEach(slot => {
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'btn btn-sm ' + (slot.available ? 'btn-outline-primary' : 'btn-outline-secondary disabled');
-            btn.textContent = slot.display;
-            btn.dataset.start = slot.start;
-            btn.dataset.end = slot.end;
-            btn.disabled = !slot.available;
-
-            if (slot.available) {
-                btn.addEventListener('click', function () {
-                    document.querySelectorAll('#slotsContainer .btn').forEach(b => b.classList.remove('btn-primary', 'active'));
-                    btn.classList.remove('btn-outline-primary');
-                    btn.classList.add('btn-primary', 'active');
-                    startHidden.value = slot.start;
-                    endHidden.value = slot.end;
-                    submitBtn.disabled = false;
-                });
+        function renderSlots(slots) {
+            slotsContainer.innerHTML = '';
+            if (!slots || slots.length === 0) {
+                slotsContainer.innerHTML = '<span class="text-danger small"><i class="bi bi-exclamation-circle me-1"></i>No available slots for this date.</span>';
+                return;
             }
-            slotsContainer.appendChild(btn);
+            slots.forEach(slot => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'btn btn-sm ' + (slot.available ? 'btn-outline-primary' : 'btn-outline-secondary disabled');
+                btn.textContent = slot.display;
+                btn.dataset.start = slot.start;
+                btn.dataset.end = slot.end;
+                btn.disabled = !slot.available;
+                if (slot.available) {
+                    btn.addEventListener('click', function () {
+                        document.querySelectorAll('#slotsContainer .btn').forEach(b => b.classList.remove('btn-primary', 'active'));
+                        btn.classList.remove('btn-outline-primary');
+                        btn.classList.add('btn-primary', 'active');
+                        startHidden.value = slot.start;
+                        endHidden.value = slot.end;
+                        submitBtn.disabled = false;
+                    });
+                }
+                slotsContainer.appendChild(btn);
+            });
+        }
+        async function loadSlots(date) {
+            clearSlots();
+            slotsContainer.innerHTML = '<span class="text-muted small"><span class="spinner-border spinner-border-sm me-1"></span> Loading available slots...</span>';
+            submitBtn.disabled = true;
+            try {
+                const res = await fetch(`/Appointment/GetAvailableSlots?doctorId=${doctorId}&date=${date}`);
+                const data = await res.json();
+                if (data.success) {
+                    renderSlots(data.slots);
+                } else {
+                    slotsContainer.innerHTML = `<span class="text-danger small"><i class="bi bi-exclamation-circle me-1"></i>${data.message || 'Failed to load slots.'}</span>`;
+                }
+            } catch {
+                slotsContainer.innerHTML = '<span class="text-danger small"><i class="bi bi-wifi-off me-1"></i>Network error. Please try again.</span>';
+            }
+        }
+        dateInput.addEventListener('change', function () {
+            if (this.value) loadSlots(this.value);
+            else clearSlots();
         });
-    }
-
-    async function loadSlots(date) {
-        clearSlots();
-        slotsContainer.innerHTML = '<span class="text-muted small"><span class="spinner-border spinner-border-sm me-1"></span> Loading available slots...</span>';
-        submitBtn.disabled = true;
-
-        try {
-            const res = await fetch(`/Appointment/GetAvailableSlots?doctorId=${doctorId}&date=${date}`);
-            const data = await res.json();
-            if (data.success) {
-                renderSlots(data.slots);
-            } else {
-                slotsContainer.innerHTML = `<span class="text-danger small"><i class="bi bi-exclamation-circle me-1"></i>${data.message || 'Failed to load slots.'}</span>`;
-            }
-        } catch {
-            slotsContainer.innerHTML = '<span class="text-danger small"><i class="bi bi-wifi-off me-1"></i>Network error. Please try again.</span>';
-        }
-    }
-
-    dateInput.addEventListener('change', function () {
-        if (this.value) loadSlots(this.value);
-        else clearSlots();
-    });
-
-    if (dateInput.value) loadSlots(dateInput.value);
-</script>
+        if (dateInput.value) loadSlots(dateInput.value);
+    </script>
 }
