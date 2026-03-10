@@ -22,7 +22,6 @@
         </div>
         <div class="card-body p-4">
 
-            @* Current appointment info *@
             <div class="alert alert-light border rounded-3 mb-4 p-3">
                 <p class="mb-1 small text-muted text-uppercase fw-bold">Current Appointment</p>
                 <div class="d-flex align-items-center gap-3">
@@ -43,10 +42,7 @@
 
                 <div class="mb-3">
                     <label asp-for="NewDate" class="form-label fw-bold">New Appointment Date <span class="text-danger">*</span></label>
-                    <input asp-for="NewDate" type="date" class="form-control form-control-lg"
-                           id="newDateInput"
-                           min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")"
-                           value="@Model.NewDate.ToString("yyyy-MM-dd")" />
+                    <input asp-for="NewDate" type="date" class="form-control form-control-lg" id="newDateInput" min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" value="@Model.NewDate.ToString("yyyy-MM-dd")" />
                     <span asp-validation-for="NewDate" class="text-danger small"></span>
                 </div>
 
@@ -144,7 +140,6 @@
         else clearSlots();
     });
 
-    // Auto-load slots if date is already set (e.g. on validation error re-render)
     if (dateInput.value) loadSlots(dateInput.value);
 </script>
 }
