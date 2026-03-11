@@ -1,4 +1,4 @@
-@model HospitalMS.Web.ViewModels.InvoiceViewModel
+﻿@model HospitalMS.Web.ViewModels.InvoiceViewModel
 @{
     ViewData["Title"] = "Invoice Details";
     var statusClass = Model.IsPaid ? "bg-success" : (Model.DueDate < DateTime.Today ? "bg-danger" : "bg-warning");
@@ -46,7 +46,7 @@
                     <hr class="my-4 opacity-10">
                     <div class="d-flex justify-content-between align-items-center mb-5">
                         <h4 class="fw-bold text-uppercase text-muted mb-0">Total Amount</h4>
-                        <h1 class="display-4 fw-bold text-primary mb-0">$@Model.Amount.ToString("N2")</h1>
+                        <h1 class="display-4 fw-bold text-primary mb-0">₹@Model.Amount.ToString("N2")</h1>
                     </div>
                     @if (!Model.IsPaid && User.IsInRole("Patient"))
                     {
