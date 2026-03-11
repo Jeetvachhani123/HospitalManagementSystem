@@ -21,7 +21,7 @@ public class SearchService : ISearchService
     public async Task<(IEnumerable<AppointmentSearchResultDto> Items, int TotalCount)> SearchAppointmentsAsync(string query, int? doctorId, int? patientId, DateTime? fromDate, DateTime? toDate, AppointmentStatus? status, int page, int pageSize)
     {
         var result = await _appointmentRepository.SearchAsync(query, doctorId, patientId, fromDate, toDate, status, page, pageSize);
-        var dtos = result.Items.Select(a => new AppointmentSearchResultDto { Id = a.Id, PatientName = $"{a.Patient?.User?.FirstName} {a.Patient?.User?.LastName}", DoctorName = $"{a.Doctor?.User?.FirstName} {a.Doctor?.User?.LastName}", AppointmentDate = a.AppointmentDate, StartTime = a.StartTime, EndTime = a.EndTime, Status = a.Status.ToString(), Reason = a.Reason ?? string.Empty, Specialization = a.Doctor?.Specialization ?? "Unknown" });
+        var dtos = result.Items.Select(a => new AppointmentSearchResultDto { Id = a.Id, PatientName = $"{a.Patient?.User?.FirstName} {a.Patient?.User?.LastName}", DoctorName = $"{a.Doctor?.User?.FirstName} {a.Doctor?.User?.LastName}", AppointmentDate = a.AppointmentDate, StartTime = a.StartTime, EndTime = a.EndTime, Status = a.Status.ToString(), Reason = a.Reason ?? string.Empty, Specialization = a.Doctor?.Specialization ?? "Unknown", CreatedBy = a.CreatedBy, UpdatedBy = a.UpdatedBy });
         return (dtos, result.TotalCount);
     }
 

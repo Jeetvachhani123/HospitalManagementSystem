@@ -142,13 +142,26 @@
                                         </div>
                                     }
                                 </div>
-                                <div class="card-footer bg-white border-top border-light py-3 px-4 d-flex justify-content-between align-items-center">
+                                <div class="card-footer bg-white border-top border-light py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
                                     <div class="d-flex align-items-center">
                                         <div class="avatar-circle bg-light text-secondary rounded-circle d-flex align-items-center justify-content-center me-2 small fw-bold" style="width: 24px; height: 24px;">
                                             Dr
                                         </div>
                                         <span class="text-muted small fw-medium">Dr. @record.DoctorName</span>
                                     </div>
+                                    @if (!string.IsNullOrEmpty(record.CreatedBy) || !string.IsNullOrEmpty(record.UpdatedBy))
+                                    {
+                                        <div class="text-muted" style="font-size: 0.75rem;">
+                                            @if (!string.IsNullOrEmpty(record.CreatedBy))
+                                            {
+                                                <span class="me-3"><strong>Created By (ID):</strong> @record.CreatedBy</span>
+                                            }
+                                            @if (!string.IsNullOrEmpty(record.UpdatedBy))
+                                            {
+                                                <span><strong>Updated By (ID):</strong> @record.UpdatedBy</span>
+                                            }
+                                        </div>
+                                    }
                                     @if (!string.IsNullOrEmpty(record.AttachmentPath))
                                     {
                                         <a href="@record.AttachmentPath" target="_blank" class="btn btn-outline-secondary btn-sm rounded-pill px-3 fw-bold small">

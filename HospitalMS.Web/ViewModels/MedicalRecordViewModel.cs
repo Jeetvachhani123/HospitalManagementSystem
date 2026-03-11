@@ -26,6 +26,10 @@ public class MedicalRecordDisplayViewModel
     public string? Notes { get; set; }
 
     public string? AttachmentPath { get; set; }
+
+    public string? CreatedBy { get; set; }
+
+    public string? UpdatedBy { get; set; }
 }
 
 public class CreateMedicalRecordViewModel

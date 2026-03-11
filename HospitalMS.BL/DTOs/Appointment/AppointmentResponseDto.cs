@@ -41,4 +41,8 @@ public class AppointmentResponseDto
     public string ApprovalStatus { get; set; } = string.Empty;
 
     public AppointmentApprovalStatus ApprovalStatusEnum { get; set; }
+
+    public string? CreatedBy { get; set; }
+
+    public string? UpdatedBy { get; set; }
 }

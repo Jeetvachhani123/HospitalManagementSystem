@@ -88,7 +88,9 @@ public class BillingController : Controller
             IssueDate = invoice.IssueDate,
             DueDate = invoice.DueDate,
             Amount = invoice.Amount,
-            IsPaid = invoice.IsPaid
+            IsPaid = invoice.IsPaid,
+            CreatedBy = invoice.CreatedBy,
+            UpdatedBy = invoice.UpdatedBy
         };
         return View(model);
     }

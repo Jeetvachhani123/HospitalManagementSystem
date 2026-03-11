@@ -135,6 +135,17 @@
 </div>
 @if (User.IsInRole("Admin"))
 {
+    <div class="container pb-3">
+        <div class="card border-0 shadow-sm text-muted small">
+            <div class="card-body p-3 bg-light rounded d-flex justify-content-between">
+                <div><strong>Created By (User ID):</strong> @(string.IsNullOrEmpty(Model.CreatedBy) ? "System" : Model.CreatedBy)</div>
+                <div><strong>Updated By (User ID):</strong> @(string.IsNullOrEmpty(Model.UpdatedBy) ? "N/A" : Model.UpdatedBy)</div>
+            </div>
+        </div>
+    </div>
+}
+@if (User.IsInRole("Admin"))
+{
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg">

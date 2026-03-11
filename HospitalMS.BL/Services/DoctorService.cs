@@ -147,7 +147,11 @@ public class DoctorService : IDoctorService
             Bio = doctor.Bio,
             ConsultationFee = doctor.ConsultationFee,
             IsAvailable = doctor.IsAvailable,
-            CreatedAt = doctor.CreatedAt
+            CreatedAt = doctor.CreatedAt,
+            DepartmentId = doctor.DepartmentId,
+            DepartmentName = doctor.Department?.Name,
+            CreatedBy = doctor.CreatedBy,
+            UpdatedBy = doctor.UpdatedBy
         };
     }
 

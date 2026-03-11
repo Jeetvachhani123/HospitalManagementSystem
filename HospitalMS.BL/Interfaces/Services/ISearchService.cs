@@ -28,6 +28,10 @@ public class AppointmentSearchResultDto
     public string Reason { get; set; } = string.Empty;
 
     public string Specialization { get; set; } = string.Empty;
+
+    public string? CreatedBy { get; set; }
+
+    public string? UpdatedBy { get; set; }
 }
 
 public class DoctorSearchResultDto

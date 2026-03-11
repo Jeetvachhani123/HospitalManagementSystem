@@ -34,6 +34,10 @@ public class AppointmentViewModel
     public string ApprovalStatus { get; set; } = string.Empty;
 
     public AppointmentApprovalStatus ApprovalStatusEnum { get; set; }
+
+    public string? CreatedBy { get; set; }
+
+    public string? UpdatedBy { get; set; }
 }
 
 public class AppointmentRequestViewModel
@@ -97,6 +101,10 @@ public class AppointmentDetailViewModel
     public int? InvoiceId { get; set; }
 
     public bool IsInvoicePaid { get; set; }
+
+    public string? CreatedBy { get; set; }
+
+    public string? UpdatedBy { get; set; }
 }
 
 public class AppointmentTimelineItem

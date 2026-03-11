@@ -15,7 +15,7 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddHospitalServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContextPool<HospitalDbContext>(options =>
+        services.AddDbContext<HospitalDbContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), sqlOptions =>
             {
                 sqlOptions.EnableRetryOnFailure(

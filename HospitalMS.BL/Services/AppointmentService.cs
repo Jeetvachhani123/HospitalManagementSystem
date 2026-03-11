@@ -421,7 +421,9 @@ public class AppointmentService : IAppointmentService
             Prescription = appointment.Prescription,
             CreatedAt = appointment.CreatedAt,
             ApprovalStatus = appointment.ApprovalStatus.ToString(),
-            ApprovalStatusEnum = appointment.ApprovalStatus
+            ApprovalStatusEnum = appointment.ApprovalStatus,
+            CreatedBy = appointment.CreatedBy,
+            UpdatedBy = appointment.UpdatedBy
         };
     }
 

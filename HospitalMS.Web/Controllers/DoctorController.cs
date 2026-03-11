@@ -1,4 +1,4 @@
-﻿using HospitalMS.BL.Interfaces.Services;
+using HospitalMS.BL.Interfaces.Services;
 using HospitalMS.BL.Services;
 using HospitalMS.Web.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -156,7 +156,11 @@ public class DoctorController : Controller
             IsAvailable = doctor.IsAvailable,
             Bio = doctor.Bio,
             Qualifications = doctor.Qualifications,
-            PhoneNumber = doctor.PhoneNumber
+            PhoneNumber = doctor.PhoneNumber,
+            DepartmentId = doctor.DepartmentId,
+            DepartmentName = doctor.DepartmentName,
+            CreatedBy = doctor.CreatedBy,
+            UpdatedBy = doctor.UpdatedBy
         };
         return View(model);
     }

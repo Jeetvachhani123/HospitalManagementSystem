@@ -13,4 +13,8 @@ public class DepartmentDto
     public bool IsActive { get; set; }
 
     public int DoctorCount { get; set; }
+
+    public string? CreatedBy { get; set; }
+
+    public string? UpdatedBy { get; set; }
 }

@@ -21,6 +21,10 @@ public class InvoiceViewModel
     public string StatusClass => IsPaid ? "bg-success" : (DueDate < DateTime.UtcNow ? "bg-danger" : "bg-warning");
 
     public string StatusText => IsPaid ? "Paid" : (DueDate < DateTime.UtcNow ? "Overdue" : "Pending");
+
+    public string? CreatedBy { get; set; }
+
+    public string? UpdatedBy { get; set; }
 }
 
 public class GenerateInvoiceViewModel

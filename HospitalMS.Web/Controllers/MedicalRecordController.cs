@@ -69,7 +69,9 @@ namespace HospitalMS.Web.Controllers
                 Diagnosis = r.Diagnosis,
                 Prescription = r.Prescription,
                 Notes = r.Notes,
-                AttachmentPath = r.AttachmentPath
+                AttachmentPath = r.AttachmentPath,
+                CreatedBy = r.CreatedBy,
+                UpdatedBy = r.UpdatedBy
             }).ToList();
             return View(viewModels);
         }

@@ -1,4 +1,4 @@
-﻿using HospitalMS.Models.Enums;
+using HospitalMS.Models.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace HospitalMS.Web.ViewModels;
@@ -31,6 +31,10 @@ public class DoctorViewModel
     public string? DepartmentName { get; set; }
 
     public int? DepartmentId { get; set; }
+
+    public string? CreatedBy { get; set; }
+
+    public string? UpdatedBy { get; set; }
 }
 
 public class DoctorCreateViewModel

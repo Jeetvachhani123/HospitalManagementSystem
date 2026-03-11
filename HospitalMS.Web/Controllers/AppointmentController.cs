@@ -60,7 +60,9 @@ public class AppointmentController : Controller
                 StartTime = a.StartTime,
                 EndTime = a.EndTime,
                 Status = a.Status,
-                Reason = a.Reason
+                Reason = a.Reason,
+                CreatedBy = a.CreatedBy,
+                UpdatedBy = a.UpdatedBy
             }).ToList(),
             CurrentPage = page,
             TotalPages = (int)Math.Ceiling(searchResult.TotalCount / (double)pageSize),
@@ -460,7 +462,9 @@ public class AppointmentController : Controller
             IsInvoicePaid = invoice?.IsPaid ?? false,
             Diagnosis = appointment.Diagnosis,
             Prescription = appointment.Prescription,
-            Notes = appointment.Notes
+            Notes = appointment.Notes,
+            CreatedBy = appointment.CreatedBy,
+            UpdatedBy = appointment.UpdatedBy
         };
         return View(model);
     }

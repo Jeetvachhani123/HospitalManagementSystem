@@ -1,4 +1,4 @@
-﻿namespace HospitalMS.BL.DTOs.Doctor;
+namespace HospitalMS.BL.DTOs.Doctor;
 
 public class DoctorResponseDto
 {
@@ -35,4 +35,8 @@ public class DoctorResponseDto
     public int? DepartmentId { get; set; }
 
     public string? DepartmentName { get; set; }
+
+    public string? CreatedBy { get; set; }
+
+    public string? UpdatedBy { get; set; }
 }

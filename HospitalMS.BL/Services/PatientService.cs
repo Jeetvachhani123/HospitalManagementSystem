@@ -116,7 +116,9 @@ public class PatientService : IPatientService
             EmergencyContact = patient.EmergencyContact,
             MedicalHistory = patient.MedicalHistory,
             Allergies = patient.Allergies,
-            CreatedAt = patient.CreatedAt
+            CreatedAt = patient.CreatedAt,
+            CreatedBy = patient.CreatedBy,
+            UpdatedBy = patient.UpdatedBy
         };
     }
 

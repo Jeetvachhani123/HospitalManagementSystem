@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace HospitalMS.Web.ViewModels;
 
@@ -25,6 +25,10 @@ public class PatientViewModel
     public string? Allergies { get; set; }
 
     public string? EmergencyContact { get; set; }
+
+    public string? CreatedBy { get; set; }
+
+    public string? UpdatedBy { get; set; }
 }
 
 public class PatientRegistrationViewModel

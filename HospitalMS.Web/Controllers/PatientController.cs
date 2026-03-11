@@ -1,4 +1,4 @@
-﻿using HospitalMS.BL.DTOs.Patient;
+using HospitalMS.BL.DTOs.Patient;
 using HospitalMS.BL.Interfaces.Services;
 using HospitalMS.BL.Services;
 using HospitalMS.Web.ViewModels;
@@ -173,7 +173,9 @@ namespace HospitalMS.Web.Controllers
                 PhoneNumber = patient.PhoneNumber,
                 MedicalHistory = patient.MedicalHistory,
                 Allergies = patient.Allergies,
-                EmergencyContact = patient.EmergencyContact
+                EmergencyContact = patient.EmergencyContact,
+                CreatedBy = patient.CreatedBy,
+                UpdatedBy = patient.UpdatedBy
             };
             return View(viewModel);
         }
