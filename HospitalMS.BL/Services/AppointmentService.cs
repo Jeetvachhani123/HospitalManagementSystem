@@ -196,6 +196,10 @@ public class AppointmentService : IAppointmentService
             {
                 throw new ConflictException($"The doctor already has an appointment scheduled during this time slot " + $"({newDate:yyyy-MM-dd} {newStartTime} - {newEndTime})");
             }
+
+            appointment.IsRescheduled = true;
+            appointment.RescheduledAt = DateTime.UtcNow;
+            appointment.OriginalAppointmentId = appointment.OriginalAppointmentId ?? appointment.Id;
         }
         if (appointmentDto.RowVersion != null)
             appointment.RowVersion = appointmentDto.RowVersion;

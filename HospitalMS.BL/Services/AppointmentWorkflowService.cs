@@ -353,12 +353,15 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
             appointment.EndTime = newEndTime;
             appointment.IsRescheduled = true;
             appointment.RescheduledAt = DateTime.UtcNow;
+            appointment.OriginalAppointmentId = appointment.OriginalAppointmentId ?? appointment.Id;
+
             if (appointment.ApprovalStatus == AppointmentApprovalStatus.Approved)
             {
                 appointment.ApprovalStatus = AppointmentApprovalStatus.Pending;
                 appointment.ApprovedByDoctorId = null;
                 appointment.ApprovedAt = null;
             }
+
             _unitOfWork.Appointments.Update(appointment);
             var history = new AppointmentStatusHistory
             {
