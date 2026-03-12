@@ -116,9 +116,7 @@ namespace HospitalMS.Web.Controllers
                             ModelState.AddModelError("Attachment", "Invalid file type. Only PDF and images are allowed.");
                             return View(viewModel);
                         }
-
                         var fileName = $"{Guid.NewGuid()}{extension}";
-                        // Store outside of wwwroot for security
                         var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "App_Data", "medical_records", viewModel.PatientId.ToString());
                         if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
                         var filePath = Path.Combine(uploadsFolder, fileName);
@@ -126,7 +124,6 @@ namespace HospitalMS.Web.Controllers
                         {
                             await viewModel.Attachment.CopyToAsync(stream);
                         }
-                        // AttachmentPath references an internal ID/path, need a dedicated endpoint to download
                         attachmentPath = $"/medicalrecords/download/{viewModel.PatientId}/{fileName}";
                     }
                     catch (Exception ex)

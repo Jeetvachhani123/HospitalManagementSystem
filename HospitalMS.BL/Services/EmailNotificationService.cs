@@ -238,7 +238,6 @@ public class EmailNotificationService : IEmailNotificationService
                     </p>
                 </div>
             </body>
-            </html>
-        ";
+            </html>";
     }
 }

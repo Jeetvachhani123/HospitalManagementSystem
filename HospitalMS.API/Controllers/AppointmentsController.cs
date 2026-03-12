@@ -119,7 +119,6 @@ public class AppointmentsController : ControllerBase
         var role = User.FindFirstValue(ClaimTypes.Role);
         var userId = GetCurrentUserId();
         IEnumerable<AppointmentResponseDto> appointments;
-
         if (role == "Doctor")
         {
             var doctor = await _appointmentService.GetDoctorByUserIdAsync(userId, cancellationToken);
@@ -134,7 +133,6 @@ public class AppointmentsController : ControllerBase
         {
             appointments = await _appointmentService.GetAllAsync(cancellationToken);
         }
-
         if (!string.IsNullOrEmpty(status))
         {
             appointments = appointments.Where(a =>
@@ -147,7 +145,6 @@ public class AppointmentsController : ControllerBase
                     _ => a.Status.Equals(status, StringComparison.OrdinalIgnoreCase) || a.ApprovalStatus.Equals(status, StringComparison.OrdinalIgnoreCase)
                 });
         }
-
         return Ok(ApiResponse<IEnumerable<AppointmentResponseDto>>.SuccessResponse(appointments.OrderByDescending(a => a.AppointmentDate)));
     }
 

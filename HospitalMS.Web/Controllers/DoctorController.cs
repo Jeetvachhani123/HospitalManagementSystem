@@ -42,7 +42,6 @@ public class DoctorController : Controller
             var pendingApprovals = await _workflowService.GetPendingApprovalsAsync(doctor.Id);
             var completedCount = await _appointmentService.GetAppointmentsCountAsync(doctor.Id, HospitalMS.Models.Enums.AppointmentStatus.Completed);
             var upcomingAppointments = await _appointmentService.GetUpcomingByDoctorIdAsync(doctor.Id, 5);
-
             var model = new DoctorDashboardViewModel
             {
                 Doctor = new DoctorViewModel

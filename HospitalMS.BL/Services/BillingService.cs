@@ -75,7 +75,6 @@ public class BillingService : IBillingService
         invoice.IsPaid = true;
         invoice.PaidAt = DateTime.UtcNow;
         invoice.PaymentMethod = paymentMethod;
-
         try
         {
             await _unitOfWork.SaveChangesAsync();

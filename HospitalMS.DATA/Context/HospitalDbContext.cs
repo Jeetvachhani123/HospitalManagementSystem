@@ -67,7 +67,6 @@ public class HospitalDbContext : DbContext
     {
         var now = DateTime.UtcNow;
         var userId = _currentUserService?.UserId;
-
         foreach (var entry in ChangeTracker.Entries<BaseEntity>())
         {
             switch (entry.State)
@@ -81,7 +80,6 @@ public class HospitalDbContext : DbContext
                     break;
             }
         }
-
         foreach (var entry in ChangeTracker.Entries<AuditableEntity>())
         {
             switch (entry.State)
@@ -96,7 +94,6 @@ public class HospitalDbContext : DbContext
                     break;
             }
         }
-
         // intercept hard-delete on AuditableEntity — convert to soft-delete
         foreach (var entry in ChangeTracker.Entries<AuditableEntity>())
         {

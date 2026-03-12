@@ -54,21 +54,18 @@ public class DoctorsController : ControllerBase
     {
         var doctor = await _doctorService.GetByIdAsync(id);
         if (doctor == null) return NotFound(ApiResponse<object>.ErrorResponse(Constants.Messages.DoctorNotFound));
-
         var targetMonth = month ?? DateTime.Today.Month;
         var targetYear = year ?? DateTime.Today.Year;
-
         var startDate = new DateTime(targetYear, targetMonth, 1);
         var endDate = startDate.AddMonths(1).AddDays(-1);
-
         var appointments = await _appointmentService.GetByDoctorIdAsync(id);
         var filteredAppointments = appointments.Where(a => a.AppointmentDate.Date >= startDate && a.AppointmentDate.Date <= endDate);
-
         return Ok(ApiResponse<object>.SuccessResponse(new
         {
             Month = targetMonth,
             Year = targetYear,
-            Appointments = filteredAppointments.OrderBy(a => a.AppointmentDate).ThenBy(a => a.StartTime).Select(a => new {
+            Appointments = filteredAppointments.OrderBy(a => a.AppointmentDate).ThenBy(a => a.StartTime).Select(a => new
+            {
                 a.Id,
                 a.PatientName,
                 a.AppointmentDate,

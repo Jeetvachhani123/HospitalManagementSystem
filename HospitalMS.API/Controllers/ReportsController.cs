@@ -180,12 +180,10 @@ public class ReportsController : ControllerBase
         var doctor = await _doctorService.GetByUserIdAsync(userId);
         if (doctor == null)
             return NotFound(ApiResponse<DoctorDashboardApiDto>.ErrorResponse("Doctor profile not found"));
-
         var performance = await _reportingService.GenerateDoctorPerformanceReportAsync(doctor.Id);
         var todayCount = await _appointmentService.GetAppointmentsCountAsync(doctor.Id, null, DateTime.UtcNow.Date);
         var pendingApprovals = await _appointmentService.GetPendingApprovalsAsync(doctor.Id);
         var upcoming = await _appointmentService.GetUpcomingByDoctorIdAsync(doctor.Id, 5);
-
         var dto = new DoctorDashboardApiDto
         {
             DoctorId = doctor.Id,
@@ -222,7 +220,6 @@ public class ReportsController : ControllerBase
         var patient = await _appointmentService.GetPatientByUserIdAsync(userId);
         if (patient == null)
             return NotFound(ApiResponse<PatientDashboardApiDto>.ErrorResponse("Patient profile not found"));
-
         var appointments = (await _appointmentService.GetByPatientIdAsync(patient.Id)).ToList();
         var dto = new PatientDashboardApiDto
         {
@@ -267,35 +264,44 @@ public class ReportsController : ControllerBase
                 var doctors = await _doctorService.GetAllAsync();
                 return Ok(ApiResponse<object>.SuccessResponse(doctors.Select(d => new
                 {
-                    d.Id, name = d.FullName, d.Email, d.Specialization, experience = d.YearsOfExperience, d.IsAvailable
+                    d.Id,
+                    name = d.FullName,
+                    d.Email,
+                    d.Specialization,
+                    experience = d.YearsOfExperience,
+                    d.IsAvailable
                 })));
-
             case "Patients":
                 var patients = await _patientService.GetAllAsync();
                 return Ok(ApiResponse<object>.SuccessResponse(patients.Select(p => new
                 {
-                    p.Id, name = p.FullName, p.Email, phone = p.PhoneNumber, p.BloodGroup
+                    p.Id,
+                    name = p.FullName,
+                    p.Email,
+                    phone = p.PhoneNumber,
+                    p.BloodGroup
                 })));
-
             case "TodayAppointments":
                 var todayAppts = await _appointmentService.GetTodaysAppointmentsAsync();
                 return Ok(ApiResponse<object>.SuccessResponse(todayAppts.Select(a => new
                 {
-                    patient = a.PatientName, doctor = a.DoctorName,
+                    patient = a.PatientName,
+                    doctor = a.DoctorName,
                     date = a.AppointmentDate.ToString("MMM dd, yyyy"),
-                    time = a.StartTime.ToString(@"hh\:mm"), a.Status
+                    time = a.StartTime.ToString(@"hh\:mm"),
+                    a.Status
                 })));
-
             case "PendingApprovals":
                 var all = await _appointmentService.GetAllAsync();
                 var pending = all.Where(a =>
                     a.ApprovalStatus == "Pending" && a.Status == "Scheduled");
                 return Ok(ApiResponse<object>.SuccessResponse(pending.Select(a => new
                 {
-                    patient = a.PatientName, doctor = a.DoctorName,
-                    date = a.AppointmentDate.ToString("MMM dd, yyyy"), a.Status
+                    patient = a.PatientName,
+                    doctor = a.DoctorName,
+                    date = a.AppointmentDate.ToString("MMM dd, yyyy"),
+                    a.Status
                 })));
-
             default:
                 return BadRequest(ApiResponse<object>.ErrorResponse("Invalid type. Use: Doctors, Patients, TodayAppointments, PendingApprovals"));
         }
@@ -311,24 +317,34 @@ public class ReportsController : ControllerBase
         var doctors = await _doctorService.GetAllAsync();
         var patients = await _patientService.GetAllAsync();
         var todayAppts = await _appointmentService.GetTodaysAppointmentsAsync();
-
         var dto = new FullReportApiDto
         {
             Stats = report,
             Doctors = doctors.Select(d => new DoctorSummaryDto
             {
-                Id = d.Id, Name = d.FullName, Email = d.Email, Specialization = d.Specialization,
-                YearsOfExperience = d.YearsOfExperience, Phone = d.PhoneNumber
+                Id = d.Id,
+                Name = d.FullName,
+                Email = d.Email,
+                Specialization = d.Specialization,
+                YearsOfExperience = d.YearsOfExperience,
+                Phone = d.PhoneNumber
             }).ToList(),
             Patients = patients.Select(p => new PatientSummaryDto
             {
-                Id = p.Id, Name = p.FullName, Email = p.Email, Phone = p.PhoneNumber,
-                BloodGroup = p.BloodGroup, DateOfBirth = p.DateOfBirth
+                Id = p.Id,
+                Name = p.FullName,
+                Email = p.Email,
+                Phone = p.PhoneNumber,
+                BloodGroup = p.BloodGroup,
+                DateOfBirth = p.DateOfBirth
             }).ToList(),
             TodayAppointments = todayAppts.Select(a => new RecentAppointmentSummaryDto
             {
-                Id = a.Id, PatientName = a.PatientName, DoctorName = a.DoctorName,
-                Status = a.Status, AppointmentDate = a.AppointmentDate
+                Id = a.Id,
+                PatientName = a.PatientName,
+                DoctorName = a.DoctorName,
+                Status = a.Status,
+                AppointmentDate = a.AppointmentDate
             }).ToList(),
             GeneratedAt = DateTime.UtcNow
         };
