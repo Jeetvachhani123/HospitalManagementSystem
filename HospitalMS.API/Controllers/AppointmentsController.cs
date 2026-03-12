@@ -111,6 +111,46 @@ public class AppointmentsController : ControllerBase
         return Ok(ApiResponse<IEnumerable<AppointmentResponseDto>>.SuccessResponse(appointments));
     }
 
+    // Get my appointments by status category
+    [HttpGet("my")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<ApiResponse<IEnumerable<AppointmentResponseDto>>>> GetMyByStatus([FromQuery] string status, CancellationToken cancellationToken)
+    {
+        var role = User.FindFirstValue(ClaimTypes.Role);
+        var userId = GetCurrentUserId();
+        IEnumerable<AppointmentResponseDto> appointments;
+
+        if (role == "Doctor")
+        {
+            var doctor = await _appointmentService.GetDoctorByUserIdAsync(userId, cancellationToken);
+            appointments = doctor == null ? Enumerable.Empty<AppointmentResponseDto>() : await _appointmentService.GetByDoctorIdAsync(doctor.Id, cancellationToken);
+        }
+        else if (role == "Patient")
+        {
+            var patient = await _appointmentService.GetPatientByUserIdAsync(userId, cancellationToken);
+            appointments = patient == null ? Enumerable.Empty<AppointmentResponseDto>() : await _appointmentService.GetByPatientIdAsync(patient.Id, cancellationToken);
+        }
+        else
+        {
+            appointments = await _appointmentService.GetAllAsync(cancellationToken);
+        }
+
+        if (!string.IsNullOrEmpty(status))
+        {
+            appointments = appointments.Where(a =>
+                status switch
+                {
+                    "Upcoming" => (a.Status == "Scheduled" || a.Status == "Confirmed") && a.ApprovalStatus == "Approved" && a.AppointmentDate.Date >= DateTime.Today,
+                    "Pending" => a.ApprovalStatus == "Pending" && a.Status == "Scheduled",
+                    "Completed" => a.Status == "Completed",
+                    "Cancelled" => a.Status == "Cancelled" || a.Status == "NoShow" || a.ApprovalStatus == "Rejected",
+                    _ => a.Status.Equals(status, StringComparison.OrdinalIgnoreCase) || a.ApprovalStatus.Equals(status, StringComparison.OrdinalIgnoreCase)
+                });
+        }
+
+        return Ok(ApiResponse<IEnumerable<AppointmentResponseDto>>.SuccessResponse(appointments.OrderByDescending(a => a.AppointmentDate)));
+    }
+
     //  POST api/appointments  (create)
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
