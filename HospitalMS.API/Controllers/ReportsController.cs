@@ -353,7 +353,6 @@ public class ReportsController : ControllerBase
     }
 }
 
-
 public class RecentAppointmentSummaryDto
 {
     public int Id { get; set; }
