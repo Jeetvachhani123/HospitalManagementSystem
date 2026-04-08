@@ -26,16 +26,27 @@ public static class ServiceCollectionExtensions
             })
             .ConfigureWarnings(w => w.Log(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.CommandExecuted))
         );
+
         services.AddScoped<IUnitOfWork, UnitOfWork.UnitOfWork>();
+       
         services.AddScoped<IUserRepository, UserRepository>();
+       
         services.AddScoped<IDoctorRepository, DoctorRepository>();
+       
         services.AddScoped<IPatientRepository, PatientRepository>();
+       
         services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+      
         services.AddScoped<IInvoiceRepository, InvoiceRepository>();
+       
         services.AddScoped<IMedicalRecordRepository, MedicalRecordRepository>();
+       
         services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+       
         services.AddScoped<IDoctorWorkingHoursRepository, DoctorWorkingHoursRepository>();
+       
         services.AddScoped<IAppointmentStatusHistoryRepository, AppointmentStatusHistoryRepository>();
+       
         return services;
     }
 }

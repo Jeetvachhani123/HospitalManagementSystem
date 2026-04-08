@@ -38,6 +38,7 @@ public class MedicalRecordsController : ControllerBase
                 return Forbid();
             }
         }
+
         var records = await _medicalRecordService.GetByPatientIdAsync(patientId);
         _logger.LogInformation("Medical records accessed for patient {PatientId} by user {UserId}", patientId, userId);
         return Ok(ApiResponse<IEnumerable<MedicalRecordDto>>.SuccessResponse(records));
@@ -54,6 +55,7 @@ public class MedicalRecordsController : ControllerBase
         {
             return NotFound(ApiResponse<IEnumerable<MedicalRecordDto>>.ErrorResponse("Patient profile not found"));
         }
+
         var records = await _medicalRecordService.GetByPatientIdAsync(patient.Id);
         return Ok(ApiResponse<IEnumerable<MedicalRecordDto>>.SuccessResponse(records));
     }
@@ -74,6 +76,7 @@ public class MedicalRecordsController : ControllerBase
                 return Forbid();
             }
         }
+
         var records = await _medicalRecordService.GetByDoctorIdAsync(doctorId);
         return Ok(ApiResponse<IEnumerable<MedicalRecordDto>>.SuccessResponse(records));
     }
@@ -89,6 +92,7 @@ public class MedicalRecordsController : ControllerBase
         {
             return NotFound(ApiResponse<IEnumerable<MedicalRecordDto>>.ErrorResponse("Doctor profile not found"));
         }
+
         var records = await _medicalRecordService.GetByDoctorIdAsync(doctor.Id);
         return Ok(ApiResponse<IEnumerable<MedicalRecordDto>>.SuccessResponse(records));
     }
@@ -104,6 +108,7 @@ public class MedicalRecordsController : ControllerBase
         {
             return NotFound(ApiResponse<MedicalRecordDto>.ErrorResponse("Medical record not found"));
         }
+
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
         var role = User.FindFirstValue(ClaimTypes.Role);
         if (role == "Patient")
@@ -122,6 +127,7 @@ public class MedicalRecordsController : ControllerBase
             {
             }
         }
+
         _logger.LogInformation("Medical record {RecordId} accessed by user {UserId}", id, userId);
         return Ok(ApiResponse<MedicalRecordDto>.SuccessResponse(record));
     }
@@ -138,12 +144,14 @@ public class MedicalRecordsController : ControllerBase
         {
             return BadRequest(ApiResponse<MedicalRecordDto>.ErrorResponse("Doctor profile not found"));
         }
+
         dto.DoctorId = doctor.Id;
         var record = await _medicalRecordService.CreateAsync(dto);
         if (record == null)
         {
             return BadRequest(ApiResponse<MedicalRecordDto>.ErrorResponse("Failed to create medical record"));
         }
+
         _logger.LogInformation("Medical record created by doctor {DoctorId} for patient {PatientId}", doctor.Id, dto.PatientId);
         return CreatedAtAction(nameof(GetById), new { id = record.Id }, ApiResponse<MedicalRecordDto>.SuccessResponse(record, "Medical record created successfully"));
     }
@@ -161,6 +169,7 @@ public class MedicalRecordsController : ControllerBase
         {
             return NotFound(ApiResponse<bool>.ErrorResponse("Medical record not found or you don't have permission to delete it"));
         }
+
         _logger.LogInformation("Medical record {RecordId} deleted by user {UserId}", id, userId);
         return Ok(ApiResponse<bool>.SuccessResponse(true, "Medical record deleted successfully"));
     }

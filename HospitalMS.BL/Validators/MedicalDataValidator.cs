@@ -9,12 +9,16 @@ public static class MedicalDataValidator
     {
         if (string.IsNullOrWhiteSpace(diagnosis))
             return (true, null);
+       
         if (diagnosis.Length > 2000)
             return (false, "Diagnosis cannot exceed 2000 characters");
+        
         if (ContainsDangerousPatterns(diagnosis))
             return (false, "Diagnosis contains potentially dangerous content");
+        
         if (!ContainsValidMedicalContent(diagnosis))
             return (false, "Diagnosis should contain valid medical information");
+       
         return (true, null);
     }
 
@@ -23,12 +27,16 @@ public static class MedicalDataValidator
     {
         if (string.IsNullOrWhiteSpace(prescription))
             return (true, null);
+       
         if (prescription.Length > 2000)
             return (false, "Prescription cannot exceed 2000 characters");
+       
         if (ContainsDangerousPatterns(prescription))
             return (false, "Prescription contains potentially dangerous content");
+       
         if (!ContainsValidPrescriptionFormat(prescription))
             return (false, "Prescription should follow proper medical format");
+      
         return (true, null);
     }
 
@@ -37,12 +45,16 @@ public static class MedicalDataValidator
     {
         if (string.IsNullOrWhiteSpace(allergies))
             return (true, null);
+       
         if (allergies.Length > 1000)
             return (false, "Allergies cannot exceed 1000 characters");
+       
         if (ContainsDangerousPatterns(allergies))
             return (false, "Allergies contain potentially dangerous content");
+       
         if (!Regex.IsMatch(allergies, @"^[a-zA-Z0-9\s,;\-\(\)\.]+$"))
             return (false, "Allergies should only contain letters, numbers, and basic punctuation");
+       
         return (true, null);
     }
 
@@ -51,21 +63,27 @@ public static class MedicalDataValidator
     {
         if (string.IsNullOrWhiteSpace(medicalHistory))
             return (true, null);
+       
         if (medicalHistory.Length > 5000)
             return (false, "Medical history cannot exceed 5000 characters");
+       
         if (ContainsDangerousPatterns(medicalHistory))
             return (false, "Medical history contains potentially dangerous content");
+        
         return (true, null);
     }
 
     // validate blood group
     public static (bool IsValid, string? ErrorMessage) ValidateBloodGroup(string? bloodGroup)
     {
+        
         if (string.IsNullOrWhiteSpace(bloodGroup))
             return (true, null);
+       
         var validBloodGroups = new[] { "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-" };
         if (!validBloodGroups.Contains(bloodGroup.Trim(), StringComparer.OrdinalIgnoreCase))
             return (false, "Invalid blood group. Valid values: A+, A-, B+, B-, AB+, AB-, O+, O-");
+       
         return (true, null);
     }
 
@@ -74,8 +92,10 @@ public static class MedicalDataValidator
     {
         if (string.IsNullOrWhiteSpace(dosage))
             return (true, null);
+        
         if (!Regex.IsMatch(dosage, @"\d+\s*(mg|ml|g|mcg|tablet|capsule|drop|spray|puff|unit|iu|teaspoon|tablespoon)", RegexOptions.IgnoreCase))
             return (false, "Dosage should include amount and unit (e.g., '500mg', '2 tablets')");
+        
         return (true, null);
     }
 
@@ -84,6 +104,7 @@ public static class MedicalDataValidator
     {
         if (string.IsNullOrWhiteSpace(frequency))
             return (true, null);
+        
         var validFrequencies = new[]
         {
             "once daily", "twice daily", "three times daily", "four times daily",
@@ -95,6 +116,7 @@ public static class MedicalDataValidator
         var normalized = frequency.ToLower().Trim();
         if (!validFrequencies.Any(f => normalized.Contains(f)))
             return (false, "Frequency should be a valid medical frequency (e.g., 'twice daily', 'every 8 hours')");
+       
         return (true, null);
     }
 
@@ -108,8 +130,7 @@ public static class MedicalDataValidator
             "eval(", "expression(",
             "vbscript:", "data:text/html"
         };
-        return dangerousPatterns.Any(pattern =>
-            text.Contains(pattern, StringComparison.OrdinalIgnoreCase));
+        return dangerousPatterns.Any(pattern => text.Contains(pattern, StringComparison.OrdinalIgnoreCase));
     }
 
     // check valid medical content

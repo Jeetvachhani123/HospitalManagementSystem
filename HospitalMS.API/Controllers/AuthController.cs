@@ -23,6 +23,7 @@ public class AuthController : ControllerBase
         {
             return Unauthorized(ApiResponse<AuthResponseDto>.ErrorResponse(Constants.Messages.LoginFailed));
         }
+
         return Ok(ApiResponse<AuthResponseDto>.SuccessResponse(result, Constants.Messages.LoginSuccess));
     }
 
@@ -34,6 +35,7 @@ public class AuthController : ControllerBase
         {
             return BadRequest(ApiResponse<AuthResponseDto>.ErrorResponse(Constants.Messages.EmailAlreadyExists));
         }
+
         return Ok(ApiResponse<AuthResponseDto>.SuccessResponse(result, Constants.Messages.RegistrationSuccess));
     }
 

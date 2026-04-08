@@ -34,12 +34,14 @@ public class PatientsController : ControllerBase
         {
             return NotFound(ApiResponse<PatientResponseDto>.ErrorResponse(Constants.Messages.PatientNotFound));
         }
+
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
         var role = User.FindFirstValue(ClaimTypes.Role);
         if (role == "Patient" && patient.UserId != userId)
         {
             return Forbid();
         }
+
         return Ok(ApiResponse<PatientResponseDto>.SuccessResponse(patient));
     }
 
@@ -51,6 +53,7 @@ public class PatientsController : ControllerBase
         {
             return NotFound(ApiResponse<PatientResponseDto>.ErrorResponse(Constants.Messages.PatientNotFound));
         }
+
         return Ok(ApiResponse<PatientResponseDto>.SuccessResponse(patient));
     }
 
@@ -63,6 +66,7 @@ public class PatientsController : ControllerBase
         {
             return BadRequest(ApiResponse<PatientResponseDto>.ErrorResponse(Constants.Messages.EmailAlreadyExists));
         }
+
         return CreatedAtAction(nameof(GetById), new { id = patient.Id }, ApiResponse<PatientResponseDto>.SuccessResponse(patient, "Patient registered successfully"));
     }
 
@@ -75,6 +79,7 @@ public class PatientsController : ControllerBase
         {
             return NotFound(ApiResponse<bool>.ErrorResponse(Constants.Messages.PatientNotFound));
         }
+
         return Ok(ApiResponse<bool>.SuccessResponse(true, "Patient deleted successfully"));
     }
 }

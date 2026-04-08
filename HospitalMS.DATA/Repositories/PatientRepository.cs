@@ -73,11 +73,13 @@ public class PatientRepository : IPatientRepository
         {
             query = query.Where(p => p.User.FirstName.Contains(searchTerm) || p.User.LastName.Contains(searchTerm) || p.User.Email.Contains(searchTerm) || (p.User.PhoneNumber != null && p.User.PhoneNumber.Contains(searchTerm)));
         }
+
         var totalCount = await query.CountAsync(cancellationToken);
         var items = await query
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
+        
         return (items, totalCount);
     }
 }

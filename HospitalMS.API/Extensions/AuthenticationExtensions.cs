@@ -39,10 +39,12 @@ public static class AuthenticationExtensions
                     {
                         context.Token = accessToken;
                     }
+
                     return Task.CompletedTask;
                 }
             };
         });
+
         return services;
     }
 }

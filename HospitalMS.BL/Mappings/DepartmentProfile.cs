@@ -10,7 +10,9 @@ public class DepartmentProfile : Profile
     {
         CreateMap<Department, DepartmentDto>()
             .ForMember(dest => dest.DoctorCount, opt => opt.MapFrom(src => src.Doctors != null ? src.Doctors.Count : 0));
+        
         CreateMap<CreateDepartmentDto, Department>();
+        
         CreateMap<UpdateDepartmentDto, Department>();
     }
 }

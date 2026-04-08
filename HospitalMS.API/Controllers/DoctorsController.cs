@@ -35,6 +35,7 @@ public class DoctorsController : ControllerBase
         {
             return NotFound(ApiResponse<DoctorResponseDto>.ErrorResponse(Constants.Messages.DoctorNotFound));
         }
+
         return Ok(ApiResponse<DoctorResponseDto>.SuccessResponse(doctor));
     }
 
@@ -46,6 +47,7 @@ public class DoctorsController : ControllerBase
         {
             return NotFound(ApiResponse<DoctorResponseDto>.ErrorResponse(Constants.Messages.DoctorNotFound));
         }
+
         return Ok(ApiResponse<DoctorResponseDto>.SuccessResponse(doctor));
     }
 
@@ -53,13 +55,17 @@ public class DoctorsController : ControllerBase
     public async Task<ActionResult<ApiResponse<object>>> GetCalendar(int id, [FromQuery] int? month, [FromQuery] int? year)
     {
         var doctor = await _doctorService.GetByIdAsync(id);
-        if (doctor == null) return NotFound(ApiResponse<object>.ErrorResponse(Constants.Messages.DoctorNotFound));
+
+        if (doctor == null) 
+            return NotFound(ApiResponse<object>.ErrorResponse(Constants.Messages.DoctorNotFound));
+       
         var targetMonth = month ?? DateTime.Today.Month;
         var targetYear = year ?? DateTime.Today.Year;
         var startDate = new DateTime(targetYear, targetMonth, 1);
         var endDate = startDate.AddMonths(1).AddDays(-1);
         var appointments = await _appointmentService.GetByDoctorIdAsync(id);
         var filteredAppointments = appointments.Where(a => a.AppointmentDate.Date >= startDate && a.AppointmentDate.Date <= endDate);
+        
         return Ok(ApiResponse<object>.SuccessResponse(new
         {
             Month = targetMonth,
@@ -100,6 +106,7 @@ public class DoctorsController : ControllerBase
         {
             return BadRequest(ApiResponse<DoctorResponseDto>.ErrorResponse("Failed to create doctor. Email or license number may already exist."));
         }
+
         return CreatedAtAction(nameof(GetById), new { id = doctor.Id }, ApiResponse<DoctorResponseDto>.SuccessResponse(doctor, "Doctor created successfully"));
     }
 
@@ -117,11 +124,13 @@ public class DoctorsController : ControllerBase
                 return Forbid();
             }
         }
+
         var doctor = await _doctorService.UpdateAsync(id, doctorDto);
         if (doctor == null)
         {
             return NotFound(ApiResponse<DoctorResponseDto>.ErrorResponse(Constants.Messages.DoctorNotFound));
         }
+
         return Ok(ApiResponse<DoctorResponseDto>.SuccessResponse(doctor, "Doctor updated successfully"));
     }
 
@@ -134,6 +143,7 @@ public class DoctorsController : ControllerBase
         {
             return NotFound(ApiResponse<bool>.ErrorResponse(Constants.Messages.DoctorNotFound));
         }
+
         return Ok(ApiResponse<bool>.SuccessResponse(true, "Doctor deleted successfully"));
     }
 }

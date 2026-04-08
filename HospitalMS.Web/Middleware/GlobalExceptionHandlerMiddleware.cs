@@ -55,21 +55,27 @@ public class GlobalExceptionHandlerMiddleware
             case ValidationException validationEx:
                 _logger.LogWarning(validationEx, "{Message}. Validation errors: {@Errors}", logMessage, validationEx.Errors);
                 break;
+            
             case NotFoundException notFoundEx:
                 _logger.LogWarning(notFoundEx, "{Message}. Resource: {ResourceType}, ID: {ResourceId}", logMessage, notFoundEx.ResourceType, notFoundEx.ResourceId);
                 break;
+            
             case BusinessRuleException businessEx:
                 _logger.LogWarning(businessEx, "{Message}. Rule: {RuleName}", logMessage, businessEx.RuleName);
                 break;
+            
             case ConflictException conflictEx:
                 _logger.LogWarning(conflictEx, "{Message}. Conflict type: {ConflictType}", logMessage, conflictEx.ConflictType);
                 break;
+           
             case UnauthorizedException unauthorizedEx:
                 _logger.LogWarning(unauthorizedEx, "{Message}", logMessage);
                 break;
+            
             case DomainException domainEx:
                 _logger.LogError(domainEx, "{Message}. Error code: {ErrorCode}", logMessage, domainEx.ErrorCode);
                 break;
+            
             default:
                 _logger.LogError(exception, "{Message}. Unhandled exception: {ExceptionType}", logMessage, exception.GetType().Name);
                 break;
@@ -89,6 +95,7 @@ public class GlobalExceptionHandlerMiddleware
                 validationErrors: validationEx.Errors,
                 path: path
             ),
+            
             NotFoundException notFoundEx => ErrorResponse.Create(
                 message: notFoundEx.Message,
                 errorCode: notFoundEx.ErrorCode,
@@ -96,6 +103,7 @@ public class GlobalExceptionHandlerMiddleware
                 correlationId: correlationId,
                 path: path
             ),
+            
             BusinessRuleException businessEx => ErrorResponse.Create(
                 message: businessEx.Message,
                 errorCode: businessEx.ErrorCode,
@@ -103,6 +111,7 @@ public class GlobalExceptionHandlerMiddleware
                 correlationId: correlationId,
                 path: path
             ),
+           
             ConflictException conflictEx => ErrorResponse.Create(
                 message: conflictEx.Message,
                 errorCode: conflictEx.ErrorCode,
@@ -110,6 +119,7 @@ public class GlobalExceptionHandlerMiddleware
                 correlationId: correlationId,
                 path: path
             ),
+            
             UnauthorizedException unauthorizedEx => ErrorResponse.Create(
                 message: unauthorizedEx.Message,
                 errorCode: unauthorizedEx.ErrorCode,
@@ -117,6 +127,7 @@ public class GlobalExceptionHandlerMiddleware
                 correlationId: correlationId,
                 path: path
             ),
+           
             DomainException domainEx => ErrorResponse.Create(
                 message: domainEx.Message,
                 errorCode: domainEx.ErrorCode,
@@ -124,6 +135,7 @@ public class GlobalExceptionHandlerMiddleware
                 correlationId: correlationId,
                 path: path
             ),
+           
             _ => ErrorResponse.Create(
                 message: _environment.IsDevelopment() ? exception.Message : "An unexpected error occurred. Please try again later.",
                 errorCode: "INTERNAL_SERVER_ERROR",

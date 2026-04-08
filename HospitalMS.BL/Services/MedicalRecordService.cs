@@ -24,6 +24,7 @@ public class MedicalRecordService : IMedicalRecordService
     public async Task<MedicalRecordDto?> GetByIdAsync(int id)
     {
         var record = await _unitOfWork.MedicalRecords.GetByIdAsync(id);
+       
         return _mapper.Map<MedicalRecordDto>(record);
     }
 
@@ -31,6 +32,7 @@ public class MedicalRecordService : IMedicalRecordService
     public async Task<IEnumerable<MedicalRecordDto>> GetByPatientIdAsync(int patientId)
     {
         var records = await _unitOfWork.MedicalRecords.GetByPatientIdAsync(patientId);
+        
         return _mapper.Map<IEnumerable<MedicalRecordDto>>(records);
     }
 
@@ -38,6 +40,7 @@ public class MedicalRecordService : IMedicalRecordService
     public async Task<IEnumerable<MedicalRecordDto>> GetByDoctorIdAsync(int doctorId)
     {
         var records = await _unitOfWork.MedicalRecords.GetByDoctorIdAsync(doctorId);
+        
         return _mapper.Map<IEnumerable<MedicalRecordDto>>(records);
     }
 
@@ -50,11 +53,13 @@ public class MedicalRecordService : IMedicalRecordService
             await _unitOfWork.MedicalRecords.AddAsync(record);
             await _unitOfWork.SaveChangesAsync();
             var createdRecord = await _unitOfWork.MedicalRecords.GetByIdAsync(record.Id);
+           
             return _mapper.Map<MedicalRecordDto>(createdRecord);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error creating medical record");
+           
             return null;
         }
     }
@@ -65,9 +70,13 @@ public class MedicalRecordService : IMedicalRecordService
         try
         {
             var record = await _unitOfWork.MedicalRecords.GetByIdAsync(id);
-            if (record == null) return false;
+            if (record == null)
+                return false;
+            
             var user = await _unitOfWork.Users.GetByIdAsync(currentUserId);
-            if (user == null) return false;
+            if (user == null) 
+                return false;
+           
             if (user.Role == UserRole.Doctor)
             {
                 var doctor = await _unitOfWork.Doctors.GetByUserIdAsync(currentUserId);
@@ -81,8 +90,10 @@ public class MedicalRecordService : IMedicalRecordService
             {
                 return false;
             }
+
             _unitOfWork.MedicalRecords.Delete(record);
             await _unitOfWork.SaveChangesAsync();
+            
             return true;
         }
         catch (Exception ex)

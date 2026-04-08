@@ -47,6 +47,7 @@ public class AppointmentController : Controller
             var patient = await _patientService.GetByUserIdAsync(userId);
             patientId = patient?.Id;
         }
+
         var searchResult = await _searchService.SearchAppointmentsAsync(searchQuery ?? string.Empty, doctorId, patientId, fromDate, toDate, null, page, pageSize);
         var model = new AppointmentListViewModel
         {
@@ -72,6 +73,7 @@ public class AppointmentController : Controller
             FromDate = fromDate,
             ToDate = toDate
         };
+        
         return View(model);
     }
 
@@ -83,6 +85,7 @@ public class AppointmentController : Controller
         var doctor = await _doctorService.GetByUserIdAsync(userId);
         if (doctor == null)
             return NotFound("Doctor profile not found");
+        
         var pendingAppointments = await _workflowService.GetPendingApprovalsAsync(doctor.Id);
         var model = pendingAppointments.Select(a => new AppointmentViewModel
         {
@@ -94,6 +97,7 @@ public class AppointmentController : Controller
             Reason = a.Reason,
             Status = a.Status
         }).OrderBy(a => a.AppointmentDate).ToList();
+       
         return View(model);
     }
 
@@ -109,6 +113,7 @@ public class AppointmentController : Controller
             {
                 return Json(new { success = true, slots = new List<object>(), message = "No slots available for this date" });
             }
+
             var formattedSlots = slots.Select(slot => new
             {
                 start = slot.StartTime.ToString(@"hh\:mm\:ss"),
@@ -116,6 +121,7 @@ public class AppointmentController : Controller
                 display = FormatTimeDisplay(slot.StartTime),
                 available = slot.IsAvailable
             }).ToList();
+            
             return Json(new { success = true, slots = formattedSlots });
         }
         catch (Exception ex)
@@ -134,6 +140,7 @@ public class AppointmentController : Controller
         var patient = await _patientService.GetByUserIdAsync(userId);
         if (patient == null)
             return Json(new List<object>());
+        
         var appointments = await _appointmentService.GetByPatientIdAsync(patient.Id);
         var filtered = appointments.Where(a =>
             status switch
@@ -154,6 +161,7 @@ public class AppointmentController : Controller
                 _ => false
             }).OrderByDescending(a => a.AppointmentDate)
               .ToList();
+       
         return Json(filtered.Select(a => new
         {
             id = a.Id,
@@ -172,6 +180,7 @@ public class AppointmentController : Controller
         var ampm = hours >= 12 ? "PM" : "AM";
         var displayHours = hours % 12;
         if (displayHours == 0) displayHours = 12;
+        
         return $"{displayHours:D2}:{minutes:D2} {ampm}";
     }
 
@@ -192,6 +201,7 @@ public class AppointmentController : Controller
             ConsultationFee = doctor.ConsultationFee,
             AppointmentDate = DateTime.Today.AddDays(1)
         };
+        
         return View(model);
     }
 
@@ -205,12 +215,15 @@ public class AppointmentController : Controller
         if (!ModelState.IsValid)
         {
             await ReloadDoctorData(model);
+            
             return View(model);
         }
+
         if (model.EndTime <= model.StartTime)
         {
             ModelState.AddModelError("", "End time must be greater than start time.");
             await ReloadDoctorData(model);
+           
             return View(model);
         }
         try
@@ -218,10 +231,12 @@ public class AppointmentController : Controller
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userIdClaim))
                 return Unauthorized();
+           
             var userId = int.Parse(userIdClaim);
             var patient = await _appointmentService.GetPatientByUserIdAsync(userId);
             if (patient == null)
                 return Unauthorized();
+            
             var dto = new AppointmentCreateDto
             {
                 PatientId = patient.Id,
@@ -274,6 +289,7 @@ public class AppointmentController : Controller
                 TempData["ErrorMessage"] = "Doctor profile not found.";
                 return RedirectToAction(nameof(PendingApprovals));
             }
+
             var result = await _workflowService.ApproveAppointmentAsync(appointmentId, doctor.Id);
             if (result == null)
             {
@@ -284,10 +300,12 @@ public class AppointmentController : Controller
                 TempData["ErrorMessage"] = "Failed to approve appointment.";
                 return RedirectToAction(nameof(PendingApprovals));
             }
+
             if (HttpContext.Request.Headers["X-Requested-With"] == "XMLHttpRequest")
             {
                 return Json(new { success = true, message = "Appointment approved successfully!" });
             }
+
             TempData["SuccessMessage"] = "Appointment approved successfully!";
             return RedirectToAction(nameof(PendingApprovals));
         }
@@ -298,6 +316,7 @@ public class AppointmentController : Controller
             {
                 return Json(new { success = false, message = "An error occurred." });
             }
+
             TempData["ErrorMessage"] = "An error occurred.";
             return RedirectToAction(nameof(PendingApprovals));
         }
@@ -321,6 +340,7 @@ public class AppointmentController : Controller
                 TempData["ErrorMessage"] = "Doctor profile not found.";
                 return RedirectToAction(nameof(PendingApprovals));
             }
+
             var result = await _workflowService.RejectAppointmentAsync(appointmentId, doctor.Id, rejectionReason);
             if (result == null)
             {
@@ -331,6 +351,7 @@ public class AppointmentController : Controller
                 TempData["ErrorMessage"] = "Failed to reject appointment.";
                 return RedirectToAction(nameof(PendingApprovals));
             }
+
             if (HttpContext.Request.Headers["X-Requested-With"] == "XMLHttpRequest")
             {
                 return Json(new { success = true, message = "Appointment rejected." });
@@ -362,12 +383,14 @@ public class AppointmentController : Controller
             TempData["ErrorMessage"] = "Doctor profile not found.";
             return RedirectToAction(nameof(Index));
         }
+
         var result = await _workflowService.CompleteAppointmentAsync(appointmentId, doctor.Id, diagnosis, prescription, notes);
         if (result == null)
         {
             TempData["ErrorMessage"] = "Failed to complete appointment.";
             return RedirectToAction(nameof(Index));
         }
+
         TempData["SuccessMessage"] = "Appointment completed successfully!";
         return RedirectToAction(nameof(Details), new { id = appointmentId });
     }
@@ -384,6 +407,7 @@ public class AppointmentController : Controller
             TempData["ErrorMessage"] = "Failed to cancel appointment.";
             return RedirectToAction(nameof(Index));
         }
+
         TempData["SuccessMessage"] = "Appointment cancelled successfully.";
         return RedirectToAction(nameof(Index));
     }
@@ -395,12 +419,14 @@ public class AppointmentController : Controller
         var appointment = await _appointmentService.GetByIdAsync(id);
         if (appointment == null)
             return NotFound();
+
         // only allow rescheduling of Scheduled or Confirmed appointments
         if (appointment.Status == "Completed" || appointment.Status == "Cancelled")
         {
             TempData["ErrorMessage"] = "Only scheduled or confirmed appointments can be rescheduled.";
             return RedirectToAction(nameof(Details), new { id });
         }
+
         var model = new RescheduleAppointmentViewModel
         {
             AppointmentId = appointment.Id,
@@ -412,6 +438,7 @@ public class AppointmentController : Controller
             NewStartTime = appointment.StartTime,
             NewEndTime = appointment.EndTime
         };
+        
         return View(model);
     }
 
@@ -422,11 +449,13 @@ public class AppointmentController : Controller
     {
         if (!ModelState.IsValid)
             return View(model);
+        
         if (model.NewEndTime <= model.NewStartTime)
         {
             ModelState.AddModelError("", "End time must be after start time.");
             return View(model);
         }
+
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         var result = await _workflowService.RescheduleAppointmentAsync(model.AppointmentId, userId, model.NewDate, model.NewStartTime, model.NewEndTime);
         if (result == null)
@@ -434,6 +463,7 @@ public class AppointmentController : Controller
             ModelState.AddModelError("", "Failed to reschedule. The selected time slot may be unavailable.");
             return View(model);
         }
+
         TempData["SuccessMessage"] = "Appointment rescheduled successfully!";
         return RedirectToAction(nameof(Details), new { id = model.AppointmentId });
     }
@@ -445,6 +475,7 @@ public class AppointmentController : Controller
         var appointment = await _appointmentService.GetByIdAsync(id);
         if (appointment == null)
             return NotFound();
+        
         var invoice = await _billingService.GetInvoiceByAppointmentIdAsync(id);
         var model = new AppointmentDetailViewModel
         {
@@ -466,6 +497,7 @@ public class AppointmentController : Controller
             CreatedBy = appointment.CreatedBy,
             UpdatedBy = appointment.UpdatedBy
         };
+
         return View(model);
     }
 
@@ -480,6 +512,7 @@ public class AppointmentController : Controller
             TempData["ErrorMessage"] = "Failed to mark appointment as no-show.";
             return RedirectToAction(nameof(Index));
         }
+
         TempData["SuccessMessage"] = "Appointment marked as no-show.";
         return RedirectToAction(nameof(Index));
     }
@@ -515,18 +548,22 @@ public class AppointmentController : Controller
         {
             query = query.Where(a => a.Status == status);
         }
+
         if (fromDate.HasValue)
         {
             query = query.Where(a => a.AppointmentDate >= fromDate.Value);
         }
+
         if (toDate.HasValue)
         {
             query = query.Where(a => a.AppointmentDate <= toDate.Value.AddDays(1));
         }
+
         if (!string.IsNullOrEmpty(doctorName))
         {
             query = query.Where(a => a.DoctorName.Contains(doctorName, StringComparison.OrdinalIgnoreCase));
         }
+
         var model = query.Select(a => new AppointmentViewModel
         {
             Id = a.Id,
@@ -539,6 +576,7 @@ public class AppointmentController : Controller
             Status = a.Status,
             Reason = a.Reason
         }).OrderByDescending(a => a.AppointmentDate).ToList();
+        
         return View(model);
     }
 
@@ -549,6 +587,7 @@ public class AppointmentController : Controller
         var appointment = await _appointmentService.GetByIdAsync(id);
         if (appointment == null)
             return NotFound();
+        
         var model = new AppointmentDetailViewModel
         {
             Id = appointment.Id,
@@ -564,6 +603,7 @@ public class AppointmentController : Controller
             Prescription = appointment.Prescription,
             Notes = appointment.Notes
         };
+        
         return View(model);
     }
 
@@ -574,6 +614,7 @@ public class AppointmentController : Controller
         var appointment = await _appointmentService.GetByIdAsync(id);
         if (appointment == null)
             return NotFound();
+        
         var model = new AppointmentDetailViewModel
         {
             Id = appointment.Id,
@@ -590,6 +631,7 @@ public class AppointmentController : Controller
             Notes = appointment.Notes,
             CreatedAt = appointment.CreatedAt
         };
+        
         return View(model);
     }
 
@@ -614,6 +656,7 @@ public class AppointmentController : Controller
             Prescription = a.Prescription
         }).ToList();
         var csvBytes = await _exportService.ExportAppointmentsToCSVAsync(exportData);
+        
         return File(csvBytes, "text/csv", $"appointments_{DateTime.Now:yyyyMMdd}.csv");
     }
 
@@ -638,6 +681,7 @@ public class AppointmentController : Controller
             Prescription = a.Prescription
         }).ToList();
         var excelBytes = await _exportService.ExportAppointmentsToExcelAsync(exportData);
+       
         return File(excelBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"appointments_{DateTime.Now:yyyyMMdd}.xlsx");
     }
 
@@ -662,6 +706,7 @@ public class AppointmentController : Controller
             Prescription = a.Prescription
         }).ToList();
         var pdfBytes = await _exportService.ExportAppointmentsToPdfAsync(exportData);
+        
         return File(pdfBytes, "application/pdf", $"appointments_{DateTime.Now:yyyyMMdd}.pdf");
     }
 

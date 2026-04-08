@@ -23,6 +23,7 @@ public class DepartmentService : IDepartmentService
     public async Task<IEnumerable<DepartmentDto>> GetAllAsync()
     {
         var departments = await _unitOfWork.Departments.GetAllAsync();
+        
         return _mapper.Map<IEnumerable<DepartmentDto>>(departments);
     }
 
@@ -30,6 +31,7 @@ public class DepartmentService : IDepartmentService
     public async Task<DepartmentDto?> GetByIdAsync(int id)
     {
         var department = await _unitOfWork.Departments.GetByIdAsync(id);
+        
         return _mapper.Map<DepartmentDto>(department);
     }
 
@@ -39,6 +41,7 @@ public class DepartmentService : IDepartmentService
         var department = _mapper.Map<Department>(dto);
         await _unitOfWork.Departments.AddAsync(department);
         await _unitOfWork.SaveChangesAsync();
+        
         return _mapper.Map<DepartmentDto>(department);
     }
 
@@ -46,11 +49,14 @@ public class DepartmentService : IDepartmentService
     public async Task<DepartmentDto?> UpdateAsync(int id, UpdateDepartmentDto dto)
     {
         var department = await _unitOfWork.Departments.GetByIdAsync(id);
-        if (department == null) return null;
+        if (department == null) 
+            return null;
+        
         _mapper.Map(dto, department);
         department.Id = id;
         _unitOfWork.Departments.Update(department);
         await _unitOfWork.SaveChangesAsync();
+       
         return _mapper.Map<DepartmentDto>(department);
     }
 
@@ -58,12 +64,15 @@ public class DepartmentService : IDepartmentService
     public async Task<bool> DeleteAsync(int id)
     {
         var department = await _unitOfWork.Departments.GetByIdAsync(id);
-        if (department == null) return false;
+        if (department == null) 
+            return false;
+        
         if (department.Doctors != null && department.Doctors.Any())
         {
             _logger.LogWarning($"Cannot delete department {id} because it has assigned doctors.");
             return false;
         }
+
         _unitOfWork.Departments.Delete(department);
         await _unitOfWork.SaveChangesAsync();
         return true;

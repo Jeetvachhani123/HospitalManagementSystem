@@ -19,6 +19,7 @@ public class PaginationService
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToList();
+        
         return PagedResult<T>.Create(items, pageNumber, pageSize, totalCount);
     }
 
@@ -28,6 +29,7 @@ public class PaginationService
         pageNumber = pageNumber < 1 ? 1 : pageNumber;
         pageSize = pageSize < 1 ? DefaultPageSize : pageSize;
         pageSize = pageSize > MaxPageSize ? MaxPageSize : pageSize;
+       
         return (pageNumber, pageSize);
     }
 }

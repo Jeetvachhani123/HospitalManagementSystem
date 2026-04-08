@@ -10,6 +10,7 @@ public static class InputSanitizer
     {
         if (string.IsNullOrWhiteSpace(input))
             return string.Empty;
+        
         return WebUtility.HtmlEncode(input);
     }
 
@@ -18,6 +19,7 @@ public static class InputSanitizer
     {
         if (string.IsNullOrWhiteSpace(input))
             return string.Empty;
+        
         var sanitized = Regex.Replace(input, @"<script[^>]*>.*?</script>", "", RegexOptions.IgnoreCase | RegexOptions.Singleline);
         sanitized = Regex.Replace(sanitized, @"on\w+\s*=\s*[""'][^""']*[""']", "", RegexOptions.IgnoreCase);
         sanitized = Regex.Replace(sanitized, @"javascript:", "", RegexOptions.IgnoreCase);
@@ -25,6 +27,7 @@ public static class InputSanitizer
         sanitized = sanitized.Trim();
         if (sanitized.Length > 5000)
             sanitized = sanitized.Substring(0, 5000);
+        
         return sanitized;
     }
 
@@ -33,11 +36,13 @@ public static class InputSanitizer
     {
         if (string.IsNullOrWhiteSpace(input))
             return string.Empty;
+        
         var sanitized = Regex.Replace(input, @"<[^>]+>", "");
         sanitized = Regex.Replace(sanitized, @"[^\w\s,;-]", "");
         sanitized = sanitized.Trim();
         if (sanitized.Length > 1000)
             sanitized = sanitized.Substring(0, 1000);
+        
         return sanitized;
     }
 
@@ -46,8 +51,10 @@ public static class InputSanitizer
     {
         if (string.IsNullOrWhiteSpace(input))
             return string.Empty;
+       
         var sanitized = WebUtility.HtmlEncode(input);
         sanitized = sanitized.Trim();
+       
         return sanitized;
     }
 
@@ -56,7 +63,9 @@ public static class InputSanitizer
     {
         if (string.IsNullOrWhiteSpace(input))
             return string.Empty;
+        
         var sanitized = Regex.Replace(input, @"[^\d\s\-\(\)\+]", "");
+       
         return sanitized.Trim();
     }
 
@@ -65,9 +74,11 @@ public static class InputSanitizer
     {
         if (string.IsNullOrWhiteSpace(input))
             return string.Empty;
+        
         var sanitized = input.Trim().ToLowerInvariant();
         if (!Regex.IsMatch(sanitized, @"^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"))
             return string.Empty;
+        
         return sanitized;
     }
 
@@ -76,6 +87,7 @@ public static class InputSanitizer
     {
         if (string.IsNullOrWhiteSpace(input))
             return string.Empty;
+        
         var dangerousPatterns = new[]
         {
             @"(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|EXECUTE)\b)",
@@ -91,6 +103,7 @@ public static class InputSanitizer
                 throw new ArgumentException("Input contains potentially dangerous SQL patterns");
             }
         }
+
         return input.Trim();
     }
 }

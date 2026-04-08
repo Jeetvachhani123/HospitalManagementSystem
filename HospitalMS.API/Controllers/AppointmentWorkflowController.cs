@@ -35,6 +35,7 @@ public class AppointmentWorkflowController : ControllerBase
                 _logger.LogWarning($"Patient {patientId} appointment request failed");
                 return BadRequest(ApiResponse<AppointmentResponseDto>.ErrorResponse("Failed to request appointment. Please verify doctor availability and time slot."));
             }
+
             _logger.LogInformation($"Appointment {result.Id} requested by patient {patientId}");
             return Ok(ApiResponse<AppointmentResponseDto>.SuccessResponse(result, "Appointment requested successfully. Awaiting doctor approval."));
         }
@@ -61,6 +62,7 @@ public class AppointmentWorkflowController : ControllerBase
                 _logger.LogWarning($"Doctor {doctorId} failed to approve appointment {appointmentId}");
                 return BadRequest(ApiResponse<AppointmentResponseDto>.ErrorResponse("Failed to approve appointment. It may not be pending or you may not be the assigned doctor."));
             }
+
             _logger.LogInformation($"Appointment {appointmentId} approved by doctor {doctorId}");
             return Ok(ApiResponse<AppointmentResponseDto>.SuccessResponse(result, "Appointment approved successfully."));
         }
@@ -87,6 +89,7 @@ public class AppointmentWorkflowController : ControllerBase
                 _logger.LogWarning($"Doctor {doctorId} failed to reject appointment {appointmentId}");
                 return BadRequest(ApiResponse<AppointmentResponseDto>.ErrorResponse("Failed to reject appointment. It may not be pending or you may not be the assigned doctor."));
             }
+
             _logger.LogInformation($"Appointment {appointmentId} rejected by doctor {doctorId}");
             return Ok(ApiResponse<AppointmentResponseDto>.SuccessResponse(result, "Appointment rejected. Patient will be notified of the reason."));
         }
@@ -113,6 +116,7 @@ public class AppointmentWorkflowController : ControllerBase
                 _logger.LogWarning($"Doctor {doctorId} failed to complete appointment {appointmentId}");
                 return BadRequest(ApiResponse<AppointmentResponseDto>.ErrorResponse("Failed to complete appointment. It may not be in approved state or you may not be the assigned doctor."));
             }
+
             _logger.LogInformation($"Appointment {appointmentId} marked as completed by doctor {doctorId}");
             return Ok(ApiResponse<AppointmentResponseDto>.SuccessResponse(result, "Appointment completed successfully with consultation notes saved."));
         }
@@ -139,6 +143,7 @@ public class AppointmentWorkflowController : ControllerBase
                 _logger.LogWarning($"Failed to cancel appointment {appointmentId} by user {userId}");
                 return BadRequest(ApiResponse<bool>.ErrorResponse("Failed to cancel appointment. It may already be completed, cancelled, or you don't have permission."));
             }
+
             _logger.LogInformation($"Appointment {appointmentId} cancelled by {userEmail}");
             return Ok(ApiResponse<bool>.SuccessResponse(true, "Appointment cancelled successfully."));
         }
@@ -164,6 +169,7 @@ public class AppointmentWorkflowController : ControllerBase
                 _logger.LogWarning($"Failed to reschedule appointment {appointmentId} by user {userId}");
                 return BadRequest(ApiResponse<AppointmentResponseDto>.ErrorResponse("Failed to reschedule appointment. The new time slot may be unavailable, appointment may be in final state, or you don't have permission."));
             }
+
             _logger.LogInformation($"Appointment {appointmentId} rescheduled to {dto.NewDate} {dto.NewStartTime}");
             return Ok(ApiResponse<AppointmentResponseDto>.SuccessResponse(result, "Appointment rescheduled successfully."));
         }
@@ -188,6 +194,7 @@ public class AppointmentWorkflowController : ControllerBase
                 _logger.LogWarning($"Failed to mark appointment {appointmentId} as no-show");
                 return NotFound(ApiResponse<bool>.ErrorResponse("Appointment not found."));
             }
+
             _logger.LogInformation($"Appointment {appointmentId} marked as no-show");
             return Ok(ApiResponse<bool>.SuccessResponse(true, "Appointment marked as no-show."));
         }
@@ -208,6 +215,7 @@ public class AppointmentWorkflowController : ControllerBase
             var doctorId = GetDoctorIdFromClaims();
             var result = await _workflowService.GetPendingApprovalsAsync(doctorId);
             _logger.LogInformation($"Retrieved {result.Count()} pending approvals for doctor {doctorId}");
+            
             return Ok(ApiResponse<IEnumerable<AppointmentResponseDto>>.SuccessResponse(result));
         }
         catch (Exception ex)
@@ -228,6 +236,7 @@ public class AppointmentWorkflowController : ControllerBase
             {
                 return BadRequest(ApiResponse<IEnumerable<TimeSlotDto>>.ErrorResponse("Cannot request slots for past dates."));
             }
+
             var result = await _workflowService.GetAvailableSlotsAsync(doctorId, date);
             _logger.LogInformation($"Retrieved {result.Count()} available slots for doctor {doctorId} on {date:yyyy-MM-dd}");
             return Ok(ApiResponse<IEnumerable<TimeSlotDto>>.SuccessResponse(result));
@@ -251,6 +260,7 @@ public class AppointmentWorkflowController : ControllerBase
             {
                 return NotFound(ApiResponse<IEnumerable<AppointmentStatusHistoryDto>>.ErrorResponse("Appointment not found or has no status history."));
             }
+
             _logger.LogInformation($"Retrieved status history for appointment {appointmentId}");
             return Ok(ApiResponse<IEnumerable<AppointmentStatusHistoryDto>>.SuccessResponse(result));
         }

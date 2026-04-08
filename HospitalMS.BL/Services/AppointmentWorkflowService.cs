@@ -36,21 +36,26 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
         {
             if (dto.AppointmentDate.Date < DateTime.UtcNow.Date)
                 return null;
+
             var doctor = await _unitOfWork.Doctors.GetByIdAsync(dto.DoctorId);
             if (doctor == null || !doctor.IsAvailable)
                 return null;
+
             var patient = await _unitOfWork.Patients.GetByIdAsync(patientId);
             if (patient == null)
                 return null;
-            bool hasConflict = await _unitOfWork.Appointments.HasConflictAsync(
-                dto.DoctorId, dto.AppointmentDate, dto.StartTime, dto.EndTime);
+
+            bool hasConflict = await _unitOfWork.Appointments.HasConflictAsync(dto.DoctorId, dto.AppointmentDate, dto.StartTime, dto.EndTime);
             if (hasConflict)
                 return null;
+
             if (!await ValidateDoctorWorkingHoursAsync(dto.DoctorId, dto.AppointmentDate, dto.StartTime, dto.EndTime))
                 return null;
+
             var appointment = new Appointment { PatientId = patientId, DoctorId = dto.DoctorId, AppointmentDate = dto.AppointmentDate, StartTime = dto.StartTime, EndTime = dto.EndTime, Reason = dto.Reason, Status = AppointmentStatus.Scheduled, ApprovalStatus = AppointmentApprovalStatus.Pending, CreatedAt = DateTime.UtcNow };
             await _unitOfWork.Appointments.AddAsync(appointment);
             await _unitOfWork.SaveChangesAsync();
+
             var history = new AppointmentStatusHistory
             {
                 AppointmentId = appointment.Id,
@@ -61,6 +66,7 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
             };
             await _unitOfWork.AppointmentStatusHistories.AddAsync(history);
             await _unitOfWork.SaveChangesAsync();
+
             try
             {
                 await _realTimeNotificationService.NotifyAppointmentRequest(doctor.UserId, appointment.Id, $"{patient.User.FirstName} {patient.User.LastName}", appointment.GetFullStartDateTime());
@@ -91,10 +97,13 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
             var appointment = await _unitOfWork.Appointments.GetByIdAsync(appointmentId);
             if (appointment == null)
                 return null;
+
             if (appointment.DoctorId != doctorId)
                 return null;
+
             if (appointment.ApprovalStatus != AppointmentApprovalStatus.Pending)
                 return null;
+
             var prevStatus = appointment.Status;
             var prevApprovalStatus = appointment.ApprovalStatus;
             appointment.ApprovalStatus = AppointmentApprovalStatus.Approved;
@@ -113,6 +122,7 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
             };
             await _unitOfWork.AppointmentStatusHistories.AddAsync(history);
             await _unitOfWork.SaveChangesAsync();
+
             try
             {
                 var patient = await _unitOfWork.Patients.GetByIdAsync(appointment.PatientId);
@@ -148,10 +158,13 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
             var appointment = await _unitOfWork.Appointments.GetByIdAsync(appointmentId);
             if (appointment == null)
                 return null;
+
             if (appointment.DoctorId != doctorId)
                 return null;
+
             if (appointment.ApprovalStatus != AppointmentApprovalStatus.Pending)
                 return null;
+
             var prevStatus = appointment.Status;
             var prevApprovalStatus = appointment.ApprovalStatus;
             appointment.ApprovalStatus = AppointmentApprovalStatus.Rejected;
@@ -172,6 +185,7 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
             };
             await _unitOfWork.AppointmentStatusHistories.AddAsync(history);
             await _unitOfWork.SaveChangesAsync();
+
             try
             {
                 var patient = await _unitOfWork.Patients.GetByIdAsync(appointment.PatientId);
@@ -207,12 +221,16 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
             var appointment = await _unitOfWork.Appointments.GetByIdAsync(appointmentId);
             if (appointment == null)
                 return null;
+
             if (appointment.DoctorId != doctorId)
                 return null;
+
             if (appointment.Status == AppointmentStatus.Completed)
                 return null;
+
             if (appointment.ApprovalStatus != AppointmentApprovalStatus.Approved)
                 return null;
+
             var prevStatus = appointment.Status;
             var prevApprovalStatus = appointment.ApprovalStatus;
             appointment.Status = AppointmentStatus.Completed;
@@ -232,6 +250,7 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
             };
             await _unitOfWork.AppointmentStatusHistories.AddAsync(history);
             await _unitOfWork.SaveChangesAsync();
+
             try
             {
                 var fee = appointment.Doctor.ConsultationFee;
@@ -265,6 +284,7 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
             }
             _logger.LogInformation($"Appointment {appointmentId} completed by doctor {doctorId}");
             await NotifyDashboardUpdateAsync();
+            
             return _mapper.Map<AppointmentResponseDto>(appointment);
         }
         catch (Exception ex)
@@ -282,13 +302,16 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
             var appointment = await _unitOfWork.Appointments.GetByIdAsync(appointmentId);
             if (appointment == null)
                 return false;
+
             var patient = await _unitOfWork.Patients.GetByIdAsync(appointment.PatientId);
             var doctor = await _unitOfWork.Doctors.GetByIdAsync(appointment.DoctorId);
             bool hasAccess = (patient != null && patient.User.Id == userId) || (doctor != null && doctor.User.Id == userId);
             if (!hasAccess)
                 return false;
+
             if (appointment.Status == AppointmentStatus.Cancelled || appointment.Status == AppointmentStatus.Completed)
                 return false;
+
             var prevStatus = appointment.Status;
             var prevApprovalStatus = appointment.ApprovalStatus;
             appointment.Status = AppointmentStatus.Cancelled;
@@ -305,6 +328,7 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
             };
             await _unitOfWork.AppointmentStatusHistories.AddAsync(history);
             await _unitOfWork.SaveChangesAsync();
+
             try
             {
                 if (patient != null && doctor != null)
@@ -318,6 +342,7 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
             }
             _logger.LogInformation($"Appointment {appointmentId} cancelled by {cancelledBy}");
             await NotifyDashboardUpdateAsync();
+           
             return true;
         }
         catch (Exception ex)
@@ -335,17 +360,20 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
             var appointment = await _unitOfWork.Appointments.GetByIdAsync(appointmentId);
             if (appointment == null)
                 return null;
+
             var patient = await _unitOfWork.Patients.GetByIdAsync(appointment.PatientId);
             var doctor = await _unitOfWork.Doctors.GetByIdAsync(appointment.DoctorId);
             bool hasAccess = (patient != null && patient.User.Id == userId) || (doctor != null && doctor.User.Id == userId);
             if (!hasAccess)
                 return null;
+
             if (appointment.Status == AppointmentStatus.Completed || appointment.Status == AppointmentStatus.Cancelled)
                 return null;
-            bool hasConflict = await _unitOfWork.Appointments.HasConflictAsync(
-                appointment.DoctorId, newDate, newStartTime, newEndTime, appointmentId);
+
+            bool hasConflict = await _unitOfWork.Appointments.HasConflictAsync(appointment.DoctorId, newDate, newStartTime, newEndTime, appointmentId);
             if (hasConflict)
                 return null;
+
             var prevStatus = appointment.Status;
             var prevApprovalStatus = appointment.ApprovalStatus;
             var oldDate = appointment.AppointmentDate;
@@ -374,6 +402,7 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
             };
             await _unitOfWork.AppointmentStatusHistories.AddAsync(history);
             await _unitOfWork.SaveChangesAsync();
+
             try
             {
                 if (doctor != null)
@@ -403,6 +432,7 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
             var appointment = await _unitOfWork.Appointments.GetByIdAsync(appointmentId);
             if (appointment == null)
                 return false;
+
             var prevStatus = appointment.Status;
             var prevApprovalStatus = appointment.ApprovalStatus;
             appointment.Status = AppointmentStatus.NoShow;
@@ -496,6 +526,7 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
                     return false;
                 return startTime >= daySchedule.StartTime && endTime <= daySchedule.EndTime;
             }
+
             var defaultStart = new TimeSpan(9, 0, 0);
             var defaultEnd = new TimeSpan(21, 0, 0);
             return startTime >= defaultStart && endTime <= defaultEnd;

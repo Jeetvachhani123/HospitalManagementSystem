@@ -42,6 +42,7 @@ public class BillingController : ControllerBase
         {
             return NotFound(ApiResponse<Invoice>.ErrorResponse("Invoice not found"));
         }
+
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
         var role = User.FindFirstValue(ClaimTypes.Role);
         if (role == "Patient")
@@ -52,6 +53,7 @@ public class BillingController : ControllerBase
                 return Forbid();
             }
         }
+
         return Ok(ApiResponse<Invoice>.SuccessResponse(invoice));
     }
 
@@ -70,6 +72,7 @@ public class BillingController : ControllerBase
                 return Forbid();
             }
         }
+
         var invoices = await _billingService.GetPatientInvoicesAsync(patientId);
         return Ok(ApiResponse<IEnumerable<Invoice>>.SuccessResponse(invoices));
     }
@@ -85,6 +88,7 @@ public class BillingController : ControllerBase
         {
             return NotFound(ApiResponse<IEnumerable<Invoice>>.ErrorResponse("Patient profile not found"));
         }
+
         var invoices = await _billingService.GetPatientInvoicesAsync(patient.Id);
         return Ok(ApiResponse<IEnumerable<Invoice>>.SuccessResponse(invoices));
     }
@@ -100,6 +104,7 @@ public class BillingController : ControllerBase
         {
             return NotFound(ApiResponse<IEnumerable<Invoice>>.ErrorResponse("Patient profile not found"));
         }
+
         var invoices = await _billingService.GetPendingInvoicesAsync(patient.Id);
         return Ok(ApiResponse<IEnumerable<Invoice>>.SuccessResponse(invoices));
     }
@@ -117,21 +122,25 @@ public class BillingController : ControllerBase
         {
             return NotFound(ApiResponse<bool>.ErrorResponse("Invoice not found"));
         }
+
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
         var patient = await _appointmentService.GetPatientByUserIdAsync(userId);
         if (patient == null || invoice.PatientId != patient.Id)
         {
             return Forbid();
         }
+
         if (invoice.IsPaid)
         {
             return BadRequest(ApiResponse<bool>.ErrorResponse("Invoice already paid"));
         }
+
         var result = await _billingService.ProcessPaymentAsync(id, request.PaymentMethod);
         if (!result)
         {
             return BadRequest(ApiResponse<bool>.ErrorResponse("Payment processing failed"));
         }
+
         _logger.LogInformation("Payment processed for invoice {InvoiceId} by patient {PatientId}", id, patient.Id);
         return Ok(ApiResponse<bool>.SuccessResponse(true, "Payment processed successfully"));
     }
@@ -147,6 +156,7 @@ public class BillingController : ControllerBase
         {
             return NotFound(ApiResponse<bool>.ErrorResponse("Invoice not found or already cancelled"));
         }
+
         _logger.LogInformation("Invoice {InvoiceId} cancelled", id);
         return Ok(ApiResponse<bool>.SuccessResponse(true, "Invoice cancelled successfully"));
     }

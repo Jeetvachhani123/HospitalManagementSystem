@@ -32,7 +32,9 @@ namespace HospitalMS.Web.Controllers
             if (role == "Patient")
             {
                 var currentPatient = await _patientService.GetByUserIdAsync(userId);
-                if (currentPatient == null) return NotFound("Patient profile not found");
+                if (currentPatient == null) 
+                    return NotFound("Patient profile not found");
+                
                 if (!patientId.HasValue || patientId.Value != currentPatient.Id)
                 {
                     patientId = currentPatient.Id;
@@ -50,8 +52,10 @@ namespace HospitalMS.Web.Controllers
                         Value = p.Id.ToString(),
                         Text = $"{p.FullName} (ID: {p.Id})"
                     }).ToList();
+                    
                     return View(new List<MedicalRecordDisplayViewModel>());
                 }
+                
                 return BadRequest("Patient ID is required for medical records.");
             }
             var records = await _medicalRecordService.GetByPatientIdAsync(patientId.Value);
@@ -73,6 +77,7 @@ namespace HospitalMS.Web.Controllers
                 CreatedBy = r.CreatedBy,
                 UpdatedBy = r.UpdatedBy
             }).ToList();
+            
             return View(viewModels);
         }
 
@@ -85,14 +90,18 @@ namespace HospitalMS.Web.Controllers
                 TempData["InfoMessage"] = "Please select a patient to add a medical record.";
                 return RedirectToAction("Index", "Patient");
             }
+
             var patient = await _patientService.GetByIdAsync(patientId.Value);
-            if (patient == null) return NotFound();
+            if (patient == null) 
+                return NotFound();
+
             var viewModel = new CreateMedicalRecordViewModel
             {
                 PatientId = patientId.Value,
                 PatientName = $"{patient.FirstName} {patient.LastName}",
                 RecordDate = DateTime.Today
             };
+
             return View(viewModel);
         }
 
@@ -116,9 +125,11 @@ namespace HospitalMS.Web.Controllers
                             ModelState.AddModelError("Attachment", "Invalid file type. Only PDF and images are allowed.");
                             return View(viewModel);
                         }
+
                         var fileName = $"{Guid.NewGuid()}{extension}";
                         var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "App_Data", "medical_records", viewModel.PatientId.ToString());
                         if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+
                         var filePath = Path.Combine(uploadsFolder, fileName);
                         using (var stream = new FileStream(filePath, FileMode.Create))
                         {
@@ -155,6 +166,7 @@ namespace HospitalMS.Web.Controllers
                 TempData["SuccessMessage"] = "Medical record added successfully.";
                 return RedirectToAction(nameof(Index), new { patientId = viewModel.PatientId });
             }
+
             return View(viewModel);
         }
 
@@ -174,6 +186,7 @@ namespace HospitalMS.Web.Controllers
             {
                 TempData["ErrorMessage"] = "Failed to delete record. You may not have permission.";
             }
+
             return RedirectToAction(nameof(Index), new { patientId });
         }
     }

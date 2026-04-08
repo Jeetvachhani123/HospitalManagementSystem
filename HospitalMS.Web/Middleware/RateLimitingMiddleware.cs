@@ -34,12 +34,14 @@ public class RateLimitingMiddleware
             await context.Response.WriteAsync("Too many requests. Please try again later.");
             return;
         }
+
         if (DateTime.UtcNow - requestInfo.WindowStart > TimeSpan.FromMinutes(1))
         {
             requestInfo.RequestCount = 0;
             requestInfo.LoginAttempts = 0;
             requestInfo.WindowStart = DateTime.UtcNow;
         }
+
         requestInfo.RequestCount++;
         if (path.Contains("/account/login") && context.Request.Method == "POST")
         {
@@ -54,6 +56,7 @@ public class RateLimitingMiddleware
                 return;
             }
         }
+
         if (requestInfo.RequestCount > MaxRequestsPerMinute)
         {
             requestInfo.IsBlocked = true;
@@ -63,6 +66,7 @@ public class RateLimitingMiddleware
             await context.Response.WriteAsync("Too many requests. Please try again later.");
             return;
         }
+
         await _next(context);
     }
 
@@ -73,6 +77,7 @@ public class RateLimitingMiddleware
         {
             return;
         }
+
         bool lockTaken = false;
         try
         {

@@ -47,11 +47,13 @@ public class AuthService : IAuthService
             _logger.LogWarning("Login failed: Invalid password for user {UserId} ({Email})", user.Id, loginDto.Email);
             return null;
         }
+
         if (!user.IsActive)
         {
             _logger.LogWarning("Login failed: User {UserId} ({Email}) is inactive", user.Id, loginDto.Email);
             return null;
         }
+
         _logger.LogInformation("Login successful for user {UserId} ({Email})", user.Id, loginDto.Email);
         user.LastLoginAt = DateTime.UtcNow;
         _unitOfWork.Users.Update(user);
@@ -68,6 +70,7 @@ public class AuthService : IAuthService
         {
             return null;
         }
+
         var token = GenerateJwtToken(user);
         return new AuthResponseDto
         {
@@ -122,7 +125,9 @@ public class AuthService : IAuthService
     public async Task<UserProfileDto?> GetProfileAsync(int userId)
     {
         var user = await _unitOfWork.Users.GetByIdAsync(userId);
-        if (user == null) return null;
+        if (user == null) 
+            return null;
+
         var profile = new UserProfileDto { Id = user.Id, Email = user.Email, FirstName = user.FirstName, LastName = user.LastName, FullName = user.GetFullName(), PhoneNumber = user.PhoneNumber, Role = user.Role.ToString(), LastLoginAt = user.LastLoginAt, CreatedAt = user.CreatedAt };
         if (user.Role == UserRole.Patient)
         {
@@ -161,9 +166,13 @@ public class AuthService : IAuthService
     public async Task<UserProfileDto?> UpdateProfileAsync(int userId, ProfileUpdateDto profileDto)
     {
         var user = await _unitOfWork.Users.GetByIdAsync(userId);
-        if (user == null) return null;
+        if (user == null) 
+            return null;
+
         if (!string.IsNullOrWhiteSpace(profileDto.FirstName)) user.FirstName = profileDto.FirstName;
+        
         if (!string.IsNullOrWhiteSpace(profileDto.LastName)) user.LastName = profileDto.LastName;
+        
         if (profileDto.PhoneNumber != null) user.PhoneNumber = profileDto.PhoneNumber;
         _unitOfWork.Users.Update(user);
         if (user.Role == UserRole.Patient)
@@ -212,17 +221,20 @@ public class AuthService : IAuthService
             _logger.LogWarning("Password change failed for user {UserId}: passwords do not match", userId);
             return false;
         }
+
         var user = await _unitOfWork.Users.GetByIdAsync(userId);
         if (user == null)
         {
             _logger.LogWarning("Password change failed: user {UserId} not found", userId);
             return false;
         }
+
         if (!VerifyPassword(passwordDto.CurrentPassword, user.PasswordHash))
         {
             _logger.LogWarning("Password change failed for user {UserId}: current password is incorrect", userId);
             return false;
         }
+
         user.PasswordHash = HashPassword(passwordDto.NewPassword);
         _unitOfWork.Users.Update(user);
         await _unitOfWork.SaveChangesAsync();

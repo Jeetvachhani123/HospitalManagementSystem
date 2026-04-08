@@ -61,6 +61,7 @@ public class BillingController : Controller
                 }).ToList();
             }
         }
+
         return View(invoices);
     }
 
@@ -70,7 +71,9 @@ public class BillingController : Controller
     public async Task<IActionResult> Details(int id)
     {
         var invoice = await _billingService.GetInvoiceByIdAsync(id);
-        if (invoice == null) return NotFound();
+        if (invoice == null)
+            return NotFound();
+
         if (User.IsInRole("Patient"))
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -80,6 +83,7 @@ public class BillingController : Controller
                 return Forbid();
             }
         }
+
         var model = new InvoiceViewModel
         {
             Id = invoice.Id,
@@ -92,6 +96,7 @@ public class BillingController : Controller
             CreatedBy = invoice.CreatedBy,
             UpdatedBy = invoice.UpdatedBy
         };
+
         return View(model);
     }
 
@@ -106,8 +111,11 @@ public class BillingController : Controller
             TempData["InfoMessage"] = "Invoice already exists for this appointment.";
             return RedirectToAction(nameof(Details), new { id = existingInvoice.Id });
         }
+
         var appointment = await _appointmentService.GetByIdAsync(appointmentId);
-        if (appointment == null) return NotFound();
+        if (appointment == null) 
+            return NotFound();
+
         var model = new GenerateInvoiceViewModel
         {
             AppointmentId = appointmentId,
@@ -116,6 +124,7 @@ public class BillingController : Controller
             AppointmentDate = appointment.AppointmentDate,
             Amount = 100
         };
+
         return View(model);
     }
 
@@ -127,16 +136,19 @@ public class BillingController : Controller
     {
         if (!ModelState.IsValid)
             return View(model);
+
         try
         {
             await _billingService.GenerateInvoiceAsync(model.AppointmentId, model.Amount, model.DueDate);
             TempData["SuccessMessage"] = "Invoice generated successfully.";
+
             return RedirectToAction(nameof(Index));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error generating invoice");
             ModelState.AddModelError("", "Failed to generate invoice: " + ex.Message);
+
             return View(model);
         }
     }
@@ -147,22 +159,27 @@ public class BillingController : Controller
     public async Task<IActionResult> Pay(int id)
     {
         var invoice = await _billingService.GetInvoiceByIdAsync(id);
+
         if (invoice == null)
             return NotFound();
+
         if (invoice.IsPaid)
             return RedirectToAction(nameof(Details), new { id });
+
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         var patient = await _patientService.GetByUserIdAsync(userId);
         if (patient == null || invoice.PatientId != patient.Id)
         {
             return Forbid();
         }
+
         var model = new PayInvoiceViewModel
         {
             InvoiceId = invoice.Id,
             Amount = invoice.Amount,
             PatientName = invoice.Patient?.User?.GetFullName() ?? "Unknown"
         };
+
         return View(model);
     }
 
@@ -174,6 +191,7 @@ public class BillingController : Controller
     {
         if (!ModelState.IsValid)
             return View(model);
+
         if (model.PaymentMethod == "Credit Card")
         {
             if (string.IsNullOrWhiteSpace(model.CardNumber) || string.IsNullOrWhiteSpace(model.ExpiryDate) || string.IsNullOrWhiteSpace(model.CVV))
@@ -189,6 +207,7 @@ public class BillingController : Controller
                 var successUrl = Url.Action("PaymentSuccess", "Billing", new { id = model.InvoiceId }, Request.Scheme) ?? string.Empty;
                 var cancelUrl = Url.Action("Details", "Billing", new { id = model.InvoiceId }, Request.Scheme) ?? string.Empty;
                 var checkoutUrl = await _paymentService.CreateCheckoutSessionAsync(model.InvoiceId, model.Amount, "usd", successUrl, cancelUrl);
+                
                 return Redirect(checkoutUrl);
             }
             else
@@ -210,6 +229,7 @@ public class BillingController : Controller
         {
             _logger.LogError(ex, "Error processing payment");
             ModelState.AddModelError("", "An error occurred during payment.");
+            
             return View(model);
         }
     }
@@ -234,8 +254,10 @@ public class BillingController : Controller
         try
         {
             var result = await _paymentService.HandleWebhookAsync(json, signature ?? string.Empty);
-            if (result) return Ok();
-            else return BadRequest();
+            if (result) 
+                return Ok();
+            else 
+                return BadRequest();
         }
         catch (Exception ex)
         {

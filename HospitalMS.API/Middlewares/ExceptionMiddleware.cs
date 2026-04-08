@@ -38,6 +38,7 @@ public class ExceptionMiddleware
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         };
+
         return context.Response.WriteAsync(JsonSerializer.Serialize(response, jsonOptions));
     }
 }

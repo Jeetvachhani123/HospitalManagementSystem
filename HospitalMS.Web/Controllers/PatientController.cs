@@ -31,7 +31,9 @@ namespace HospitalMS.Web.Controllers
             {
                 var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
                 var patient = await _patientService.GetByUserIdAsync(userId);
-                if (patient == null) return NotFound("Patient profile not found");
+                if (patient == null) 
+                    return NotFound("Patient profile not found");
+                
                 var appointments = await _appointmentService.GetByPatientIdAsync(patient.Id);
                 var appointmentList = appointments.ToList();
                 var model = new PatientDashboardViewModel
@@ -84,6 +86,7 @@ namespace HospitalMS.Web.Controllers
                             }))
                         .ToList()
                 };
+
                 return View(model);
             }
             catch (Exception ex)
@@ -142,6 +145,7 @@ namespace HospitalMS.Web.Controllers
                     TotalCount = pagedResult.TotalCount,
                     SearchQuery = searchQuery
                 };
+
                 return View(model);
             }
             catch (Exception ex)
@@ -156,11 +160,14 @@ namespace HospitalMS.Web.Controllers
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var patient = await _patientService.GetByIdAsync(id);
-            if (patient == null) return NotFound();
+            if (patient == null) 
+                return NotFound();
+
             if (User.IsInRole("Patient") && patient.UserId != userId)
             {
                 return Forbid();
             }
+
             var viewModel = new PatientViewModel
             {
                 Id = patient.Id,
@@ -177,6 +184,7 @@ namespace HospitalMS.Web.Controllers
                 CreatedBy = patient.CreatedBy,
                 UpdatedBy = patient.UpdatedBy
             };
+
             return View(viewModel);
         }
 
@@ -197,6 +205,7 @@ namespace HospitalMS.Web.Controllers
             {
                 return View(model);
             }
+
             try
             {
                 var createDto = new PatientCreateDto
@@ -217,12 +226,14 @@ namespace HospitalMS.Web.Controllers
                     ModelState.AddModelError("Email", "Email already exists or registration failed.");
                     return View(model);
                 }
+
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error creating patient");
                 ModelState.AddModelError("", "An unexpected error occurred.");
+                
                 return View(model);
             }
         }
@@ -232,7 +243,9 @@ namespace HospitalMS.Web.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             var patient = await _patientService.GetByIdAsync(id);
-            if (patient == null) return NotFound();
+            if (patient == null) 
+                return NotFound();
+
             var model = new PatientEditViewModel
             {
                 Id = patient.Id,
@@ -246,6 +259,7 @@ namespace HospitalMS.Web.Controllers
                 MedicalHistory = patient.MedicalHistory,
                 Allergies = patient.Allergies
             };
+
             return View(model);
         }
 
@@ -255,8 +269,12 @@ namespace HospitalMS.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, PatientEditViewModel model)
         {
-            if (id != model.Id) return BadRequest();
-            if (!ModelState.IsValid) return View(model);
+            if (id != model.Id) 
+                return BadRequest();
+            
+            if (!ModelState.IsValid) 
+                return View(model);
+            
             try
             {
                 var updateDto = new PatientUpdateDto
@@ -273,13 +291,16 @@ namespace HospitalMS.Web.Controllers
                 {
                     return NotFound();
                 }
+
                 TempData["SuccessMessage"] = "Patient updated successfully.";
+                
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error updating patient {Id}", id);
                 ModelState.AddModelError("", "An unexpected error occurred.");
+               
                 return View(model);
             }
         }
@@ -298,6 +319,7 @@ namespace HospitalMS.Web.Controllers
                     TempData["ErrorMessage"] = "Patient not found.";
                     return RedirectToAction(nameof(Index));
                 }
+
                 TempData["SuccessMessage"] = "Patient deleted successfully.";
                 return RedirectToAction(nameof(Index));
             }
@@ -305,6 +327,7 @@ namespace HospitalMS.Web.Controllers
             {
                 _logger.LogError(ex, "Error deleting patient {Id}", id);
                 TempData["ErrorMessage"] = "An error occurred while deleting the patient.";
+               
                 return RedirectToAction(nameof(Index));
             }
         }

@@ -80,11 +80,13 @@ public class DoctorRepository : IDoctorRepository
         {
             query = query.Where(d => d.User.FirstName.Contains(searchTerm) || d.User.LastName.Contains(searchTerm) || d.Specialization.Contains(searchTerm));
         }
+
         var totalCount = await query.CountAsync(cancellationToken);
         var items = await query
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
+        
         return (items, totalCount);
     }
 

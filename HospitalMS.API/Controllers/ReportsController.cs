@@ -32,6 +32,7 @@ public class ReportsController : ControllerBase
     {
         var report = await _reportingService.GenerateAppointmentReportAsync(startDate, endDate);
         _logger.LogInformation("Appointment report generated for period {StartDate} to {EndDate}", startDate?.ToString("yyyy-MM-dd") ?? "all time", endDate?.ToString("yyyy-MM-dd") ?? "present");
+        
         return Ok(ApiResponse<AppointmentReportDto>.SuccessResponse(report));
     }
 
@@ -51,6 +52,7 @@ public class ReportsController : ControllerBase
                 return Forbid();
             }
         }
+
         var report = await _reportingService.GenerateDoctorPerformanceReportAsync(doctorId);
         _logger.LogInformation("Doctor performance report generated for doctor {DoctorId}", doctorId);
         return Ok(ApiResponse<DoctorPerformanceReportDto>.SuccessResponse(report));
@@ -67,6 +69,7 @@ public class ReportsController : ControllerBase
         {
             return NotFound(ApiResponse<DoctorPerformanceReportDto>.ErrorResponse("Doctor profile not found"));
         }
+
         var report = await _reportingService.GenerateDoctorPerformanceReportAsync(doctor.Id);
         return Ok(ApiResponse<DoctorPerformanceReportDto>.SuccessResponse(report));
     }
@@ -78,6 +81,7 @@ public class ReportsController : ControllerBase
     {
         var stats = await _reportingService.GetSystemStatisticsAsync();
         _logger.LogInformation("System statistics retrieved");
+        
         return Ok(ApiResponse<SystemStatisticsDto>.SuccessResponse(stats));
     }
 
@@ -90,6 +94,7 @@ public class ReportsController : ControllerBase
         {
             return BadRequest(ApiResponse<MonthlyTrendDto>.ErrorResponse("Months must be between 1 and 24"));
         }
+
         var trend = await _reportingService.GetMonthlyTrendAsync(months);
         _logger.LogInformation("Monthly trend data retrieved for {Months} months", months);
         return Ok(ApiResponse<MonthlyTrendDto>.SuccessResponse(trend));
@@ -135,6 +140,7 @@ public class ReportsController : ControllerBase
         {
             return Forbid();
         }
+
         return Ok(ApiResponse<DashboardStatsDto>.SuccessResponse(stats));
     }
 
@@ -165,6 +171,7 @@ public class ReportsController : ControllerBase
                 AppointmentDate = a.AppointmentDate
             }).ToList()
         };
+
         _logger.LogInformation("Admin dashboard data retrieved");
         return Ok(ApiResponse<AdminDashboardApiDto>.SuccessResponse(dto));
     }
@@ -178,8 +185,10 @@ public class ReportsController : ControllerBase
     {
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
         var doctor = await _doctorService.GetByUserIdAsync(userId);
+        
         if (doctor == null)
             return NotFound(ApiResponse<DoctorDashboardApiDto>.ErrorResponse("Doctor profile not found"));
+        
         var performance = await _reportingService.GenerateDoctorPerformanceReportAsync(doctor.Id);
         var todayCount = await _appointmentService.GetAppointmentsCountAsync(doctor.Id, null, DateTime.UtcNow.Date);
         var pendingApprovals = await _appointmentService.GetPendingApprovalsAsync(doctor.Id);
@@ -205,6 +214,7 @@ public class ReportsController : ControllerBase
                 AppointmentDate = a.AppointmentDate
             }).ToList()
         };
+
         _logger.LogInformation("Doctor dashboard data retrieved for doctor {DoctorId}", doctor.Id);
         return Ok(ApiResponse<DoctorDashboardApiDto>.SuccessResponse(dto));
     }
@@ -218,8 +228,10 @@ public class ReportsController : ControllerBase
     {
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
         var patient = await _appointmentService.GetPatientByUserIdAsync(userId);
+        
         if (patient == null)
             return NotFound(ApiResponse<PatientDashboardApiDto>.ErrorResponse("Patient profile not found"));
+        
         var appointments = (await _appointmentService.GetByPatientIdAsync(patient.Id)).ToList();
         var dto = new PatientDashboardApiDto
         {
@@ -247,6 +259,7 @@ public class ReportsController : ControllerBase
                     AppointmentDate = a.AppointmentDate
                 }).ToList()
         };
+
         _logger.LogInformation("Patient dashboard data retrieved for patient {PatientId}", patient.Id);
         return Ok(ApiResponse<PatientDashboardApiDto>.SuccessResponse(dto));
     }
@@ -271,6 +284,7 @@ public class ReportsController : ControllerBase
                     experience = d.YearsOfExperience,
                     d.IsAvailable
                 })));
+            
             case "Patients":
                 var patients = await _patientService.GetAllAsync();
                 return Ok(ApiResponse<object>.SuccessResponse(patients.Select(p => new
@@ -281,6 +295,7 @@ public class ReportsController : ControllerBase
                     phone = p.PhoneNumber,
                     p.BloodGroup
                 })));
+           
             case "TodayAppointments":
                 var todayAppts = await _appointmentService.GetTodaysAppointmentsAsync();
                 return Ok(ApiResponse<object>.SuccessResponse(todayAppts.Select(a => new
@@ -291,6 +306,7 @@ public class ReportsController : ControllerBase
                     time = a.StartTime.ToString(@"hh\:mm"),
                     a.Status
                 })));
+           
             case "PendingApprovals":
                 var all = await _appointmentService.GetAllAsync();
                 var pending = all.Where(a =>
@@ -302,6 +318,7 @@ public class ReportsController : ControllerBase
                     date = a.AppointmentDate.ToString("MMM dd, yyyy"),
                     a.Status
                 })));
+           
             default:
                 return BadRequest(ApiResponse<object>.ErrorResponse("Invalid type. Use: Doctors, Patients, TodayAppointments, PendingApprovals"));
         }
@@ -348,6 +365,7 @@ public class ReportsController : ControllerBase
             }).ToList(),
             GeneratedAt = DateTime.UtcNow
         };
+
         _logger.LogInformation("Full report snapshot generated");
         return Ok(ApiResponse<FullReportApiDto>.SuccessResponse(dto));
     }

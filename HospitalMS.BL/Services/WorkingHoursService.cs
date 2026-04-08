@@ -30,6 +30,7 @@ public class WorkingHoursService : IWorkingHoursService
             await _unitOfWork.SaveChangesAsync();
             hours = await _unitOfWork.DoctorWorkingHours.GetByDoctorIdAsync(doctorId);
         }
+       
         return hours.OrderBy(h => h.DayOfWeek).Select(h => new WorkingHoursDto
         {
             Id = h.Id,

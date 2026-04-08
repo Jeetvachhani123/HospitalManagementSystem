@@ -25,7 +25,9 @@ public class DepartmentController : Controller
     public async Task<IActionResult> Details(int id)
     {
         var department = await _departmentService.GetByIdAsync(id);
-        if (department == null) return NotFound();
+        if (department == null) 
+            return NotFound();
+        
         return View(department);
     }
 
@@ -48,6 +50,7 @@ public class DepartmentController : Controller
             TempData["SuccessMessage"] = "Department created successfully.";
             return RedirectToAction(nameof(Index));
         }
+        
         return View(dto);
     }
 
@@ -56,7 +59,9 @@ public class DepartmentController : Controller
     public async Task<IActionResult> Edit(int id)
     {
         var department = await _departmentService.GetByIdAsync(id);
-        if (department == null) return NotFound();
+        if (department == null) 
+            return NotFound();
+        
         var updateDto = new UpdateDepartmentDto { Id = department.Id, Name = department.Name, Description = department.Description, Location = department.Location, IsActive = department.IsActive };
         return View(updateDto);
     }
@@ -67,13 +72,16 @@ public class DepartmentController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, UpdateDepartmentDto dto)
     {
-        if (id != dto.Id) return BadRequest();
+        if (id != dto.Id) 
+            return BadRequest();
+        
         if (ModelState.IsValid)
         {
             await _departmentService.UpdateAsync(id, dto);
             TempData["SuccessMessage"] = "Department updated successfully.";
             return RedirectToAction(nameof(Index));
         }
+        
         return View(dto);
     }
 
@@ -92,6 +100,7 @@ public class DepartmentController : Controller
         {
             TempData["ErrorMessage"] = "Could not delete department. It may have assigned doctors.";
         }
+        
         return RedirectToAction(nameof(Index));
     }
 }

@@ -146,6 +146,7 @@ public class AppointmentRepository : IAppointmentRepository
         {
             query = query.Where(a => a.Id != excludeAppointmentId.Value);
         }
+        
         return await query.AnyAsync(cancellationToken);
     }
 
@@ -155,6 +156,7 @@ public class AppointmentRepository : IAppointmentRepository
         var today = DateTime.Today;
         if (date.Date < today)
             return new List<TimeSpan>();
+        
         var dayOfWeek = (int)date.DayOfWeek;
         var workingHours = await _context.DoctorWorkingHours
             .AsNoTracking()
@@ -168,6 +170,7 @@ public class AppointmentRepository : IAppointmentRepository
                 IsWorkingDay = true
             };
         }
+
         if (!workingHours.IsWorkingDay)
         {
             if (dayOfWeek == 0 || dayOfWeek == 6)
@@ -176,6 +179,7 @@ public class AppointmentRepository : IAppointmentRepository
             workingHours.StartTime = new TimeSpan(9, 0, 0);
             workingHours.EndTime = new TimeSpan(21, 0, 0);
         }
+
         var bookedSlots = await _context.Appointments
             .AsNoTracking()
             .Where(a => a.DoctorId == doctorId && a.AppointmentDate.Date == date.Date && a.Status != AppointmentStatus.Cancelled && a.ApprovalStatus != AppointmentApprovalStatus.Rejected)
@@ -211,6 +215,7 @@ public class AppointmentRepository : IAppointmentRepository
                 tempTime = tempTime.Add(TimeSpan.FromMinutes(slotDurationMinutes));
             }
         }
+
         return availableSlots;
     }
 
@@ -218,6 +223,7 @@ public class AppointmentRepository : IAppointmentRepository
     public async Task<Appointment> AddAsync(Appointment appointment, CancellationToken cancellationToken = default)
     {
         await _context.Appointments.AddAsync(appointment, cancellationToken);
+       
         return appointment;
     }
 
@@ -243,6 +249,7 @@ public class AppointmentRepository : IAppointmentRepository
         {
             query = query.Where(predicate);
         }
+        
         return await query.CountAsync(cancellationToken);
     }
 
@@ -276,33 +283,40 @@ public class AppointmentRepository : IAppointmentRepository
         {
             query = query.Where(a => a.DoctorId == doctorId.Value);
         }
+
         if (patientId.HasValue)
         {
             query = query.Where(a => a.PatientId == patientId.Value);
         }
+
         if (fromDate.HasValue)
         {
             query = query.Where(a => a.AppointmentDate >= fromDate.Value.Date);
         }
+
         if (toDate.HasValue)
         {
             query = query.Where(a => a.AppointmentDate <= toDate.Value.Date);
         }
+
         if (status.HasValue)
         {
             query = query.Where(a => a.Status == status.Value);
         }
+
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
             var lowerQuery = searchTerm.ToLower();
             query = query.Where(a => a.Patient!.User!.FirstName.Contains(searchTerm) || a.Patient!.User!.LastName.Contains(searchTerm) || a.Doctor!.User!.FirstName.Contains(searchTerm) || a.Doctor!.User!.LastName.Contains(searchTerm) || (a.Reason != null && a.Reason.Contains(searchTerm)) || (a.Diagnosis != null && a.Diagnosis.Contains(searchTerm)));
         }
+
         var totalCount = await query.CountAsync(cancellationToken);
         var items = await query
             .OrderByDescending(a => a.AppointmentDate)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
+        
         return (items, totalCount);
     }
 }

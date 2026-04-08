@@ -36,7 +36,9 @@ public class DoctorController : Controller
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var doctor = await _doctorService.GetByUserIdAsync(userId);
-            if (doctor == null) return NotFound("Doctor profile not found");
+            if (doctor == null) 
+                return NotFound("Doctor profile not found");
+            
             var today = DateTime.Today;
             var todayAppointmentsCount = await _appointmentService.GetAppointmentsCountAsync(doctor.Id, null, today);
             var pendingApprovals = await _workflowService.GetPendingApprovalsAsync(doctor.Id);
@@ -63,6 +65,7 @@ public class DoctorController : Controller
                     Status = a.Status
                 }).ToList()
             };
+            
             return View(model);
         }
         catch (Exception ex)
@@ -96,14 +99,17 @@ public class DoctorController : Controller
                     Qualifications = ""
                 });
             }
+
             else
             {
                 doctors = await _doctorService.GetAllAsync();
             }
+
             if (!string.IsNullOrWhiteSpace(specialization))
             {
                 doctors = doctors.Where(d => d.Specialization.Equals(specialization, StringComparison.OrdinalIgnoreCase));
             }
+
             var allDoctors = await _doctorService.GetAllAsync();
             var specializations = allDoctors.Select(d => d.Specialization).Distinct().OrderBy(s => s).ToList();
             var pagedResult = PaginationService.Create(doctors, page, pageSize);
@@ -129,6 +135,7 @@ public class DoctorController : Controller
                 SelectedSpecialization = specialization,
                 Specializations = specializations
             };
+
             return View(model);
         }
         catch (Exception ex)
@@ -142,7 +149,9 @@ public class DoctorController : Controller
     public async Task<IActionResult> Details(int id)
     {
         var doctor = await _doctorService.GetByIdAsync(id);
-        if (doctor == null) return NotFound();
+        if (doctor == null) 
+            return NotFound();
+        
         var model = new DoctorViewModel
         {
             Id = doctor.Id,
@@ -161,6 +170,7 @@ public class DoctorController : Controller
             CreatedBy = doctor.CreatedBy,
             UpdatedBy = doctor.UpdatedBy
         };
+       
         return View(model);
     }
 
@@ -174,7 +184,9 @@ public class DoctorController : Controller
             if (year == 0) year = DateTime.Now.Year;
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var doctor = await _doctorService.GetByUserIdAsync(userId);
-            if (doctor == null) return NotFound("Doctor profile not found");
+            if (doctor == null)
+                return NotFound("Doctor profile not found");
+            
             var appointments = await _appointmentService.GetByDoctorIdAsync(doctor.Id);
             var appointmentList = appointments.ToList();
             var firstDayOfMonth = new DateTime(year, month, 1);
@@ -188,6 +200,7 @@ public class DoctorController : Controller
                 var date = prevMonthLastDay.AddDays(-i);
                 days.Add(new CalendarDayViewModel { Day = date.Day, IsCurrentMonth = false, Date = date });
             }
+
             for (int day = 1; day <= daysInMonth; day++)
             {
                 var date = new DateTime(year, month, day);
@@ -212,12 +225,14 @@ public class DoctorController : Controller
                     Appointments = dayAppointments
                 });
             }
+
             int remainingDays = 42 - days.Count;
             for (int day = 1; day <= remainingDays; day++)
             {
                 var date = lastDayOfMonth.AddDays(day);
                 days.Add(new CalendarDayViewModel { Day = date.Day, IsCurrentMonth = false, Date = date });
             }
+
             var model = new CalendarViewModel
             {
                 DoctorId = doctor.Id,
@@ -241,6 +256,7 @@ public class DoctorController : Controller
                     }).ToList(),
                 TotalAppointments = appointmentList.Count
             };
+
             return View(model);
         }
         catch (Exception ex)
@@ -255,6 +271,7 @@ public class DoctorController : Controller
     public async Task<IActionResult> Create()
     {
         ViewBag.Departments = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(await _departmentService.GetAllAsync(), "Id", "Name");
+       
         return View();
     }
 
@@ -264,7 +281,9 @@ public class DoctorController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(DoctorCreateViewModel model)
     {
-        if (!ModelState.IsValid) return View(model);
+        if (!ModelState.IsValid) 
+            return View(model);
+        
         try
         {
             var createDto = new BL.DTOs.Doctor.DoctorCreateDto
@@ -289,11 +308,13 @@ public class DoctorController : Controller
                 ViewBag.Departments = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(await _departmentService.GetAllAsync(), "Id", "Name");
                 return View(model);
             }
+
             return RedirectToAction(nameof(Index));
         }
         catch (Exception)
         {
             ModelState.AddModelError("", "An unexpected error occurred.");
+            
             return View(model);
         }
     }
@@ -303,7 +324,9 @@ public class DoctorController : Controller
     public async Task<IActionResult> Edit(int id)
     {
         var doctor = await _doctorService.GetByIdAsync(id);
-        if (doctor == null) return NotFound();
+        if (doctor == null) 
+            return NotFound();
+        
         var model = new DoctorEditViewModel
         {
             Id = doctor.Id,
@@ -320,6 +343,7 @@ public class DoctorController : Controller
             DepartmentId = doctor.DepartmentId
         };
         ViewBag.Departments = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(await _departmentService.GetAllAsync(), "Id", "Name", doctor.DepartmentId);
+        
         return View(model);
     }
 
@@ -329,8 +353,12 @@ public class DoctorController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, DoctorEditViewModel model)
     {
-        if (id != model.Id) return BadRequest();
-        if (!ModelState.IsValid) return View(model);
+        if (id != model.Id) 
+            return BadRequest();
+
+        if (!ModelState.IsValid) 
+            return View(model);
+
         try
         {
             var updateDto = new BL.DTOs.Doctor.DoctorUpdateDto
@@ -349,7 +377,9 @@ public class DoctorController : Controller
             {
                 return NotFound();
             }
+
             TempData["SuccessMessage"] = "Doctor updated successfully.";
+            
             return RedirectToAction(nameof(Index));
         }
         catch (Exception ex)
@@ -357,6 +387,7 @@ public class DoctorController : Controller
             _logger.LogError(ex, "Error updating doctor {Id}", id);
             ModelState.AddModelError("", "An unexpected error occurred.");
             ViewBag.Departments = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(await _departmentService.GetAllAsync(), "Id", "Name", model.DepartmentId);
+            
             return View(model);
         }
     }
@@ -394,6 +425,7 @@ public class DoctorController : Controller
         var doctor = await _doctorService.GetByUserIdAsync(userId);
         if (doctor == null)
             return NotFound("Doctor profile not found");
+
         var hours = await _workingHoursService.GetWorkingHoursAsync(doctor.Id);
         var model = new WorkingHoursViewModel
         {
@@ -408,6 +440,7 @@ public class DoctorController : Controller
                 EndTime = h.EndTime
             }).OrderBy(h => h.DayOfWeek == 0 ? 7 : h.DayOfWeek).ToList()
         };
+
         return View(model);
     }
 
@@ -423,6 +456,7 @@ public class DoctorController : Controller
         {
             return Forbid();
         }
+
         var dtos = model.WorkingDays.Select(d => new BL.DTOs.Doctor.WorkingHoursDto
         {
             Id = d.Id,
@@ -432,6 +466,7 @@ public class DoctorController : Controller
             StartTime = d.StartTime,
             EndTime = d.EndTime
         }).ToList();
+
         await _workingHoursService.UpdateWorkingHoursAsync(model.DoctorId, dtos);
         TempData["SuccessMessage"] = "Working hours updated successfully.";
         return RedirectToAction(nameof(ManageWorkingHours));

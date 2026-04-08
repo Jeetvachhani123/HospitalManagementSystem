@@ -36,6 +36,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IMedicalRecordService, MedicalRecordService>();
         services.AddScoped<IDepartmentService, DepartmentService>();
         services.AddScoped<IWorkingHoursService, WorkingHoursService>();
+        
         return services;
     }
 }

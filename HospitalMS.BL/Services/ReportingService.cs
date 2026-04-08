@@ -39,6 +39,7 @@ public class ReportingService : IReportingService
             NoShowRate = totalCount > 0 ? (decimal)noShowCount / totalCount * 100 : 0,
             CancellationRate = totalCount > 0 ? (decimal)cancelledCount / totalCount * 100 : 0
         };
+
         var doctorGroups = appointmentList.GroupBy(a => a.DoctorId);
         foreach (var group in doctorGroups)
         {
@@ -57,6 +58,7 @@ public class ReportingService : IReportingService
                 });
             }
         }
+
         return report;
     }
 
@@ -66,12 +68,14 @@ public class ReportingService : IReportingService
         var doctor = await _doctorRepository.GetByIdAsync(doctorId);
         if (doctor == null)
             throw new KeyNotFoundException($"Doctor with ID {doctorId} not found");
+       
         var appointments = await _appointmentRepository.GetByDoctorIdAsync(doctorId);
         var appointmentList = appointments.ToList();
         var completedAppointments = appointmentList.Where(a => a.Status == AppointmentStatus.Completed).ToList();
         var totalAppointments = appointmentList.Count;
         var avgConsultationMinutes = 30;
         var patientsServed = appointmentList.Select(a => a.PatientId).Distinct().Count();
+        
         return new DoctorPerformanceReportDto
         {
             DoctorId = doctorId,
@@ -95,6 +99,7 @@ public class ReportingService : IReportingService
         var pendingApprovals = await _appointmentRepository.CountAsync(a => a.ApprovalStatus == AppointmentApprovalStatus.Pending && a.Status == AppointmentStatus.Scheduled);
         var completedCount = await _appointmentRepository.CountAsync(a => a.Status == AppointmentStatus.Completed);
         var noShowCount = await _appointmentRepository.CountAsync(a => a.Status == AppointmentStatus.NoShow);
+        
         return new SystemStatisticsDto
         {
             TotalDoctors = totalDoctors.Count(),
@@ -124,6 +129,7 @@ public class ReportingService : IReportingService
                 CompletedAppointments = g.Count(a => a.Status == AppointmentStatus.Completed),
                 CancelledAppointments = g.Count(a => a.Status == AppointmentStatus.Cancelled)
             }).ToList();
+       
         return new MonthlyTrendDto
         {
             Months = monthlyData

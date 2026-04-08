@@ -29,6 +29,7 @@ public class SignalRNotificationService : IRealTimeNotificationService
             appointmentDate = appointmentDate.ToString("yyyy-MM-dd HH:mm"),
             timestamp = DateTime.UtcNow
         };
+
         await _hubContext.Clients.Group($"doctor_{doctorUserId}").SendAsync("AppointmentNotification", notification);
         _logger.LogInformation($"New appointment request notification sent to doctor user {doctorUserId}");
     }
@@ -45,6 +46,7 @@ public class SignalRNotificationService : IRealTimeNotificationService
             message = $"Your appointment with Dr. {doctorName} has been approved!",
             timestamp = DateTime.UtcNow
         };
+
         await _hubContext.Clients.Group($"patient_{patientUserId}").SendAsync("AppointmentNotification", notification);
         _logger.LogInformation($"Appointment approved notification sent to patient user {patientUserId}");
     }
@@ -61,6 +63,7 @@ public class SignalRNotificationService : IRealTimeNotificationService
             message = $"Your appointment with Dr. {doctorName} was rejected: {rejectionReason}",
             timestamp = DateTime.UtcNow
         };
+
         await _hubContext.Clients.Group($"patient_{patientUserId}").SendAsync("AppointmentNotification", notification);
         _logger.LogInformation($"Appointment rejected notification sent to patient user {patientUserId}");
     }
@@ -77,6 +80,7 @@ public class SignalRNotificationService : IRealTimeNotificationService
             message = $"Your appointment with Dr. {doctorName} has been completed.",
             timestamp = DateTime.UtcNow
         };
+
         await _hubContext.Clients.Group($"patient_{patientUserId}").SendAsync("AppointmentNotification", notification);
         _logger.LogInformation($"Appointment completed notification sent to patient user {patientUserId}");
     }
@@ -92,6 +96,7 @@ public class SignalRNotificationService : IRealTimeNotificationService
             message = $"An appointment has been cancelled.",
             timestamp = DateTime.UtcNow
         };
+
         await _hubContext.Clients.Group($"doctor_{doctorUserId}").SendAsync("AppointmentNotification", notification);
         await _hubContext.Clients.Group($"patient_{patientUserId}").SendAsync("AppointmentNotification", notification);
         _logger.LogInformation($"Appointment cancelled notification sent to doctor user {doctorUserId} and patient user {patientUserId}");
@@ -109,6 +114,7 @@ public class SignalRNotificationService : IRealTimeNotificationService
             message = $"An appointment has been rescheduled.",
             timestamp = DateTime.UtcNow
         };
+
         await _hubContext.Clients.Group($"doctor_{doctorUserId}").SendAsync("AppointmentNotification", notification);
         _logger.LogInformation($"Appointment rescheduled notification sent to doctor user {doctorUserId}");
     }
@@ -130,6 +136,7 @@ public class SignalRNotificationService : IRealTimeNotificationService
             pendingApprovals,
             timestamp = DateTime.UtcNow
         };
+
         await _hubContext.Clients.Group("admins").SendAsync("DashboardUpdated", update);
         await _hubContext.Clients.Group("doctors").SendAsync("DashboardUpdated", update);
         _logger.LogInformation("Dashboard update broadcast sent");

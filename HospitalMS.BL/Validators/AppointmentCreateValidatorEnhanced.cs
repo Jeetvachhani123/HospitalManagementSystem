@@ -28,22 +28,28 @@ public class AppointmentCreateValidatorEnhanced : AbstractValidator<AppointmentC
     {
         RuleFor(x => x.PatientId)
             .GreaterThan(0).WithMessage("Patient ID is required");
+        
         RuleFor(x => x.DoctorId)
             .GreaterThan(0).WithMessage("Doctor ID is required");
+       
         RuleFor(x => x.AppointmentDate)
             .NotEmpty().WithMessage("Appointment date is required")
             .GreaterThanOrEqualTo(DateTime.Today).WithMessage("Appointment date must be today or in the future")
             .LessThanOrEqualTo(DateTime.Today.AddMonths(6)).WithMessage("Appointments can only be booked up to 6 months in advance");
+        
         RuleFor(x => x.StartTime)
             .NotEmpty().WithMessage("Start time is required")
             .Must(BeWithinWorkingHours).WithMessage($"Start time must be between {WorkingHoursStart:hh\\:mm} and {WorkingHoursEnd:hh\\:mm}");
+       
         RuleFor(x => x.EndTime)
             .NotEmpty().WithMessage("End time is required")
             .GreaterThan(x => x.StartTime).WithMessage("End time must be after start time")
             .Must((dto, endTime) => BeWithinWorkingHours(endTime)).WithMessage($"End time must be between {WorkingHoursStart:hh\\:mm} and {WorkingHoursEnd:hh\\:mm}");
+       
         RuleFor(x => x)
             .Must(HaveValidDuration).WithMessage($"Appointment duration must be between {MinimumDuration.TotalMinutes} minutes and {MaximumDuration.TotalHours} hours")
             .Must(NotSpanMultipleDays).WithMessage("Appointment cannot span multiple days");
+       
         RuleFor(x => x.Reason)
             .MaximumLength(500).WithMessage("Reason cannot exceed 500 characters")
             .Must(BeSafeText).WithMessage("Reason contains potentially dangerous content")

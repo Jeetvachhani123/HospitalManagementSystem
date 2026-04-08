@@ -37,14 +37,23 @@ public class HospitalDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+       
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+       
         modelBuilder.Entity<User>().HasQueryFilter(u => !u.IsDeleted);
+       
         modelBuilder.Entity<Doctor>().HasQueryFilter(d => !d.IsDeleted);
+       
         modelBuilder.Entity<Patient>().HasQueryFilter(p => !p.IsDeleted);
+       
         modelBuilder.Entity<Appointment>().HasQueryFilter(a => !a.IsDeleted);
+       
         modelBuilder.Entity<DoctorWorkingHours>().HasQueryFilter(dw => !dw.IsDeleted);
+      
         modelBuilder.Entity<Invoice>().HasQueryFilter(i => !i.IsDeleted);
+      
         modelBuilder.Entity<MedicalRecord>().HasQueryFilter(m => !m.IsDeleted);
+       
         modelBuilder.Entity<Department>().HasQueryFilter(d => !d.IsDeleted);
     }
 
@@ -52,6 +61,7 @@ public class HospitalDbContext : DbContext
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         UpdateAuditFields();
+       
         return base.SaveChangesAsync(cancellationToken);
     }
 
@@ -59,6 +69,7 @@ public class HospitalDbContext : DbContext
     public override int SaveChanges()
     {
         UpdateAuditFields();
+       
         return base.SaveChanges();
     }
 
@@ -75,11 +86,13 @@ public class HospitalDbContext : DbContext
                     entry.Entity.CreatedAt = now;
                     entry.Entity.UpdatedAt = now;  
                     break;
+               
                 case EntityState.Modified:
                     entry.Entity.UpdatedAt = now;
                     break;
             }
         }
+
         foreach (var entry in ChangeTracker.Entries<AuditableEntity>())
         {
             switch (entry.State)
@@ -88,12 +101,14 @@ public class HospitalDbContext : DbContext
                     if (!string.IsNullOrEmpty(userId))
                         entry.Entity.CreatedBy = userId;
                     break;
+                
                 case EntityState.Modified:
                     if (!string.IsNullOrEmpty(userId))
                         entry.Entity.UpdatedBy = userId;
                     break;
             }
         }
+
         // intercept hard-delete on AuditableEntity — convert to soft-delete
         foreach (var entry in ChangeTracker.Entries<AuditableEntity>())
         {

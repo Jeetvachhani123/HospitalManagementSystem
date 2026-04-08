@@ -49,6 +49,7 @@ public class WorkingHoursController : ControllerBase
                 return Forbid();
             }
         }
+
         if (workingHours == null || !workingHours.Any())
         {
             return BadRequest(ApiResponse<bool>.ErrorResponse("Working hours cannot be empty"));
@@ -60,6 +61,7 @@ public class WorkingHoursController : ControllerBase
                 return BadRequest(ApiResponse<bool>.ErrorResponse($"Invalid time range for {hours.DayOfWeek}: Start time must be before end time"));
             }
         }
+
         await _workingHoursService.UpdateWorkingHoursAsync(doctorId, workingHours);
         _logger.LogInformation("Working hours updated for doctor {DoctorId}", doctorId);
         return Ok(ApiResponse<bool>.SuccessResponse(true, "Working hours updated successfully"));
@@ -76,6 +78,7 @@ public class WorkingHoursController : ControllerBase
         {
             return NotFound(ApiResponse<List<WorkingHoursDto>>.ErrorResponse("Doctor profile not found"));
         }
+
         var workingHours = await _workingHoursService.GetWorkingHoursAsync(doctor.Id);
         return Ok(ApiResponse<List<WorkingHoursDto>>.SuccessResponse(workingHours));
     }
@@ -92,6 +95,7 @@ public class WorkingHoursController : ControllerBase
         {
             return NotFound(ApiResponse<bool>.ErrorResponse("Doctor profile not found"));
         }
+
         if (workingHours == null || !workingHours.Any())
         {
             return BadRequest(ApiResponse<bool>.ErrorResponse("Working hours cannot be empty"));
@@ -103,6 +107,7 @@ public class WorkingHoursController : ControllerBase
                 return BadRequest(ApiResponse<bool>.ErrorResponse($"Invalid time range for {hours.DayOfWeek}: Start time must be before end time"));
             }
         }
+
         await _workingHoursService.UpdateWorkingHoursAsync(doctor.Id, workingHours);
         _logger.LogInformation("Working hours updated for doctor {DoctorId}", doctor.Id);
         return Ok(ApiResponse<bool>.SuccessResponse(true, "Working hours updated successfully"));

@@ -17,10 +17,12 @@ public class GlobalExceptionFilter : IExceptionFilter
     {
         _logger.LogError(context.Exception, "An unhandled exception occurred");
         var response = ApiResponse<object>.ErrorResponse("An error occurred while processing your request", context.Exception.Message);
+        
         context.Result = new ObjectResult(response)
         {
             StatusCode = 500
         };
+
         context.ExceptionHandled = true;
     }
 }

@@ -44,6 +44,7 @@ public class AdminController : Controller
                 AppointmentDate = a.AppointmentDate
             }).ToList()
         };
+       
         return View(model);
     }
 
@@ -62,6 +63,7 @@ public class AdminController : Controller
                     specialization = d.Specialization,
                     experience = d.YearsOfExperience
                 }));
+            
             case "Patients":
                 var patients = await _patientService.GetAllAsync();
                 return Json(patients.Select(p => new
@@ -71,6 +73,7 @@ public class AdminController : Controller
                     phone = p.PhoneNumber,
                     bloodGroup = p.BloodGroup
                 }));
+            
             case "TodayAppointments":
                 var all = await _appointmentService.GetAllAsync();
                 var todayUtc = DateTime.UtcNow.Date;
@@ -83,6 +86,7 @@ public class AdminController : Controller
                     time = a.StartTime.ToString(@"hh\:mm"),
                     status = a.Status
                 }));
+           
             case "PendingApprovals":
                 var appointments = await _appointmentService.GetAllAsync();
                 var pending = appointments
@@ -101,6 +105,7 @@ public class AdminController : Controller
                     status = a.Status
                 }));
         }
+
         return Json(new { });
     }
 
@@ -108,6 +113,7 @@ public class AdminController : Controller
     public async Task<IActionResult> GenerateReport(DateTime? startDate, DateTime? endDate)
     {
         var report = await _reportingService.GenerateAppointmentReportAsync(startDate, endDate);
+        
         return Json(report);
     }
 
@@ -146,6 +152,7 @@ public class AdminController : Controller
                 time = a.StartTime.ToString(@"hh\:mm"),
                 status = a.Status
             }).ToList();
+       
         return Json(new
         {
             stats = report,
@@ -160,6 +167,7 @@ public class AdminController : Controller
     public async Task<IActionResult> GetMonthlyTrend(int months = 12)
     {
         var trend = await _reportingService.GetMonthlyTrendAsync(months);
+        
         return Json(trend.Months);
     }
 }

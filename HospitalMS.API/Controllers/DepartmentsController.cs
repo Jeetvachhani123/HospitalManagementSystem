@@ -38,6 +38,7 @@ public class DepartmentsController : ControllerBase
         {
             return NotFound(ApiResponse<DepartmentDto>.ErrorResponse("Department not found"));
         }
+
         return Ok(ApiResponse<DepartmentDto>.SuccessResponse(department));
     }
 
@@ -52,6 +53,7 @@ public class DepartmentsController : ControllerBase
         {
             return BadRequest(ApiResponse<DepartmentDto>.ErrorResponse("Failed to create department"));
         }
+
         _logger.LogInformation("Department {DepartmentName} created", dto.Name);
         return CreatedAtAction(nameof(GetById), new { id = department.Id }, ApiResponse<DepartmentDto>.SuccessResponse(department, "Department created successfully"));
     }
@@ -68,6 +70,7 @@ public class DepartmentsController : ControllerBase
         {
             return NotFound(ApiResponse<DepartmentDto>.ErrorResponse("Department not found"));
         }
+
         _logger.LogInformation("Department {DepartmentId} updated", id);
         return Ok(ApiResponse<DepartmentDto>.SuccessResponse(department, "Department updated successfully"));
     }
@@ -83,6 +86,7 @@ public class DepartmentsController : ControllerBase
         {
             return NotFound(ApiResponse<bool>.ErrorResponse("Department not found"));
         }
+
         _logger.LogInformation("Department {DepartmentId} deleted", id);
         return Ok(ApiResponse<bool>.SuccessResponse(true, "Department deleted successfully"));
     }
