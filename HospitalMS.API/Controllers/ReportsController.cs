@@ -346,6 +346,7 @@ public class ReportsController : ControllerBase
                 YearsOfExperience = d.YearsOfExperience,
                 Phone = d.PhoneNumber
             }).ToList(),
+
             Patients = patients.Select(p => new PatientSummaryDto
             {
                 Id = p.Id,
@@ -355,6 +356,7 @@ public class ReportsController : ControllerBase
                 BloodGroup = p.BloodGroup,
                 DateOfBirth = p.DateOfBirth
             }).ToList(),
+
             TodayAppointments = todayAppts.Select(a => new RecentAppointmentSummaryDto
             {
                 Id = a.Id,
