@@ -174,6 +174,7 @@ public class AuthService : IAuthService
         if (!string.IsNullOrWhiteSpace(profileDto.LastName)) user.LastName = profileDto.LastName;
         
         if (profileDto.PhoneNumber != null) user.PhoneNumber = profileDto.PhoneNumber;
+
         _unitOfWork.Users.Update(user);
         if (user.Role == UserRole.Patient)
         {
