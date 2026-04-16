@@ -93,6 +93,7 @@ public class CacheService : ICacheService
         return data;
     }
     #endregion
+
     #region Doctor Caching
     // get doctor list cache
     public Task<T?> GetDoctorListAsync<T>()
@@ -130,6 +131,7 @@ public class CacheService : ICacheService
         return RemoveAsync($"{DoctorByIdKeyPrefix}{doctorId}");
     }
     #endregion
+
     #region Specializations Caching
     // get specializations cache
     public Task<T?> GetSpecializationsAsync<T>()
@@ -149,6 +151,7 @@ public class CacheService : ICacheService
         return RemoveAsync(SpecializationsKey);
     }
     #endregion
+
     #region Medical History Caching
     // get medical history cache
     public Task<T?> GetMedicalHistoryAsync<T>(int patientId)
@@ -168,6 +171,7 @@ public class CacheService : ICacheService
         return RemoveAsync($"{MedicalHistoryKeyPrefix}{patientId}");
     }
     #endregion
+
     #region Bulk Operations
     // invalidate all doctor caches
     public async Task InvalidateAllDoctorCachesAsync()
