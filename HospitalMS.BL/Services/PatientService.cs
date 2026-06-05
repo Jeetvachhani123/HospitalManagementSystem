@@ -23,7 +23,7 @@ public class PatientService : IPatientService
     public async Task<PatientResponseDto?> GetByIdAsync(int id)
     {
         var patient = await _unitOfWork.Patients.GetByIdAsync(id);
-       
+
         return patient == null ? null : MapToPatientResponse(patient);
     }
 
@@ -31,7 +31,7 @@ public class PatientService : IPatientService
     public async Task<PatientResponseDto?> GetByUserIdAsync(int userId)
     {
         var patient = await _unitOfWork.Patients.GetByUserIdAsync(userId);
-       
+
         return patient == null ? null : MapToPatientResponse(patient);
     }
 
@@ -39,7 +39,7 @@ public class PatientService : IPatientService
     public async Task<IEnumerable<PatientResponseDto>> GetAllAsync(int page = 1, int pageSize = 100)
     {
         var patients = await _unitOfWork.Patients.GetAllAsync(page, pageSize);
-       
+
         return patients.Select(MapToPatientResponse);
     }
 
@@ -75,7 +75,7 @@ public class PatientService : IPatientService
         _unitOfWork.Patients.Delete(patient);
         _unitOfWork.Users.Delete(patient.User);
         await _unitOfWork.SaveChangesAsync();
-        
+
         return true;
     }
 
@@ -83,19 +83,19 @@ public class PatientService : IPatientService
     public async Task<PatientResponseDto?> UpdateAsync(int id, PatientUpdateDto patientDto)
     {
         var patient = await _unitOfWork.Patients.GetByIdAsync(id);
-        if (patient == null) 
+        if (patient == null)
             return null;
-        
+
         if (patientDto.PhoneNumber != null) patient.User.PhoneNumber = patientDto.PhoneNumber;
         if (patientDto.BloodGroup != null) patient.BloodGroup = patientDto.BloodGroup;
         if (patientDto.Gender != null) patient.Gender = patientDto.Gender;
         if (patientDto.EmergencyContact != null) patient.EmergencyContact = patientDto.EmergencyContact;
         if (patientDto.MedicalHistory != null) patient.MedicalHistory = patientDto.MedicalHistory;
         if (patientDto.Allergies != null) patient.Allergies = patientDto.Allergies;
-        
+
         _unitOfWork.Patients.Update(patient);
         await _unitOfWork.SaveChangesAsync();
-        
+
         return MapToPatientResponse(patient);
     }
 
@@ -103,7 +103,7 @@ public class PatientService : IPatientService
     public async Task<(IEnumerable<PatientResponseDto> Items, int TotalCount)> SearchAsync(string? searchTerm, int page, int pageSize)
     {
         var result = await _unitOfWork.Patients.SearchAsync(searchTerm, page, pageSize);
-        
+
         return (result.Items.Select(MapToPatientResponse), result.TotalCount);
     }
 

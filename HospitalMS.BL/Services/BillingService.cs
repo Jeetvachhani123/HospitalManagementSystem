@@ -52,11 +52,11 @@ public class BillingService : IBillingService
         var existingInvoice = await _unitOfWork.Invoices.GetByAppointmentIdAsync(appointmentId);
         if (existingInvoice != null)
             throw new InvalidOperationException($"Invoice already exists for appointment {appointmentId}");
-        
+
         var appointment = await _unitOfWork.Appointments.GetByIdAsync(appointmentId);
         if (appointment == null)
             throw new InvalidOperationException($"Appointment {appointmentId} not found");
-        
+
         var invoice = new Invoice { AppointmentId = appointmentId, PatientId = appointment.PatientId, Amount = amount, IssueDate = DateTime.UtcNow, DueDate = dueDate, IsPaid = false };
         await _unitOfWork.Invoices.AddAsync(invoice);
         await _unitOfWork.SaveChangesAsync();
@@ -68,9 +68,9 @@ public class BillingService : IBillingService
     public async Task<bool> ProcessPaymentAsync(int invoiceId, string paymentMethod)
     {
         var invoice = await _unitOfWork.Invoices.GetByIdAsync(invoiceId);
-        if (invoice == null) 
+        if (invoice == null)
             return false;
-        
+
         if (invoice.IsPaid)
         {
             _logger.LogWarning("Attempted to pay already paid invoice {InvoiceId}", invoiceId);
@@ -97,7 +97,7 @@ public class BillingService : IBillingService
     public async Task<bool> CancelInvoiceAsync(int invoiceId)
     {
         var invoice = await _unitOfWork.Invoices.GetByIdAsync(invoiceId);
-        if (invoice == null) 
+        if (invoice == null)
             return false;
 
         if (invoice.IsPaid)

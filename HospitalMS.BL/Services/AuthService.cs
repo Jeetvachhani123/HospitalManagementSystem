@@ -125,7 +125,7 @@ public class AuthService : IAuthService
     public async Task<UserProfileDto?> GetProfileAsync(int userId)
     {
         var user = await _unitOfWork.Users.GetByIdAsync(userId);
-        if (user == null) 
+        if (user == null)
             return null;
 
         var profile = new UserProfileDto { Id = user.Id, Email = user.Email, FirstName = user.FirstName, LastName = user.LastName, FullName = user.GetFullName(), PhoneNumber = user.PhoneNumber, Role = user.Role.ToString(), LastLoginAt = user.LastLoginAt, CreatedAt = user.CreatedAt };
@@ -166,13 +166,13 @@ public class AuthService : IAuthService
     public async Task<UserProfileDto?> UpdateProfileAsync(int userId, ProfileUpdateDto profileDto)
     {
         var user = await _unitOfWork.Users.GetByIdAsync(userId);
-        if (user == null) 
+        if (user == null)
             return null;
 
         if (!string.IsNullOrWhiteSpace(profileDto.FirstName)) user.FirstName = profileDto.FirstName;
-        
+
         if (!string.IsNullOrWhiteSpace(profileDto.LastName)) user.LastName = profileDto.LastName;
-        
+
         if (profileDto.PhoneNumber != null) user.PhoneNumber = profileDto.PhoneNumber;
 
         _unitOfWork.Users.Update(user);

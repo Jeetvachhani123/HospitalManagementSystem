@@ -58,7 +58,7 @@ public class ExportService : IExportService
         var bytes = Encoding.UTF8.GetPreamble()
                              .Concat(Encoding.UTF8.GetBytes(sb.ToString()))
                              .ToArray();
-       
+
         return Task.FromResult(bytes);
     }
 
@@ -173,7 +173,7 @@ public class ExportService : IExportService
         ws.SheetView.FreezeRows(4);
         using var stream = new MemoryStream();
         workbook.SaveAs(stream);
-        
+
         return Task.FromResult(stream.ToArray());
     }
     // export to pdf
@@ -284,7 +284,7 @@ public class ExportService : IExportService
             });
         });
         var pdfBytes = document.GeneratePdf();
-        
+
         return Task.FromResult(pdfBytes);
     }
 }

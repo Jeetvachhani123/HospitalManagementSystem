@@ -51,7 +51,7 @@ public static class ValidationConfiguration
             var age = DateTime.Today.Year - dateOfBirth.Year;
             if (dateOfBirth.Date > DateTime.Today.AddYears(-age))
                 age--;
-           
+
             return age;
         }
 
@@ -59,7 +59,7 @@ public static class ValidationConfiguration
         public static bool IsValidAge(DateTime dateOfBirth)
         {
             var age = CalculateAge(dateOfBirth);
-           
+
             return age >= MinimumAge && age <= MaximumAge;
         }
 
@@ -120,7 +120,7 @@ public static class ValidationConfiguration
         {
             if (string.IsNullOrWhiteSpace(bloodGroup))
                 return false;
-           
+
             return ValidBloodGroups.Contains(bloodGroup.Trim(), StringComparer.OrdinalIgnoreCase);
         }
 
@@ -129,7 +129,7 @@ public static class ValidationConfiguration
         {
             if (string.IsNullOrWhiteSpace(gender))
                 return false;
-           
+
             return ValidGenders.Contains(gender.Trim(), StringComparer.OrdinalIgnoreCase);
         }
     }
@@ -180,7 +180,7 @@ public static class ValidationConfiguration
         {
             if (string.IsNullOrWhiteSpace(input))
                 return false;
-            
+
             return DangerousSqlPatterns.Any(pattern => input.Contains(pattern, StringComparison.OrdinalIgnoreCase));
         }
 
@@ -189,7 +189,7 @@ public static class ValidationConfiguration
         {
             if (string.IsNullOrWhiteSpace(input))
                 return false;
-            
+
             return DangerousXssPatterns.Any(pattern => input.Contains(pattern, StringComparison.OrdinalIgnoreCase));
         }
     }

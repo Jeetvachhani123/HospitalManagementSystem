@@ -24,7 +24,7 @@ public class AccountController : Controller
     private int GetCurrentUserId()
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-       
+
         return userIdClaim != null ? int.Parse(userIdClaim.Value) : 0;
     }
 
@@ -33,7 +33,7 @@ public class AccountController : Controller
     public IActionResult Login(string? returnUrl = null)
     {
         ViewData["ReturnUrl"] = returnUrl;
-       
+
         return View();
     }
 
@@ -42,9 +42,9 @@ public class AccountController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(LoginDto loginDto, string? returnUrl = null)
     {
-        if (!ModelState.IsValid) 
+        if (!ModelState.IsValid)
             return View(loginDto);
-        
+
         var result = await _authService.LoginAsync(loginDto);
         if (result == null)
         {
@@ -64,16 +64,16 @@ public class AccountController : Controller
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
         if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
             return Redirect(returnUrl);
-        
-        if (result.Role == "Admin") 
+
+        if (result.Role == "Admin")
             return RedirectToAction("Dashboard", "Admin");
-        
-        if (result.Role == "Doctor") 
+
+        if (result.Role == "Doctor")
             return RedirectToAction("Dashboard", "Doctor");
-        
-        if (result.Role == "Patient") 
+
+        if (result.Role == "Patient")
             return RedirectToAction("Dashboard", "Patient");
-       
+
         return RedirectToAction("Index", "Home");
     }
 
@@ -86,9 +86,9 @@ public class AccountController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Register(RegisterViewModel model)
     {
-        if (!ModelState.IsValid) 
+        if (!ModelState.IsValid)
             return View(model);
-       
+
         var registerDto = new RegisterDto { Email = model.Email, Password = model.Password, FirstName = model.FirstName, LastName = model.LastName, PhoneNumber = model.PhoneNumber, Role = model.Role, DateOfBirth = model.DateOfBirth, Gender = model.Gender, BloodGroup = model.BloodGroup };
         var result = await _authService.RegisterAsync(registerDto);
         if (result == null)
@@ -108,7 +108,7 @@ public class AccountController : Controller
         var authProperties = new AuthenticationProperties { IsPersistent = true };
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
             new ClaimsPrincipal(claimsIdentity), authProperties);
-       
+
         return RedirectToAction("Dashboard", "Patient");
     }
 
@@ -149,7 +149,7 @@ public class AccountController : Controller
             LastLoginAt = profile.LastLoginAt,
             CreatedAt = profile.CreatedAt
         };
-       
+
         return View(model);
     }
 
@@ -246,7 +246,7 @@ public class AccountController : Controller
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
             new ClaimsPrincipal(claimsIdentity), authProperties);
         TempData["SuccessMessage"] = "Your profile has been updated successfully.";
-       
+
         return RedirectToAction(nameof(Profile));
     }
 
@@ -283,7 +283,7 @@ public class AccountController : Controller
             return View(model);
         }
         TempData["SuccessMessage"] = "Your password has been changed successfully.";
-        
+
         return RedirectToAction(nameof(Profile));
     }
 }

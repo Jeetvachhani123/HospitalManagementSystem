@@ -4,7 +4,6 @@ namespace HospitalMS.API.Extensions;
 
 public static class SwaggerExtensions
 {
-    // add swagger with jwt support
     public static IServiceCollection AddSwaggerDocumentation(this IServiceCollection services)
     {
         services.AddSwaggerGen(c =>

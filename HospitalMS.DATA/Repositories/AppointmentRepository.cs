@@ -146,7 +146,7 @@ public class AppointmentRepository : IAppointmentRepository
         {
             query = query.Where(a => a.Id != excludeAppointmentId.Value);
         }
-        
+
         return await query.AnyAsync(cancellationToken);
     }
 
@@ -156,7 +156,7 @@ public class AppointmentRepository : IAppointmentRepository
         var today = DateTime.Today;
         if (date.Date < today)
             return new List<TimeSpan>();
-        
+
         var dayOfWeek = (int)date.DayOfWeek;
         var workingHours = await _context.DoctorWorkingHours
             .AsNoTracking()
@@ -223,7 +223,7 @@ public class AppointmentRepository : IAppointmentRepository
     public async Task<Appointment> AddAsync(Appointment appointment, CancellationToken cancellationToken = default)
     {
         await _context.Appointments.AddAsync(appointment, cancellationToken);
-       
+
         return appointment;
     }
 
@@ -249,7 +249,7 @@ public class AppointmentRepository : IAppointmentRepository
         {
             query = query.Where(predicate);
         }
-        
+
         return await query.CountAsync(cancellationToken);
     }
 
@@ -316,7 +316,7 @@ public class AppointmentRepository : IAppointmentRepository
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
-        
+
         return (items, totalCount);
     }
 }

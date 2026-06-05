@@ -36,9 +36,9 @@ public class DoctorController : Controller
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var doctor = await _doctorService.GetByUserIdAsync(userId);
-            if (doctor == null) 
+            if (doctor == null)
                 return NotFound("Doctor profile not found");
-            
+
             var today = DateTime.Today;
             var todayAppointmentsCount = await _appointmentService.GetAppointmentsCountAsync(doctor.Id, null, today);
             var pendingApprovals = await _workflowService.GetPendingApprovalsAsync(doctor.Id);
@@ -65,7 +65,7 @@ public class DoctorController : Controller
                     Status = a.Status
                 }).ToList()
             };
-            
+
             return View(model);
         }
         catch (Exception ex)
@@ -149,9 +149,9 @@ public class DoctorController : Controller
     public async Task<IActionResult> Details(int id)
     {
         var doctor = await _doctorService.GetByIdAsync(id);
-        if (doctor == null) 
+        if (doctor == null)
             return NotFound();
-        
+
         var model = new DoctorViewModel
         {
             Id = doctor.Id,
@@ -170,7 +170,7 @@ public class DoctorController : Controller
             CreatedBy = doctor.CreatedBy,
             UpdatedBy = doctor.UpdatedBy
         };
-       
+
         return View(model);
     }
 
@@ -186,7 +186,7 @@ public class DoctorController : Controller
             var doctor = await _doctorService.GetByUserIdAsync(userId);
             if (doctor == null)
                 return NotFound("Doctor profile not found");
-            
+
             var appointments = await _appointmentService.GetByDoctorIdAsync(doctor.Id);
             var appointmentList = appointments.ToList();
             var firstDayOfMonth = new DateTime(year, month, 1);
@@ -271,7 +271,7 @@ public class DoctorController : Controller
     public async Task<IActionResult> Create()
     {
         ViewBag.Departments = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(await _departmentService.GetAllAsync(), "Id", "Name");
-       
+
         return View();
     }
 
@@ -281,9 +281,9 @@ public class DoctorController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(DoctorCreateViewModel model)
     {
-        if (!ModelState.IsValid) 
+        if (!ModelState.IsValid)
             return View(model);
-        
+
         try
         {
             var createDto = new BL.DTOs.Doctor.DoctorCreateDto
@@ -314,7 +314,7 @@ public class DoctorController : Controller
         catch (Exception)
         {
             ModelState.AddModelError("", "An unexpected error occurred.");
-            
+
             return View(model);
         }
     }
@@ -324,9 +324,9 @@ public class DoctorController : Controller
     public async Task<IActionResult> Edit(int id)
     {
         var doctor = await _doctorService.GetByIdAsync(id);
-        if (doctor == null) 
+        if (doctor == null)
             return NotFound();
-        
+
         var model = new DoctorEditViewModel
         {
             Id = doctor.Id,
@@ -343,7 +343,7 @@ public class DoctorController : Controller
             DepartmentId = doctor.DepartmentId
         };
         ViewBag.Departments = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(await _departmentService.GetAllAsync(), "Id", "Name", doctor.DepartmentId);
-        
+
         return View(model);
     }
 
@@ -353,10 +353,10 @@ public class DoctorController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, DoctorEditViewModel model)
     {
-        if (id != model.Id) 
+        if (id != model.Id)
             return BadRequest();
 
-        if (!ModelState.IsValid) 
+        if (!ModelState.IsValid)
             return View(model);
 
         try
@@ -379,7 +379,7 @@ public class DoctorController : Controller
             }
 
             TempData["SuccessMessage"] = "Doctor updated successfully.";
-            
+
             return RedirectToAction(nameof(Index));
         }
         catch (Exception ex)
@@ -387,7 +387,7 @@ public class DoctorController : Controller
             _logger.LogError(ex, "Error updating doctor {Id}", id);
             ModelState.AddModelError("", "An unexpected error occurred.");
             ViewBag.Departments = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(await _departmentService.GetAllAsync(), "Id", "Name", model.DepartmentId);
-            
+
             return View(model);
         }
     }

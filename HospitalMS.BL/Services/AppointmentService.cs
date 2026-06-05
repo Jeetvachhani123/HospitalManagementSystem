@@ -73,10 +73,10 @@ public class AppointmentService : IAppointmentService
         var fullDateTime = EnsureUtc(appointmentDto.AppointmentDate.Date + appointmentDto.StartTime);
         if (fullDateTime <= DateTime.UtcNow)
             throw new BusinessRuleException("PastAppointment", "Cannot create appointments in the past");
-        
+
         if (appointmentDto.StartTime >= appointmentDto.EndTime)
             throw new ValidationException("Start time must be before end time");
-        
+
         var patient = await _unitOfWork.Patients.GetByIdAsync(appointmentDto.PatientId, cancellationToken);
         if (patient == null)
         {
@@ -153,13 +153,13 @@ public class AppointmentService : IAppointmentService
         appointment.Status = statusDto.Status;
         if (statusDto.Notes != null)
             appointment.Notes = statusDto.Notes;
-        
+
         if (statusDto.Diagnosis != null)
             appointment.Diagnosis = statusDto.Diagnosis;
-        
+
         if (statusDto.Prescription != null)
             appointment.Prescription = statusDto.Prescription;
-       
+
         _unitOfWork.Appointments.Update(appointment);
         if (previousStatus != appointment.Status)
         {
@@ -185,7 +185,7 @@ public class AppointmentService : IAppointmentService
         var appointment = await _unitOfWork.Appointments.GetByIdAsync(id, cancellationToken);
         if (appointment == null)
             throw new NotFoundException("Appointment", id);
-       
+
         bool dateTimeChanged = appointmentDto.AppointmentDate.HasValue || appointmentDto.StartTime.HasValue || appointmentDto.EndTime.HasValue;
         if (dateTimeChanged)
         {
@@ -195,7 +195,7 @@ public class AppointmentService : IAppointmentService
             var newFullDateTime = EnsureUtc(newDate.Date + newStartTime);
             if (newFullDateTime <= DateTime.UtcNow)
                 throw new BusinessRuleException("PastAppointment", "Cannot schedule appointments in the past");
-            
+
             if (newStartTime >= newEndTime)
                 throw new ValidationException("Start time must be before end time");
             var hasConflict = await _unitOfWork.Appointments.HasConflictAsync(
@@ -206,7 +206,7 @@ public class AppointmentService : IAppointmentService
                 excludeAppointmentId: id,
                 cancellationToken: cancellationToken
             );
-            
+
             if (hasConflict)
             {
                 throw new ConflictException($"The doctor already has an appointment scheduled during this time slot " + $"({newDate:yyyy-MM-dd} {newStartTime} - {newEndTime})");
@@ -218,25 +218,25 @@ public class AppointmentService : IAppointmentService
         }
         if (appointmentDto.RowVersion != null)
             appointment.RowVersion = appointmentDto.RowVersion;
-       
+
         if (appointmentDto.AppointmentDate.HasValue)
             appointment.AppointmentDate = appointmentDto.AppointmentDate.Value;
-        
+
         if (appointmentDto.StartTime.HasValue)
             appointment.StartTime = appointmentDto.StartTime.Value;
-        
+
         if (appointmentDto.EndTime.HasValue)
             appointment.EndTime = appointmentDto.EndTime.Value;
-        
+
         if (appointmentDto.Reason != null)
             appointment.Reason = appointmentDto.Reason;
-       
+
         if (appointmentDto.Notes != null)
             appointment.Notes = appointmentDto.Notes;
-       
+
         if (appointmentDto.Diagnosis != null)
             appointment.Diagnosis = appointmentDto.Diagnosis;
-       
+
         if (appointmentDto.Prescription != null)
             appointment.Prescription = appointmentDto.Prescription;
         try
@@ -313,7 +313,7 @@ public class AppointmentService : IAppointmentService
     {
         if (startTime >= endTime)
             throw new ValidationException("Start time must be before end time");
-        
+
         return await _unitOfWork.Appointments.HasConflictAsync(doctorId, appointmentDate, startTime, endTime, excludeAppointmentId, cancellationToken);
     }
 
@@ -323,13 +323,13 @@ public class AppointmentService : IAppointmentService
         var appointment = await _unitOfWork.Appointments.GetByIdAsync(id, cancellationToken);
         if (appointment == null)
             throw new NotFoundException("Appointment", id);
-        
+
         if (appointment.DoctorId != doctorId)
             throw new UnauthorizedException("Only the assigned doctor can approve this appointment");
-        
+
         if (appointment.ApprovalStatus == AppointmentApprovalStatus.Approved)
             throw new BusinessRuleException("AlreadyApproved", "This appointment has already been approved");
-       
+
         if (appointment.ApprovalStatus == AppointmentApprovalStatus.Rejected)
             throw new BusinessRuleException("AlreadyRejected", "This appointment has been rejected and cannot be approved");
         var previousApprovalStatus = appointment.ApprovalStatus;
@@ -359,17 +359,17 @@ public class AppointmentService : IAppointmentService
     {
         if (string.IsNullOrWhiteSpace(rejectionReason))
             throw new ValidationException("Rejection reason is required");
-        
+
         var appointment = await _unitOfWork.Appointments.GetByIdAsync(id, cancellationToken);
         if (appointment == null)
             throw new NotFoundException("Appointment", id);
-        
+
         if (appointment.DoctorId != doctorId)
             throw new UnauthorizedException("Only the assigned doctor can reject this appointment");
-        
+
         if (appointment.ApprovalStatus == AppointmentApprovalStatus.Rejected)
             throw new BusinessRuleException("AlreadyRejected", "This appointment has already been rejected");
-        
+
         if (appointment.ApprovalStatus == AppointmentApprovalStatus.Approved)
             throw new BusinessRuleException("AlreadyApproved", "This appointment has been approved and cannot be rejected");
         var previousApprovalStatus = appointment.ApprovalStatus;
@@ -420,14 +420,14 @@ public class AppointmentService : IAppointmentService
     {
         if (currentStatus == newStatus)
             return;
-        
+
         var invalidTransitions = new Dictionary<AppointmentStatus, AppointmentStatus[]>
         {
             { AppointmentStatus.Cancelled, new[] { AppointmentStatus.Scheduled, AppointmentStatus.InProgress, AppointmentStatus.Completed } },
             { AppointmentStatus.Completed, new[] { AppointmentStatus.Scheduled, AppointmentStatus.InProgress, AppointmentStatus.Cancelled } },
             { AppointmentStatus.NoShow, new[] { AppointmentStatus.Scheduled, AppointmentStatus.InProgress, AppointmentStatus.Completed } }
         };
-        
+
         if (invalidTransitions.TryGetValue(currentStatus, out var forbidden) && forbidden.Contains(newStatus))
         {
             throw new BusinessRuleException("InvalidStatusTransition", $"Cannot transition from {currentStatus} to {newStatus}");
@@ -439,10 +439,10 @@ public class AppointmentService : IAppointmentService
     {
         if (dateTime.Kind == DateTimeKind.Utc)
             return dateTime;
-        
+
         if (dateTime.Kind == DateTimeKind.Local)
             return dateTime.ToUniversalTime();
-        
+
         return DateTime.SpecifyKind(dateTime, DateTimeKind.Utc);
     }
 
@@ -480,7 +480,7 @@ public class AppointmentService : IAppointmentService
         var appointment = await _unitOfWork.Appointments.GetByIdAsync(appointmentId, cancellationToken);
         if (appointment == null)
             return false;
-        
+
         var patient = await _unitOfWork.Patients.GetByIdAsync(appointment.PatientId, cancellationToken);
         var doctor = await _unitOfWork.Doctors.GetByIdAsync(appointment.DoctorId, cancellationToken);
         return (patient != null && patient.User.Id == userId) || (doctor != null && doctor.User.Id == userId);
@@ -492,7 +492,7 @@ public class AppointmentService : IAppointmentService
         var doctor = await _unitOfWork.Doctors.GetByUserIdAsync(userId, cancellationToken);
         if (doctor == null)
             return null;
-        
+
         return new DoctorResponseDto { Id = doctor.Id, UserId = doctor.User.Id, FullName = doctor.User.GetFullName(), Email = doctor.User.Email, Specialization = doctor.Specialization, LicenseNumber = doctor.LicenseNumber, ConsultationFee = doctor.ConsultationFee, IsAvailable = doctor.IsAvailable };
     }
 
@@ -502,7 +502,7 @@ public class AppointmentService : IAppointmentService
         var patient = await _unitOfWork.Patients.GetByUserIdAsync(userId, cancellationToken);
         if (patient == null)
             return null;
-        
+
         return new PatientResponseDto { Id = patient.Id, UserId = patient.User.Id, FullName = patient.User.GetFullName(), Email = patient.User.Email, PhoneNumber = patient.User.PhoneNumber, DateOfBirth = patient.DateOfBirth, Gender = patient.Gender, BloodGroup = patient.BloodGroup };
     }
 

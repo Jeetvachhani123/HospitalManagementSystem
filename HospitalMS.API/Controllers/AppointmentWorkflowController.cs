@@ -215,7 +215,7 @@ public class AppointmentWorkflowController : ControllerBase
             var doctorId = GetDoctorIdFromClaims();
             var result = await _workflowService.GetPendingApprovalsAsync(doctorId);
             _logger.LogInformation($"Retrieved {result.Count()} pending approvals for doctor {doctorId}");
-            
+
             return Ok(ApiResponse<IEnumerable<AppointmentResponseDto>>.SuccessResponse(result));
         }
         catch (Exception ex)

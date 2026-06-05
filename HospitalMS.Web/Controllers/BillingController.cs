@@ -113,7 +113,7 @@ public class BillingController : Controller
         }
 
         var appointment = await _appointmentService.GetByIdAsync(appointmentId);
-        if (appointment == null) 
+        if (appointment == null)
             return NotFound();
 
         var model = new GenerateInvoiceViewModel
@@ -207,7 +207,7 @@ public class BillingController : Controller
                 var successUrl = Url.Action("PaymentSuccess", "Billing", new { id = model.InvoiceId }, Request.Scheme) ?? string.Empty;
                 var cancelUrl = Url.Action("Details", "Billing", new { id = model.InvoiceId }, Request.Scheme) ?? string.Empty;
                 var checkoutUrl = await _paymentService.CreateCheckoutSessionAsync(model.InvoiceId, model.Amount, "usd", successUrl, cancelUrl);
-                
+
                 return Redirect(checkoutUrl);
             }
             else
@@ -229,7 +229,7 @@ public class BillingController : Controller
         {
             _logger.LogError(ex, "Error processing payment");
             ModelState.AddModelError("", "An error occurred during payment.");
-            
+
             return View(model);
         }
     }
@@ -254,9 +254,9 @@ public class BillingController : Controller
         try
         {
             var result = await _paymentService.HandleWebhookAsync(json, signature ?? string.Empty);
-            if (result) 
+            if (result)
                 return Ok();
-            else 
+            else
                 return BadRequest();
         }
         catch (Exception ex)

@@ -284,7 +284,7 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
             }
             _logger.LogInformation($"Appointment {appointmentId} completed by doctor {doctorId}");
             await NotifyDashboardUpdateAsync();
-            
+
             return _mapper.Map<AppointmentResponseDto>(appointment);
         }
         catch (Exception ex)
@@ -342,7 +342,7 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
             }
             _logger.LogInformation($"Appointment {appointmentId} cancelled by {cancelledBy}");
             await NotifyDashboardUpdateAsync();
-           
+
             return true;
         }
         catch (Exception ex)

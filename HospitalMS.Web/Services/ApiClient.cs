@@ -23,7 +23,7 @@ public class ApiClient
         {
             AddAuthorizationHeader();
             var response = await _httpClient.GetAsync($"{endpoint}", cancellationToken);
-            
+
             return await HandleResponse<T>(response, cancellationToken);
         }
         catch (Exception ex)
@@ -41,7 +41,7 @@ public class ApiClient
             var json = JsonSerializer.Serialize(data);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await _httpClient.PostAsync(endpoint, content, cancellationToken);
-            
+
             return await HandleResponse<TResponse>(response, cancellationToken);
         }
         catch (Exception ex)
@@ -59,7 +59,7 @@ public class ApiClient
             var json = JsonSerializer.Serialize(data);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await _httpClient.PutAsync(endpoint, content, cancellationToken);
-           
+
             return await HandleResponse<TResponse>(response, cancellationToken);
         }
         catch (Exception ex)
@@ -76,7 +76,7 @@ public class ApiClient
             AddAuthorizationHeader();
             var request = new HttpRequestMessage(HttpMethod.Patch, endpoint) { Content = content };
             var response = await _httpClient.SendAsync(request, cancellationToken);
-           
+
             return await HandleResponse<TResponse>(response, cancellationToken);
         }
         catch (Exception ex)
@@ -92,7 +92,7 @@ public class ApiClient
         {
             AddAuthorizationHeader();
             var response = await _httpClient.DeleteAsync(endpoint, cancellationToken);
-            
+
             return response.IsSuccessStatusCode;
         }
         catch (Exception ex)
@@ -109,7 +109,7 @@ public class ApiClient
         {
             if (string.IsNullOrEmpty(content))
                 return default;
-            
+
             var jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             return JsonSerializer.Deserialize<T>(content, jsonOptions);
         }

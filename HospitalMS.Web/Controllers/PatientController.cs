@@ -31,9 +31,9 @@ namespace HospitalMS.Web.Controllers
             {
                 var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
                 var patient = await _patientService.GetByUserIdAsync(userId);
-                if (patient == null) 
+                if (patient == null)
                     return NotFound("Patient profile not found");
-                
+
                 var appointments = await _appointmentService.GetByPatientIdAsync(patient.Id);
                 var appointmentList = appointments.ToList();
                 var model = new PatientDashboardViewModel
@@ -160,7 +160,7 @@ namespace HospitalMS.Web.Controllers
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var patient = await _patientService.GetByIdAsync(id);
-            if (patient == null) 
+            if (patient == null)
                 return NotFound();
 
             if (User.IsInRole("Patient") && patient.UserId != userId)
@@ -233,7 +233,7 @@ namespace HospitalMS.Web.Controllers
             {
                 _logger.LogError(ex, "Error creating patient");
                 ModelState.AddModelError("", "An unexpected error occurred.");
-                
+
                 return View(model);
             }
         }
@@ -243,7 +243,7 @@ namespace HospitalMS.Web.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             var patient = await _patientService.GetByIdAsync(id);
-            if (patient == null) 
+            if (patient == null)
                 return NotFound();
 
             var model = new PatientEditViewModel
@@ -269,12 +269,12 @@ namespace HospitalMS.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, PatientEditViewModel model)
         {
-            if (id != model.Id) 
+            if (id != model.Id)
                 return BadRequest();
-            
-            if (!ModelState.IsValid) 
+
+            if (!ModelState.IsValid)
                 return View(model);
-            
+
             try
             {
                 var updateDto = new PatientUpdateDto
@@ -293,14 +293,14 @@ namespace HospitalMS.Web.Controllers
                 }
 
                 TempData["SuccessMessage"] = "Patient updated successfully.";
-                
+
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error updating patient {Id}", id);
                 ModelState.AddModelError("", "An unexpected error occurred.");
-               
+
                 return View(model);
             }
         }
@@ -327,7 +327,7 @@ namespace HospitalMS.Web.Controllers
             {
                 _logger.LogError(ex, "Error deleting patient {Id}", id);
                 TempData["ErrorMessage"] = "An error occurred while deleting the patient.";
-               
+
                 return RedirectToAction(nameof(Index));
             }
         }

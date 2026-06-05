@@ -79,7 +79,7 @@ public class PatientRepository : IPatientRepository
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
-        
+
         return (items, totalCount);
     }
 }

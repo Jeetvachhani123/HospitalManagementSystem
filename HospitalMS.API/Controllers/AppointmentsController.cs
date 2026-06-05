@@ -37,7 +37,7 @@ public class AppointmentsController : ControllerBase
     {
         var role = User.FindFirstValue(ClaimTypes.Role);
         IEnumerable<AppointmentResponseDto> appointments;
-        
+
         if (role == "Admin" || role == "Doctor")
         {
             appointments = await _appointmentService.GetAllAsync(cancellationToken);
@@ -61,16 +61,16 @@ public class AppointmentsController : ControllerBase
     public async Task<ActionResult<ApiResponse<AppointmentResponseDto>>> GetById(int id, CancellationToken cancellationToken)
     {
         var appointment = await _appointmentService.GetByIdAsync(id, cancellationToken);
-        
+
         if (appointment == null)
             return NotFound(ApiResponse<AppointmentResponseDto>.ErrorResponse("Appointment not found."));
-        
+
         var role = User.FindFirstValue(ClaimTypes.Role);
         if (role != "Admin" && role != "Doctor")
         {
             var userId = GetCurrentUserId();
             var hasAccess = await _appointmentService.UserHasAccessToAppointmentAsync(userId, id, cancellationToken);
-            
+
             if (!hasAccess)
                 return Forbid();
         }
@@ -105,7 +105,7 @@ public class AppointmentsController : ControllerBase
         if (startDate > endDate)
             return BadRequest(ApiResponse<IEnumerable<AppointmentResponseDto>>.ErrorResponse("Start date must be before or equal to end date."));
         var appointments = await _appointmentService.GetByDateRangeAsync(startDate, endDate, cancellationToken);
-       
+
         return Ok(ApiResponse<IEnumerable<AppointmentResponseDto>>.SuccessResponse(appointments));
     }
 
@@ -126,7 +126,7 @@ public class AppointmentsController : ControllerBase
         var role = User.FindFirstValue(ClaimTypes.Role);
         var userId = GetCurrentUserId();
         IEnumerable<AppointmentResponseDto> appointments;
-       
+
         if (role == "Doctor")
         {
             var doctor = await _appointmentService.GetDoctorByUserIdAsync(userId, cancellationToken);
@@ -165,7 +165,7 @@ public class AppointmentsController : ControllerBase
     {
         var appointment = await _appointmentService.CreateAsync(dto, cancellationToken);
         _logger.LogInformation("Appointment {AppointmentId} created for patient {PatientId}", appointment.Id, dto.PatientId);
-        
+
         return CreatedAtAction(nameof(GetById), new { id = appointment.Id },
             ApiResponse<AppointmentResponseDto>.SuccessResponse(appointment, "Appointment created successfully."));
     }
@@ -180,7 +180,7 @@ public class AppointmentsController : ControllerBase
         var appointment = await _appointmentService.UpdateAsync(id, dto, cancellationToken);
         if (appointment == null)
             return NotFound(ApiResponse<AppointmentResponseDto>.ErrorResponse("Appointment not found."));
-        
+
         _logger.LogInformation("Appointment {AppointmentId} updated", id);
         return Ok(ApiResponse<AppointmentResponseDto>.SuccessResponse(appointment, "Appointment updated successfully."));
     }
@@ -195,10 +195,10 @@ public class AppointmentsController : ControllerBase
     {
         var currentUserId = GetCurrentUserId();
         var appointment = await _appointmentService.UpdateStatusAsync(id, dto, currentUserId, cancellationToken);
-        
+
         if (appointment == null)
             return NotFound(ApiResponse<AppointmentResponseDto>.ErrorResponse("Appointment not found."));
-       
+
         _logger.LogInformation("Appointment {AppointmentId} status updated to {Status} by user {UserId}", id, dto.Status, currentUserId);
         return Ok(ApiResponse<AppointmentResponseDto>.SuccessResponse(appointment, "Appointment status updated successfully."));
     }
@@ -212,7 +212,7 @@ public class AppointmentsController : ControllerBase
     {
         var result = await _appointmentService.CancelAsync(id, reason, cancellationToken);
         _logger.LogInformation("Appointment {AppointmentId} cancelled", id);
-        
+
         return Ok(ApiResponse<bool>.SuccessResponse(result, "Appointment cancelled successfully."));
     }
 
@@ -224,9 +224,9 @@ public class AppointmentsController : ControllerBase
     {
         if (req.StartTime >= req.EndTime)
             return BadRequest(ApiResponse<bool>.ErrorResponse("Start time must be before end time."));
-        
+
         var hasConflict = await _appointmentService.HasConflictAsync(req.DoctorId, req.AppointmentDate, req.StartTime, req.EndTime, req.ExcludeAppointmentId, cancellationToken);
-            return Ok(ApiResponse<bool>.SuccessResponse(hasConflict,hasConflict ? "A scheduling conflict exists for the requested slot." : "The time slot is available."));
+        return Ok(ApiResponse<bool>.SuccessResponse(hasConflict, hasConflict ? "A scheduling conflict exists for the requested slot." : "The time slot is available."));
     }
 
     //  GET api/appointments/export/csv 
@@ -248,10 +248,10 @@ public class AppointmentsController : ControllerBase
                 Csv(a.Reason), Csv(a.Diagnosis), Csv(a.Prescription), Csv(a.Notes),
                 a.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")));
         }
-       
+
         var bytes = Encoding.UTF8.GetBytes(sb.ToString());
         _logger.LogInformation("Exported {Count} appointments to CSV", data.Count());
-        
+
         return File(bytes, "text/csv", $"appointments_{DateTime.UtcNow:yyyyMMdd_HHmm}.csv");
     }
 
@@ -298,7 +298,7 @@ public class AppointmentsController : ControllerBase
         using var ms = new MemoryStream();
         wb.SaveAs(ms);
         _logger.LogInformation("Exported {Count} appointments to Excel", data.Count);
-        
+
         return File(ms.ToArray(),
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             $"appointments_{DateTime.UtcNow:yyyyMMdd_HHmm}.xlsx");
@@ -362,7 +362,7 @@ public class AppointmentsController : ControllerBase
         doc.Add(table);
         doc.Close();
         _logger.LogInformation("Exported {Count} appointments to PDF", data.Count);
-        
+
         return File(ms.ToArray(), "application/pdf", $"appointments_{DateTime.UtcNow:yyyyMMdd_HHmm}.pdf");
     }
 
@@ -391,7 +391,7 @@ public class AppointmentsController : ControllerBase
             a.StatusEnum != AppointmentStatus.Cancelled &&
             a.StatusEnum != AppointmentStatus.Completed &&
             a.StatusEnum != AppointmentStatus.NoShow);
-        
+
         return Ok(ApiResponse<IEnumerable<AppointmentResponseDto>>.SuccessResponse(upcoming));
     }
 
@@ -423,7 +423,7 @@ public class AppointmentsController : ControllerBase
             a.StatusEnum == AppointmentStatus.Cancelled ||
             a.StatusEnum == AppointmentStatus.NoShow)
             .OrderByDescending(a => a.AppointmentDate);
-        
+
         return Ok(ApiResponse<IEnumerable<AppointmentResponseDto>>.SuccessResponse(history));
     }
 
@@ -442,17 +442,17 @@ public class AppointmentsController : ControllerBase
             page: 1,
             pageSize: int.MaxValue,
             cancellationToken: ct);
-        
+
         return items;
     }
 
     private static string Csv(string? v)
     {
-        if (string.IsNullOrEmpty(v)) 
+        if (string.IsNullOrEmpty(v))
             return string.Empty;
-       
+
         v = v.Replace("\"", "\"\"");
-            return v.IndexOfAny(new[] { ',', '"', '\n', '\r' }) >= 0 ? $"\"{v}\"" : v;
+        return v.IndexOfAny(new[] { ',', '"', '\n', '\r' }) >= 0 ? $"\"{v}\"" : v;
     }
 }
 

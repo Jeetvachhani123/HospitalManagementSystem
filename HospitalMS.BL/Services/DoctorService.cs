@@ -23,7 +23,7 @@ public class DoctorService : IDoctorService
     public async Task<DoctorResponseDto?> GetByIdAsync(int id)
     {
         var doctor = await _unitOfWork.Doctors.GetByIdAsync(id);
-        
+
         return doctor == null ? null : MapToDoctorResponse(doctor);
     }
 
@@ -31,7 +31,7 @@ public class DoctorService : IDoctorService
     public async Task<DoctorResponseDto?> GetByUserIdAsync(int userId)
     {
         var doctor = await _unitOfWork.Doctors.GetByUserIdAsync(userId);
-        
+
         return doctor == null ? null : MapToDoctorResponse(doctor);
     }
 
@@ -39,7 +39,7 @@ public class DoctorService : IDoctorService
     public async Task<IEnumerable<DoctorResponseDto>> GetAllAsync(int page = 1, int pageSize = 100)
     {
         var doctors = await _unitOfWork.Doctors.GetAllAsync(page, pageSize);
-        
+
         return doctors.Select(MapToDoctorResponse);
     }
 
@@ -47,7 +47,7 @@ public class DoctorService : IDoctorService
     public async Task<IEnumerable<DoctorResponseDto>> GetAvailableDoctorsAsync(int page = 1, int pageSize = 100)
     {
         var doctors = await _unitOfWork.Doctors.GetAvailableDoctorsAsync(page, pageSize);
-        
+
         return doctors.Select(MapToDoctorResponse);
     }
 
@@ -55,17 +55,17 @@ public class DoctorService : IDoctorService
     public async Task<IEnumerable<DoctorResponseDto>> GetBySpecializationAsync(string specialization)
     {
         var doctors = await _unitOfWork.Doctors.GetBySpecializationAsync(specialization);
-        
+
         return doctors.Select(MapToDoctorResponse);
     }
 
     // create new doctor
     public async Task<DoctorResponseDto?> CreateAsync(DoctorCreateDto doctorDto)
     {
-        if (await _unitOfWork.Users.EmailExistsAsync(doctorDto.Email)) 
+        if (await _unitOfWork.Users.EmailExistsAsync(doctorDto.Email))
             return null;
 
-        if (await _unitOfWork.Doctors.LicenseNumberExistsAsync(doctorDto.LicenseNumber)) 
+        if (await _unitOfWork.Doctors.LicenseNumberExistsAsync(doctorDto.LicenseNumber))
             return null;
 
         return await _unitOfWork.ExecuteInTransactionAsync(async () =>
@@ -107,25 +107,25 @@ public class DoctorService : IDoctorService
     public async Task<DoctorResponseDto?> UpdateAsync(int id, DoctorUpdateDto doctorDto)
     {
         var doctor = await _unitOfWork.Doctors.GetByIdAsync(id);
-        if (doctor == null) 
+        if (doctor == null)
             return null;
 
         if (doctorDto.PhoneNumber != null) doctor.User.PhoneNumber = doctorDto.PhoneNumber;
-        
+
         if (doctorDto.Specialization != null) doctor.Specialization = doctorDto.Specialization;
-       
+
         if (doctorDto.YearsOfExperience.HasValue) doctor.YearsOfExperience = doctorDto.YearsOfExperience.Value;
-       
+
         if (doctorDto.Qualifications != null) doctor.Qualifications = doctorDto.Qualifications;
-       
+
         if (doctorDto.Bio != null) doctor.Bio = doctorDto.Bio;
-      
+
         if (doctorDto.ConsultationFee.HasValue) doctor.ConsultationFee = doctorDto.ConsultationFee.Value;
-       
+
         if (doctorDto.IsAvailable.HasValue) doctor.IsAvailable = doctorDto.IsAvailable.Value;
         _unitOfWork.Doctors.Update(doctor);
         await _unitOfWork.SaveChangesAsync();
-        
+
         return MapToDoctorResponse(doctor);
     }
 
@@ -133,7 +133,7 @@ public class DoctorService : IDoctorService
     public async Task<bool> DeleteAsync(int id)
     {
         var doctor = await _unitOfWork.Doctors.GetByIdAsync(id);
-        if (doctor == null) 
+        if (doctor == null)
             return false;
 
         _unitOfWork.Doctors.Delete(doctor);
@@ -146,7 +146,7 @@ public class DoctorService : IDoctorService
     public async Task<(IEnumerable<DoctorResponseDto> Items, int TotalCount)> SearchAsync(string? searchTerm, int page, int pageSize)
     {
         var result = await _unitOfWork.Doctors.SearchAsync(searchTerm, page, pageSize);
-        
+
         return (result.Items.Select(MapToDoctorResponse), result.TotalCount);
     }
 

@@ -32,9 +32,9 @@ namespace HospitalMS.Web.Controllers
             if (role == "Patient")
             {
                 var currentPatient = await _patientService.GetByUserIdAsync(userId);
-                if (currentPatient == null) 
+                if (currentPatient == null)
                     return NotFound("Patient profile not found");
-                
+
                 if (!patientId.HasValue || patientId.Value != currentPatient.Id)
                 {
                     patientId = currentPatient.Id;
@@ -52,10 +52,10 @@ namespace HospitalMS.Web.Controllers
                         Value = p.Id.ToString(),
                         Text = $"{p.FullName} (ID: {p.Id})"
                     }).ToList();
-                    
+
                     return View(new List<MedicalRecordDisplayViewModel>());
                 }
-                
+
                 return BadRequest("Patient ID is required for medical records.");
             }
             var records = await _medicalRecordService.GetByPatientIdAsync(patientId.Value);
@@ -77,7 +77,7 @@ namespace HospitalMS.Web.Controllers
                 CreatedBy = r.CreatedBy,
                 UpdatedBy = r.UpdatedBy
             }).ToList();
-            
+
             return View(viewModels);
         }
 
@@ -92,7 +92,7 @@ namespace HospitalMS.Web.Controllers
             }
 
             var patient = await _patientService.GetByIdAsync(patientId.Value);
-            if (patient == null) 
+            if (patient == null)
                 return NotFound();
 
             var viewModel = new CreateMedicalRecordViewModel
