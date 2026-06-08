@@ -14,87 +14,137 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <style>
         body {
-            background-color: #f8f9fa;
+            background-color: var(--brand-light);
+            background-image: radial-gradient(var(--brand-primary-light) 1px, transparent 1px);
+            background-size: 32px 32px;
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 2rem 0;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Decorative Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -10%;
+            left: -10%;
+            width: 50vw;
+            height: 50vw;
+            background: var(--brand-primary);
+            opacity: 0.15;
+            filter: blur(100px);
+            border-radius: 50%;
+            z-index: 0;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -10%;
+            right: -10%;
+            width: 50vw;
+            height: 50vw;
+            background: var(--brand-success);
+            opacity: 0.15;
+            filter: blur(100px);
+            border-radius: 50%;
+            z-index: 0;
         }
 
         .register-card {
-            border: none;
-            border-radius: 16px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.06);
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-2xl);
+            box-shadow: var(--shadow-xl);
             overflow: hidden;
             width: 100%;
-            max-width: 600px;
-            background: #fff;
+            max-width: 700px;
+            position: relative;
+            z-index: 1;
+            animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
         .register-header {
-            padding: 2rem 2rem 1rem;
+            padding: 2.5rem 2.5rem 1rem;
             text-align: center;
         }
 
         .register-body {
-            padding: 2rem;
+            padding: 1.5rem 2.5rem 2.5rem;
         }
 
         .form-control, .form-select {
             padding: 0.75rem 1rem;
-            border-radius: 8px;
+            border-radius: var(--radius-md);
             font-size: 0.95rem;
-            background-color: #f9f9f9;
-            border: 1px solid #e9ecef;
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 1px solid #E2E8F0;
+            transition: var(--transition-all);
         }
 
-            .form-control:focus, .form-select:focus {
-                background-color: #fff;
-                border-color: #0d6efd;
-                box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
-            }
+        .form-control:focus, .form-select:focus {
+            background-color: #fff;
+            border-color: var(--brand-primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        }
 
-        .btn-primary {
-            padding: 0.8rem 1rem;
-            border-radius: 8px;
-            font-weight: 600;
-            letter-spacing: 0.3px;
+        .brand-logo {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-success));
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            margin: 0 auto 1.25rem;
+            box-shadow: var(--shadow-md);
         }
     </style>
 </head>
 <body>
     <div class="register-card">
         <div class="register-header">
-            <h4 class="fw-bold mb-1">Create Account</h4>
-            <p class="text-muted small">Join Hospital Management System</p>
+            <div class="brand-logo">
+                <i class="bi bi-person-plus-fill"></i>
+            </div>
+            <h4 class="fw-bold text-dark mb-1">Create Account</h4>
+            <p class="text-muted small">Join the Hospital Management System</p>
         </div>
         <div class="register-body pt-0">
             <form asp-action="Register" method="post" id="registerForm">
                 <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small mb-4 border-0 bg-danger-subtle text-danger rounded-3"></div>
                 <input type="hidden" asp-for="Role" value="Patient" />
+                
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
-                        <label asp-for="FirstName" class="form-label small fw-bold text-muted text-uppercase">First Name</label>
-                        <input asp-for="FirstName" class="form-control" placeholder="FirstName" />
+                        <label asp-for="FirstName" class="form-label small fw-bold text-secondary text-uppercase">First Name</label>
+                        <input asp-for="FirstName" class="form-control shadow-sm" placeholder="John" />
                         <span asp-validation-for="FirstName" class="text-danger small mt-1 d-block"></span>
                     </div>
                     <div class="col-md-6">
-                        <label asp-for="LastName" class="form-label small fw-bold text-muted text-uppercase">Last Name</label>
-                        <input asp-for="LastName" class="form-control" placeholder="LastName" />
+                        <label asp-for="LastName" class="form-label small fw-bold text-secondary text-uppercase">Last Name</label>
+                        <input asp-for="LastName" class="form-control shadow-sm" placeholder="Doe" />
                         <span asp-validation-for="LastName" class="text-danger small mt-1 d-block"></span>
                     </div>
                 </div>
+                
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
-                        <label asp-for="DateOfBirth" class="form-label small fw-bold text-muted text-uppercase">Date of Birth</label>
-                        <input asp-for="DateOfBirth" type="date" class="form-control" />
+                        <label asp-for="DateOfBirth" class="form-label small fw-bold text-secondary text-uppercase">Date of Birth</label>
+                        <input asp-for="DateOfBirth" type="date" class="form-control shadow-sm" />
                         <span asp-validation-for="DateOfBirth" class="text-danger small mt-1 d-block"></span>
                     </div>
                     <div class="col-md-6">
-                        <label asp-for="Gender" class="form-label small fw-bold text-muted text-uppercase">Gender</label>
-                        <select asp-for="Gender" class="form-select">
+                        <label asp-for="Gender" class="form-label small fw-bold text-secondary text-uppercase">Gender</label>
+                        <select asp-for="Gender" class="form-select shadow-sm">
                             <option value="">Select Gender</option>
                             <option value="Male">Male</option>
                             <option value="Female">Female</option>
@@ -103,15 +153,16 @@
                         <span asp-validation-for="Gender" class="text-danger small mt-1 d-block"></span>
                     </div>
                 </div>
+                
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
-                        <label asp-for="PhoneNumber" class="form-label small fw-bold text-muted text-uppercase">Phone Number</label>
-                        <input asp-for="PhoneNumber" class="form-control" placeholder="+1234567890" />
+                        <label asp-for="PhoneNumber" class="form-label small fw-bold text-secondary text-uppercase">Phone Number</label>
+                        <input asp-for="PhoneNumber" class="form-control shadow-sm" placeholder="+1234567890" />
                         <span asp-validation-for="PhoneNumber" class="text-danger small mt-1 d-block"></span>
                     </div>
                     <div class="col-md-6">
-                        <label asp-for="BloodGroup" class="form-label small fw-bold text-muted text-uppercase">Blood Group</label>
-                        <select asp-for="BloodGroup" class="form-select">
+                        <label asp-for="BloodGroup" class="form-label small fw-bold text-secondary text-uppercase">Blood Group</label>
+                        <select asp-for="BloodGroup" class="form-select shadow-sm">
                             <option value="">Select Blood Group</option>
                             <option value="A+">A+</option>
                             <option value="A-">A-</option>
@@ -125,36 +176,40 @@
                         <span asp-validation-for="BloodGroup" class="text-danger small mt-1 d-block"></span>
                     </div>
                 </div>
+                
                 <div class="mb-3">
-                    <label asp-for="Email" class="form-label small fw-bold text-muted text-uppercase">Email Address</label>
-                    <input asp-for="Email" class="form-control" placeholder="name@company.com" />
+                    <label asp-for="Email" class="form-label small fw-bold text-secondary text-uppercase">Email Address</label>
+                    <input asp-for="Email" class="form-control shadow-sm" placeholder="name@example.com" />
                     <span asp-validation-for="Email" class="text-danger small mt-1 d-block"></span>
                 </div>
+                
                 <div class="row g-3 mb-4">
                     <div class="col-md-6">
-                        <label asp-for="Password" class="form-label small fw-bold text-muted text-uppercase">Password</label>
-                        <input asp-for="Password" type="password" class="form-control" placeholder="Create password" />
+                        <label asp-for="Password" class="form-label small fw-bold text-secondary text-uppercase">Password</label>
+                        <input asp-for="Password" type="password" class="form-control shadow-sm" placeholder="Create password" />
                         <span asp-validation-for="Password" class="text-danger small mt-1 d-block"></span>
                     </div>
                     <div class="col-md-6">
-                        <label asp-for="ConfirmPassword" class="form-label small fw-bold text-muted text-uppercase">Confirm</label>
-                        <input asp-for="ConfirmPassword" type="password" class="form-control" placeholder="Repeat password" />
+                        <label asp-for="ConfirmPassword" class="form-label small fw-bold text-secondary text-uppercase">Confirm Password</label>
+                        <input asp-for="ConfirmPassword" type="password" class="form-control shadow-sm" placeholder="Repeat password" />
                         <span asp-validation-for="ConfirmPassword" class="text-danger small mt-1 d-block"></span>
                     </div>
                 </div>
-                <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-primary shadow-sm" id="submitBtn">
+                
+                <div class="d-grid gap-3 mt-2">
+                    <button type="submit" class="btn btn-primary btn-lg shadow-sm hover-lift" id="submitBtn">
                         <span id="btnText">Create Account</span>
                         <span id="btnSpinner" class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true" style="display:none;"></span>
                     </button>
-                    <a asp-action="Login" class="btn btn-light text-muted">Already have an account? Sign In</a>
+                    <a asp-action="Login" class="btn btn-outline-secondary hover-lift">Already have an account? Sign In</a>
                 </div>
             </form>
         </div>
-        <div class="bg-light py-3 text-center border-top">
-            <small class="text-muted">By signing up, you agree to our Terms & Privacy Policy.</small>
+        <div class="bg-white bg-opacity-50 py-3 text-center border-top border-opacity-10">
+            <small class="text-muted">By signing up, you agree to our <a href="#" class="text-primary text-decoration-none">Terms</a> & <a href="#" class="text-primary text-decoration-none">Privacy Policy</a>.</small>
         </div>
     </div>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>

@@ -1,12 +1,15 @@
-﻿@model HospitalMS.Web.ViewModels.AdminDashboardViewModel
+@model HospitalMS.Web.ViewModels.AdminDashboardViewModel
 @{
     ViewData["Title"] = "Admin Dashboard";
 }
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="h3 fw-bold text-gray-800">Administrator Dashboard</h1>
-            <p class="text-muted mb-0">Overview of hospital performance and daily activities.</p>
+            <h1 class="h3 fw-bold text-dark mb-1">
+                <i class="bi bi-speedometer2 text-primary me-2"></i>
+                <span class="text-gradient">Administrator Dashboard</span>
+            </h1>
+            <p class="text-secondary fw-medium mb-0">Overview of hospital performance and daily activities.</p>
         </div>
         <div class="d-flex gap-2">
             <div class="dropdown">
@@ -27,7 +30,7 @@
     </div>
     <div class="row g-4 mb-4">
         <div class="col-xl-3 col-md-6">
-            <div class="card dashboard-card border-0 shadow-sm h-100 border-start border-4 border-primary" data-type="Doctors" style="cursor:pointer;">
+            <div class="card dashboard-card border-0 shadow-sm h-100 border-start border-4 border-primary hover-lift" data-type="Doctors" style="cursor:pointer; border-radius: 1rem;">
                 <div class="card-body">
                     <div class="d-flex align-items-center justify-content-between">
                         <div>
@@ -46,7 +49,7 @@
             </div>
         </div>
         <div class="col-xl-3 col-md-6">
-            <div class="card dashboard-card border-0 shadow-sm h-100 border-start border-4 border-success" data-type="Patients" style="cursor:pointer;">
+            <div class="card dashboard-card border-0 shadow-sm h-100 border-start border-4 border-success hover-lift" data-type="Patients" style="cursor:pointer; border-radius: 1rem;">
                 <div class="card-body">
                     <div class="d-flex align-items-center justify-content-between">
                         <div>
@@ -65,7 +68,7 @@
             </div>
         </div>
         <div class="col-xl-3 col-md-6">
-            <div class="card dashboard-card border-0 shadow-sm h-100 border-start border-4 border-info" data-type="TodayAppointments" style="cursor:pointer;">
+            <div class="card dashboard-card border-0 shadow-sm h-100 border-start border-4 border-info hover-lift" data-type="TodayAppointments" style="cursor:pointer; border-radius: 1rem;">
                 <div class="card-body">
                     <div class="d-flex align-items-center justify-content-between">
                         <div>
@@ -84,7 +87,7 @@
             </div>
         </div>
         <div class="col-xl-3 col-md-6">
-            <div class="card dashboard-card border-0 shadow-sm h-100 border-start border-4 border-warning" data-type="PendingApprovals" style="cursor:pointer;">
+            <div class="card dashboard-card border-0 shadow-sm h-100 border-start border-4 border-warning hover-lift" data-type="PendingApprovals" style="cursor:pointer; border-radius: 1rem;">
                 <div class="card-body">
                     <div class="d-flex align-items-center justify-content-between">
                         <div>
@@ -269,9 +272,9 @@
                         data: {
                             labels: labels,
                             datasets: [
-                                { label: 'Total', data: total, backgroundColor: '#0d6efd' },
-                                { label: 'Completed', data: completed, backgroundColor: '#198754' },
-                                { label: 'Cancelled', data: cancelled, backgroundColor: '#dc3545' }
+                                { label: 'Total', data: total, backgroundColor: 'rgba(79, 70, 229, 0.8)', borderRadius: 4 },
+                                { label: 'Completed', data: completed, backgroundColor: 'rgba(16, 185, 129, 0.8)', borderRadius: 4 },
+                                { label: 'Cancelled', data: cancelled, backgroundColor: 'rgba(239, 68, 68, 0.8)', borderRadius: 4 }
                             ]
                         },
                         options: {

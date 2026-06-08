@@ -9,62 +9,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <style>
-        body {
-            background-color: #f4f6f9;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-        }
-
-        .navbar {
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            background-color: #ffffff !important;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .navbar-brand {
-            font-weight: 700;
-            color: #0d6efd !important;
-            font-size: 1.25rem;
-            letter-spacing: -0.5px;
-        }
-
-        .nav-link {
-            color: #495057 !important;
-            font-weight: 500;
-            padding: 0.5rem 1rem !important;
-            border-radius: 4px;
-            transition: all 0.2s;
-        }
-
-            .nav-link:hover, .nav-link.active {
-                color: #0d6efd !important;
-                background-color: #e9ecef;
-            }
-
         .nav-section-label {
             font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            color: #adb5bd;
+            color: var(--text-muted);
             margin-bottom: 0.25rem;
             padding-left: 1rem;
             font-weight: 600;
             display: block;
         }
-
-        .dropdown-menu {
-            border: 1px solid rgba(0,0,0,0.08);
-            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1);
-            border-radius: 0.5rem;
-        }
-
-        .dropdown-item {
-            padding: 0.5rem 1rem;
-            font-weight: 500;
-        }
-
-            .dropdown-item:active {
-                background-color: #0d6efd;
-            }
 
         @@media (max-width: 991.98px) {
             .nav-section-label {
@@ -89,15 +43,15 @@
             transition: all 0.3s ease;
         }
 
-            .connection-indicator.connected {
-                background-color: #28a745;
-                box-shadow: 0 0 5px #28a745;
-            }
+        .connection-indicator.connected {
+            background-color: var(--brand-success);
+            box-shadow: 0 0 5px var(--brand-success);
+        }
 
-            .connection-indicator.disconnected {
-                background-color: #dc3545;
-                box-shadow: 0 0 5px #dc3545;
-            }
+        .connection-indicator.disconnected {
+            background-color: var(--brand-danger);
+            box-shadow: 0 0 5px var(--brand-danger);
+        }
     </style>
 </head>
 <body>
