@@ -11,7 +11,7 @@ public class MedicalRecordDto
     public int? DoctorId { get; set; }
 
     public string? DoctorName { get; set; }
-    
+
     public DateTime RecordDate { get; set; }
 
     public string RecordType { get; set; } = string.Empty;

@@ -1,6 +1,6 @@
 using HospitalMS.BL.Common;
 using HospitalMS.BL.DTOs.Appointment;
-using HospitalMS.BL.Interfaces.Services;
+using HospitalMS.BL.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;

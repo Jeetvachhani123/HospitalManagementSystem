@@ -1,4 +1,4 @@
-namespace HospitalMS.BL.Interfaces.Services;
+namespace HospitalMS.Models;
 
 public interface IRealTimeNotificationService
 {

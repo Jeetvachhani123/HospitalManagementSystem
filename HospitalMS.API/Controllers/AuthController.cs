@@ -1,6 +1,6 @@
-﻿using HospitalMS.BL.Common;
+using HospitalMS.BL.Common;
 using HospitalMS.BL.DTOs.Auth;
-using HospitalMS.BL.Interfaces.Services;
+using HospitalMS.BL.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HospitalMS.API.Controllers;

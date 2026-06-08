@@ -1,6 +1,6 @@
 using FluentValidation;
 using HospitalMS.BL.DTOs.Appointment;
-using HospitalMS.BL.Interfaces.Services;
+using HospitalMS.BL.Services;
 using System.Text.RegularExpressions;
 
 namespace HospitalMS.BL.Validators;

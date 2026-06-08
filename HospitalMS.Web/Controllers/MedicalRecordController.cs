@@ -1,5 +1,5 @@
 using HospitalMS.BL.DTOs.MedicalRecord;
-using HospitalMS.BL.Interfaces.Services;
+using HospitalMS.BL.Services;
 using HospitalMS.Web.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

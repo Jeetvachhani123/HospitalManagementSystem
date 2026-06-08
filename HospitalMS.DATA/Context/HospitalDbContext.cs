@@ -1,4 +1,4 @@
-using HospitalMS.BL.Interfaces;
+using HospitalMS.Models;
 using HospitalMS.Models.Base;
 using HospitalMS.Models.Entities;
 using Microsoft.EntityFrameworkCore;

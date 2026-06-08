@@ -6,7 +6,7 @@ using HospitalMS.API.Middlewares;
 using HospitalMS.API.Services;
 using HospitalMS.BL.Common;
 using HospitalMS.BL.Mappings;
-using HospitalMS.BL.Interfaces.Services;
+using HospitalMS.Models;
 using HospitalMS.BL.Services;
 using FluentValidation;
 using Serilog;
@@ -48,7 +48,7 @@ builder.Services.AddScoped<IEmailNotificationService, EmailNotificationService>(
 
 // Add user context accessor
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<HospitalMS.BL.Interfaces.ICurrentUserService, CurrentUserService>();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile).Assembly);
 builder.Services.AddValidatorsFromAssemblyContaining(typeof(HospitalMS.BL.Validators.DoctorCreateValidator));
 builder.Services.AddControllers(options =>
@@ -89,13 +89,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerDocumentation();
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll",
-        policy => policy
+    options.AddPolicy("AllowAll", policy => policy
             .WithOrigins(
-                "http://localhost:3000",
-                "https://localhost:7058",
-                "http://localhost:5000",
-                "https://localhost:5001")
+                "http://localhost:3000", "https://localhost:7058",
+                "http://localhost:5000", "https://localhost:5001")
             .AllowAnyMethod()
             .AllowAnyHeader());
 });

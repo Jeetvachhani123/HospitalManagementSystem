@@ -1,4 +1,4 @@
-﻿using HospitalMS.BL.Interfaces.Services;
+using HospitalMS.Models;
 using Microsoft.AspNetCore.SignalR;
 
 namespace HospitalMS.API.Hubs

@@ -1,13 +1,25 @@
 using AutoMapper;
 using HospitalMS.BL.DTOs.Doctor;
-using HospitalMS.BL.Interfaces;
-using HospitalMS.BL.Interfaces.Services;
+using HospitalMS.DATA.UnitOfWork;
 using HospitalMS.Models.Entities;
 using HospitalMS.Models.Enums;
 using System.Security.Cryptography;
 using System.Text;
 
 namespace HospitalMS.BL.Services;
+
+public interface IDoctorService
+{
+    Task<DoctorResponseDto?> GetByIdAsync(int id);
+    Task<DoctorResponseDto?> GetByUserIdAsync(int userId);
+    Task<IEnumerable<DoctorResponseDto>> GetAllAsync(int page = 1, int pageSize = 100);
+    Task<IEnumerable<DoctorResponseDto>> GetAvailableDoctorsAsync(int page = 1, int pageSize = 100);
+    Task<IEnumerable<DoctorResponseDto>> GetBySpecializationAsync(string specialization);
+    Task<DoctorResponseDto?> CreateAsync(DoctorCreateDto doctorDto);
+    Task<DoctorResponseDto?> UpdateAsync(int id, DoctorUpdateDto doctorDto);
+    Task<bool> DeleteAsync(int id);
+    Task<(IEnumerable<DoctorResponseDto> Items, int TotalCount)> SearchAsync(string? searchTerm, int page, int pageSize);
+}
 
 public class DoctorService : IDoctorService
 {

@@ -1,11 +1,19 @@
 using AutoMapper;
 using HospitalMS.BL.DTOs.Department;
-using HospitalMS.BL.Interfaces;
-using HospitalMS.BL.Interfaces.Services;
+using HospitalMS.DATA.UnitOfWork;
 using HospitalMS.Models.Entities;
 using Microsoft.Extensions.Logging;
 
 namespace HospitalMS.BL.Services;
+
+public interface IDepartmentService
+{
+    Task<IEnumerable<DepartmentDto>> GetAllAsync();
+    Task<DepartmentDto?> GetByIdAsync(int id);
+    Task<DepartmentDto> CreateAsync(CreateDepartmentDto dto);
+    Task<DepartmentDto?> UpdateAsync(int id, UpdateDepartmentDto dto);
+    Task<bool> DeleteAsync(int id);
+}
 
 public class DepartmentService : IDepartmentService
 {

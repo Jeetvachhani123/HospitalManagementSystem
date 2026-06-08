@@ -1,10 +1,15 @@
 using HospitalMS.BL.DTOs.Doctor;
-using HospitalMS.BL.Interfaces;
-using HospitalMS.BL.Interfaces.Services;
+using HospitalMS.DATA.UnitOfWork;
 using HospitalMS.Models.Entities;
 using Microsoft.Extensions.Logging;
 
 namespace HospitalMS.BL.Services;
+
+public interface IWorkingHoursService
+{
+    Task<List<WorkingHoursDto>> GetWorkingHoursAsync(int doctorId);
+    Task UpdateWorkingHoursAsync(int doctorId, List<WorkingHoursDto> hours);
+}
 
 public class WorkingHoursService : IWorkingHoursService
 {

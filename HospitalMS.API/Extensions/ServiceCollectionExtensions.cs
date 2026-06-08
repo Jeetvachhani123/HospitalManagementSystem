@@ -1,6 +1,3 @@
-using HospitalMS.BL.Interfaces;
-using HospitalMS.BL.Interfaces.Repositories;
-using HospitalMS.BL.Interfaces.Services;
 using HospitalMS.BL.Services;
 using HospitalMS.DATA.Context;
 using HospitalMS.DATA.Repositories;
@@ -35,7 +32,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IMedicalRecordService, MedicalRecordService>();
         services.AddScoped<IDepartmentService, DepartmentService>();
         services.AddScoped<IWorkingHoursService, WorkingHoursService>();
-        
+
         return services;
     }
 }

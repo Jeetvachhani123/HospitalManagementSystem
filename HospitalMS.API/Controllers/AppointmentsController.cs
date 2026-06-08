@@ -1,7 +1,7 @@
 using ClosedXML.Excel;
 using HospitalMS.BL.Common;
 using HospitalMS.BL.DTOs.Appointment;
-using HospitalMS.BL.Interfaces.Services;
+using HospitalMS.BL.Services;
 using HospitalMS.Models.Enums;
 using iText.IO.Font.Constants;
 using iText.Kernel.Colors;
@@ -377,20 +377,8 @@ public class AppointmentsController : ControllerBase
             patientId = patient?.Id;
         }
         var today = DateTime.UtcNow.Date;
-        var (items, _) = await _appointmentService.SearchAsync(
-            searchTerm: null,
-            doctorId: doctorId,
-            patientId: patientId,
-            fromDate: today,
-            toDate: today.AddYears(2),
-            status: null,
-            page: 1,
-            pageSize: 1000,
-            cancellationToken: cancellationToken);
-        var upcoming = items.Where(a =>
-            a.StatusEnum != AppointmentStatus.Cancelled &&
-            a.StatusEnum != AppointmentStatus.Completed &&
-            a.StatusEnum != AppointmentStatus.NoShow);
+        var (items, _) = await _appointmentService.SearchAsync(searchTerm: null, doctorId: doctorId, patientId: patientId, fromDate: today, toDate: today.AddYears(2), status: null, page: 1, pageSize: 1000, cancellationToken: cancellationToken);
+        var upcoming = items.Where(a => a.StatusEnum != AppointmentStatus.Cancelled && a.StatusEnum != AppointmentStatus.Completed && a.StatusEnum != AppointmentStatus.NoShow);
 
         return Ok(ApiResponse<IEnumerable<AppointmentResponseDto>>.SuccessResponse(upcoming));
     }
@@ -407,16 +395,7 @@ public class AppointmentsController : ControllerBase
         }
 
         var today = DateTime.UtcNow.Date;
-        var (items, _) = await _appointmentService.SearchAsync(
-            searchTerm: null,
-            doctorId: doctorId,
-            patientId: patientId,
-            fromDate: null,
-            toDate: today.AddDays(-1),
-            status: null,
-            page: 1,
-            pageSize: 1000,
-            cancellationToken: cancellationToken);
+        var (items, _) = await _appointmentService.SearchAsync(searchTerm: null, doctorId: doctorId, patientId: patientId, fromDate: null, toDate: today.AddDays(-1), status: null, page: 1, pageSize: 1000, cancellationToken: cancellationToken);
         var history = items.Where(a =>
             a.AppointmentDate < today ||
             a.StatusEnum == AppointmentStatus.Completed ||
@@ -432,16 +411,7 @@ public class AppointmentsController : ControllerBase
 
     private async Task<IEnumerable<AppointmentResponseDto>> GetFilteredAsync(int? patientId, int? doctorId, CancellationToken ct)
     {
-        var (items, _) = await _appointmentService.SearchAsync(
-            searchTerm: null,
-            doctorId: doctorId,
-            patientId: patientId,
-            fromDate: null,
-            toDate: null,
-            status: null,
-            page: 1,
-            pageSize: int.MaxValue,
-            cancellationToken: ct);
+        var (items, _) = await _appointmentService.SearchAsync(searchTerm: null, doctorId: doctorId, patientId: patientId, fromDate: null, toDate: null, status: null, page: 1, pageSize: int.MaxValue, cancellationToken: ct);
 
         return items;
     }

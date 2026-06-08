@@ -1,10 +1,15 @@
-using HospitalMS.BL.Interfaces.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Stripe;
 using Stripe.Checkout;
 
 namespace HospitalMS.BL.Services;
+
+public interface IPaymentService
+{
+    Task<string> CreateCheckoutSessionAsync(int invoiceId, decimal amount, string currency, string successUrl, string cancelUrl);
+    Task<bool> HandleWebhookAsync(string json, string signature);
+}
 
 public class StripePaymentService : IPaymentService
 {

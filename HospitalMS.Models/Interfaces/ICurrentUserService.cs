@@ -1,4 +1,4 @@
-namespace HospitalMS.BL.Interfaces;
+namespace HospitalMS.Models;
 
 public interface ICurrentUserService
 {

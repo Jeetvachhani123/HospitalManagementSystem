@@ -1,4 +1,4 @@
-using HospitalMS.BL.Interfaces;
+using HospitalMS.Models;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 

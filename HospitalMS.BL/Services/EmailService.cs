@@ -1,10 +1,14 @@
-using HospitalMS.BL.Interfaces.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Net.Mail;
 using System.Net;
 
 namespace HospitalMS.BL.Services;
+
+public interface IEmailService
+{
+    Task SendEmailAsync(string to, string subject, string body);
+}
 
 public class EmailService : IEmailService
 {

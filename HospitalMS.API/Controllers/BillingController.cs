@@ -1,5 +1,5 @@
 using HospitalMS.BL.Common;
-using HospitalMS.BL.Interfaces.Services;
+using HospitalMS.BL.Services;
 using HospitalMS.Models.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

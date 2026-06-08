@@ -1,7 +1,4 @@
-using HospitalMS.BL.Interfaces;
-using HospitalMS.BL.Interfaces.Repositories;
-using HospitalMS.BL.Interfaces.Services;
-using HospitalMS.BL.Services;
+
 using HospitalMS.DATA.Context;
 using HospitalMS.DATA.Repositories;
 using HospitalMS.DATA.UnitOfWork;

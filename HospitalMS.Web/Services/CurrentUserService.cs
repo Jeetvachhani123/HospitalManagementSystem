@@ -1,4 +1,4 @@
-using HospitalMS.BL.Interfaces;
+using HospitalMS.Models;
 using System.Security.Claims;
 
 namespace HospitalMS.Web.Services;

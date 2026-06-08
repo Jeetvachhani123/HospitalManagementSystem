@@ -1,6 +1,5 @@
 using HospitalMS.BL.DTOs.Auth;
-using HospitalMS.BL.Interfaces;
-using HospitalMS.BL.Interfaces.Services;
+using HospitalMS.DATA.UnitOfWork;
 using HospitalMS.Models.Entities;
 using HospitalMS.Models.Enums;
 using Microsoft.Extensions.Logging;

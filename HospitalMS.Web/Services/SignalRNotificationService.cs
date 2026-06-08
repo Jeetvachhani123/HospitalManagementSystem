@@ -1,4 +1,4 @@
-using HospitalMS.BL.Interfaces.Services;
+using HospitalMS.Models;
 using HospitalMS.Web.Hubs;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;

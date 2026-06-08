@@ -1,10 +1,21 @@
-using HospitalMS.BL.Interfaces;
-using HospitalMS.BL.Interfaces.Services;
+using HospitalMS.DATA.UnitOfWork;
 using HospitalMS.Models.Entities;
 using HospitalMS.Models.Enums;
 using Microsoft.Extensions.Logging;
 
 namespace HospitalMS.BL.Services;
+
+public interface IBillingService
+{
+    Task<Invoice?> GetInvoiceByIdAsync(int id);
+    Task<Invoice?> GetInvoiceByAppointmentIdAsync(int appointmentId);
+    Task<IEnumerable<Invoice>> GetAllInvoicesAsync();
+    Task<IEnumerable<Invoice>> GetPatientInvoicesAsync(int patientId);
+    Task<IEnumerable<Invoice>> GetPendingInvoicesAsync(int patientId);
+    Task<Invoice> GenerateInvoiceAsync(int appointmentId, decimal amount, DateTime dueDate);
+    Task<bool> ProcessPaymentAsync(int invoiceId, string paymentMethod);
+    Task<bool> CancelInvoiceAsync(int invoiceId);
+}
 
 public class BillingService : IBillingService
 {

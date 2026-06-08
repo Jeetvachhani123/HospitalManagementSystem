@@ -1,5 +1,5 @@
-﻿using HospitalMS.BL.DTOs.Auth;
-using HospitalMS.BL.Interfaces.Services;
+using HospitalMS.BL.DTOs.Auth;
+using HospitalMS.BL.Services;
 using HospitalMS.Models.Enums;
 using HospitalMS.Web.ViewModels;
 using Microsoft.AspNetCore.Authentication;

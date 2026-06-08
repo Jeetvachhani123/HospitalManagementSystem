@@ -1,12 +1,20 @@
 using AutoMapper;
 using HospitalMS.BL.DTOs.MedicalRecord;
-using HospitalMS.BL.Interfaces;
-using HospitalMS.BL.Interfaces.Services;
+using HospitalMS.DATA.UnitOfWork;
 using HospitalMS.Models.Entities;
 using HospitalMS.Models.Enums;
 using Microsoft.Extensions.Logging;
 
 namespace HospitalMS.BL.Services;
+
+public interface IMedicalRecordService
+{
+    Task<IEnumerable<MedicalRecordDto>> GetByPatientIdAsync(int patientId);
+    Task<IEnumerable<MedicalRecordDto>> GetByDoctorIdAsync(int doctorId);
+    Task<MedicalRecordDto?> GetByIdAsync(int id);
+    Task<MedicalRecordDto?> CreateAsync(MedicalRecordCreateDto dto);
+    Task<bool> DeleteAsync(int id, int currentUserId);
+}
 
 public class MedicalRecordService : IMedicalRecordService
 {

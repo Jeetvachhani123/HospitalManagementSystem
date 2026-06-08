@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\HospitalMS.Models\HospitalMS.Models.csproj" />
-    <ProjectReference Include="..\HospitalMS.BL\HospitalMS.BL.csproj" />
   </ItemGroup>
 
 </Project>

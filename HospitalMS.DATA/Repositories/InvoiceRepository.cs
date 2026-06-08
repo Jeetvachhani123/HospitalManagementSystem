@@ -1,9 +1,20 @@
-using HospitalMS.BL.Interfaces.Repositories;
 using HospitalMS.DATA.Context;
 using HospitalMS.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace HospitalMS.DATA.Repositories;
+
+public interface IInvoiceRepository
+{
+    Task<Invoice?> GetByIdAsync(int id);
+    Task<IEnumerable<Invoice>> GetAllAsync();
+    Task<IEnumerable<Invoice>> GetByPatientIdAsync(int patientId);
+    Task<Invoice?> GetByAppointmentIdAsync(int appointmentId);
+    Task<IEnumerable<Invoice>> GetPendingByPatientIdAsync(int patientId);
+    Task AddAsync(Invoice invoice);
+    void Update(Invoice invoice);
+    void Delete(Invoice invoice);
+}
 
 public class InvoiceRepository : IInvoiceRepository
 {

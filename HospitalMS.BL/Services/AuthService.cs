@@ -1,8 +1,7 @@
-﻿using AutoMapper;
+using AutoMapper;
 using HospitalMS.BL.Common;
 using HospitalMS.BL.DTOs.Auth;
-using HospitalMS.BL.Interfaces;
-using HospitalMS.BL.Interfaces.Services;
+using HospitalMS.DATA.UnitOfWork;
 using HospitalMS.Models.Entities;
 using HospitalMS.Models.Enums;
 using Microsoft.Extensions.Logging;
@@ -14,6 +13,16 @@ using System.Security.Cryptography;
 using System.Text;
 
 namespace HospitalMS.BL.Services;
+
+public interface IAuthService
+{
+    Task<AuthResponseDto?> LoginAsync(LoginDto loginDto);
+    Task<AuthResponseDto?> RegisterAsync(RegisterDto registerDto);
+    Task<bool> ValidateTokenAsync(string token);
+    Task<UserProfileDto?> GetProfileAsync(int userId);
+    Task<UserProfileDto?> UpdateProfileAsync(int userId, ProfileUpdateDto profileDto);
+    Task<bool> ChangePasswordAsync(int userId, ChangePasswordDto passwordDto);
+}
 
 public class AuthService : IAuthService
 {

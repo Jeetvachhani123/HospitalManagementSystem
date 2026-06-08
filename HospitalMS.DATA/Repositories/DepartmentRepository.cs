@@ -1,9 +1,17 @@
-using HospitalMS.BL.Interfaces.Repositories;
 using HospitalMS.DATA.Context;
 using HospitalMS.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace HospitalMS.DATA.Repositories;
+
+public interface IDepartmentRepository
+{
+    Task<Department?> GetByIdAsync(int id);
+    Task<IEnumerable<Department>> GetAllAsync();
+    Task AddAsync(Department department);
+    void Update(Department department);
+    void Delete(Department department);
+}
 
 public class DepartmentRepository : IDepartmentRepository
 {
