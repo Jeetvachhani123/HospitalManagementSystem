@@ -1,6 +1,6 @@
 @model HospitalMS.BL.DTOs.Auth.LoginDto
 @{
-    ViewData["Title"] = "Sign In";
+    ViewData["Title"] = "Log in";
     Layout = null;
 }
 <!DOCTYPE html>
@@ -8,185 +8,70 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sign In - Hospital Management System</title>
+    <title>@ViewData["Title"] - Hospital MS</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <style>
-        body {
-            background-color: var(--brand-light);
-            background-image: radial-gradient(var(--brand-primary-light) 1px, transparent 1px);
-            background-size: 32px 32px;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Decorative Background */
-        body::before {
-            content: '';
-            position: absolute;
-            top: -10%;
-            left: -10%;
-            width: 50vw;
-            height: 50vw;
-            background: var(--brand-primary);
-            opacity: 0.15;
-            filter: blur(100px);
-            border-radius: 50%;
-            z-index: 0;
-        }
-        body::after {
-            content: '';
-            position: absolute;
-            bottom: -10%;
-            right: -10%;
-            width: 50vw;
-            height: 50vw;
-            background: var(--brand-secondary);
-            opacity: 0.15;
-            filter: blur(100px);
-            border-radius: 50%;
-            z-index: 0;
-        }
-
-        .login-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius-2xl);
-            box-shadow: var(--shadow-xl);
-            overflow: hidden;
-            width: 100%;
-            max-width: 420px;
-            position: relative;
-            z-index: 1;
-            animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        .login-header {
-            padding: 2.5rem 2rem 1rem;
-            text-align: center;
-        }
-
-        .login-body {
-            padding: 1.5rem 2.5rem 2.5rem;
-        }
-
-        .form-control {
-            padding: 0.75rem 1rem;
-            border-radius: var(--radius-md);
-            font-size: 0.95rem;
-            background-color: rgba(255, 255, 255, 0.9);
-            border: 1px solid transparent;
-        }
-        .form-control:focus {
-            box-shadow: none;
-        }
-        .input-group:focus-within {
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15) !important;
-            border-color: var(--brand-primary);
-        }
-
-        .brand-logo {
-            width: 72px;
-            height: 72px;
-            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            margin: 0 auto 1.5rem;
-            box-shadow: var(--shadow-lg);
-        }
-    </style>
 </head>
-<body>
-    <div class="login-card">
-        <div class="login-header">
-            <div class="brand-logo">
-                <i class="bi bi-hospital-fill"></i>
+<body class="bg-light d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5 col-lg-4">
+                <div class="text-center mb-4">
+                    <a href="/" class="text-decoration-none">
+                        <i class="bi bi-hospital-fill text-primary display-4"></i>
+                        <h2 class="fw-bold text-dark mt-2">Hospital MS</h2>
+                    </a>
+                    <p class="text-secondary">Sign in to your account</p>
+                </div>
+                
+                <div class="card border-0 shadow-sm bg-white" style="border-radius: 1rem;">
+                    <div class="card-body p-4 p-md-5">
+                        <form id="account" method="post">
+                            <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+                            
+                            <div class="mb-4">
+                                <label asp-for="Email" class="form-label text-dark fw-bold">Email Address</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 text-muted">
+                                        <i class="bi bi-envelope"></i>
+                                    </span>
+                                    <input asp-for="Email" class="form-control border-start-0 ps-0" placeholder="name@example.com" autocomplete="username" aria-required="true" />
+                                </div>
+                                <span asp-validation-for="Email" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label asp-for="Password" class="form-label text-dark fw-bold mb-0">Password</label>
+                                    <a class="small text-primary text-decoration-none fw-medium" asp-action="ForgotPassword">Forgot password?</a>
+                                </div>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 text-muted">
+                                        <i class="bi bi-lock"></i>
+                                    </span>
+                                    <input asp-for="Password" class="form-control border-start-0 ps-0" placeholder="••••••••" autocomplete="current-password" aria-required="true" />
+                                </div>
+                                <span asp-validation-for="Password" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                            
+                            <button id="login-submit" type="submit" class="btn btn-primary w-100 py-2 fw-bold mb-4">
+                                Sign In
+                            </button>
+                            
+                            <div class="text-center">
+                                <span class="text-secondary small">Don't have an account?</span>
+                                <a asp-action="Register" class="text-primary text-decoration-none small fw-bold ms-1">Register now</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <h4 class="fw-bold text-dark mb-1">Welcome Back</h4>
-            <p class="text-muted mb-0 small">Sign in to your account</p>
-        </div>
-        <div class="login-body">
-            <form asp-action="Login" method="post" id="loginForm">
-                <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small mb-3 border-0 bg-danger-subtle text-danger rounded-3"></div>
-                
-                <div class="mb-4">
-                    <label asp-for="Email" class="form-label small fw-bold text-secondary text-uppercase letter-spacing-1">Email Address</label>
-                    <div class="input-group shadow-sm rounded-3 overflow-hidden bg-white border">
-                        <span class="input-group-text bg-transparent border-0 text-primary"><i class="bi bi-envelope"></i></span>
-                        <input asp-for="Email" class="form-control border-0 ps-0" placeholder="name@example.com" autofocus />
-                    </div>
-                    <span asp-validation-for="Email" class="text-danger small mt-1 d-block"></span>
-                </div>
-                
-                <div class="mb-4">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <label asp-for="Password" class="form-label small fw-bold text-secondary text-uppercase letter-spacing-1 mb-0">Password</label>
-                        <a href="javascript:alert('Please contact your system administrator to reset your password.');" class="small text-decoration-none text-primary fw-bold hover-lift" tabindex="-1">Forgot?</a>
-                    </div>
-                    <div class="input-group shadow-sm rounded-3 overflow-hidden bg-white border">
-                        <span class="input-group-text bg-transparent border-0 text-primary"><i class="bi bi-lock"></i></span>
-                        <input asp-for="Password" type="password" class="form-control border-0 ps-0" id="passwordInput" placeholder="Enter your password" />
-                        <span class="input-group-text bg-transparent border-0" style="cursor:pointer;" id="togglePassword">
-                            <i class="bi bi-eye text-muted" id="eyeIcon"></i>
-                        </span>
-                    </div>
-                    <span asp-validation-for="Password" class="text-danger small mt-1 d-block"></span>
-                </div>
-                
-                <div class="d-grid mb-4 mt-2">
-                    <button type="submit" class="btn btn-primary btn-lg shadow-sm hover-lift" id="submitBtn">
-                        <span id="btnText">Sign In</span>
-                        <span id="btnSpinner" class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true" style="display:none;"></span>
-                    </button>
-                </div>
-                
-                <div class="text-center">
-                    <p class="text-secondary small mb-0">Don't have an account? <a asp-action="Register" class="text-primary fw-bold text-decoration-none">Create Account</a></p>
-                </div>
-            </form>
-        </div>
-        <div class="bg-white bg-opacity-50 py-3 text-center border-top border-opacity-10">
-            <a asp-controller="Home" asp-action="Index" class="small text-secondary text-decoration-none fw-medium hover-lift d-inline-block"><i class="bi bi-arrow-left me-1"></i> Back to Home</a>
         </div>
     </div>
-
+    
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
-    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            $('#togglePassword').on('click', function() {
-                const input = $('#passwordInput');
-                const icon = $('#eyeIcon');
-                if (input.attr('type') === 'password') {
-                    input.attr('type', 'text');
-                    icon.removeClass('bi-eye').addClass('bi-eye-slash');
-                } else {
-                    input.attr('type', 'password');
-                    icon.removeClass('bi-eye-slash').addClass('bi-eye');
-                }
-            });
-            $('#loginForm').on('submit', function() {
-                if($(this).valid()) {
-                    $('#submitBtn').prop('disabled', true);
-                    $('#btnText').text('Signing In...');
-                    $('#btnSpinner').show();
-                }
-            });
-        });
-    </script>
+    <partial name="_ValidationScriptsPartial" />
 </body>
 </html>

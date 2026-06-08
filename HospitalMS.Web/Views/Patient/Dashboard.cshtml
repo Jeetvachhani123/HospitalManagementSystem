@@ -6,7 +6,7 @@
     <div class="row mb-5 align-items-center">
         <div class="col-lg-8">
             <h1 class="h2 fw-bold text-dark mb-2">
-                <span class="text-gradient">Hello, @Model.Patient.FullName</span>
+                Hello, @Model.Patient.FullName
             </h1>
             <p class="text-secondary fw-medium lead mb-0">Welcome back to your health dashboard.</p>
         </div>
@@ -18,8 +18,7 @@
     </div>
     <div class="row g-4 mb-5">
         <div class="col-md-6 col-lg-3">
-            <div class="card border-0 shadow-sm h-100 bg-white dashboard-card hover-lift"
-                 data-type="Upcoming" style="cursor:pointer; border-radius: 1rem;">
+            <div class="card border-0 shadow-sm h-100 bg-white dashboard-card hover-lift" data-type="Upcoming" style="cursor:pointer;">
                 <div class="card-body p-4 text-center">
                     <div class="icon-circle bg-primary bg-opacity-10 text-primary rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width:50px;height:50px;">
                         <i class="bi bi-calendar-event fs-4"></i>
@@ -68,7 +67,7 @@
     </div>
     <div class="row g-4">
         <div class="col-lg-8">
-            <div class="card border-0 shadow-sm h-100 hover-lift" style="border-radius: 1rem;">
+            <div class="card border-0 shadow-sm h-100 hover-lift">
                 <div class="card-header bg-white py-3 border-bottom d-flex align-items-center justify-content-between">
                     <h5 class="fw-bold text-dark m-0">Upcoming Schedule</h5>
                     <a asp-controller="Appointment" asp-action="Index" class="small text-decoration-none fw-bold">View All</a>
@@ -117,7 +116,7 @@
             </div>
         </div>
         <div class="col-lg-4">
-            <div class="card border-0 shadow-sm h-100 hover-lift" style="border-radius: 1rem;">
+            <div class="card border-0 shadow-sm h-100 hover-lift">
                 <div class="card-header bg-white py-3 border-bottom">
                     <h5 class="fw-bold text-dark m-0">Recent History</h5>
                 </div>
