@@ -3,9 +3,9 @@
     ViewData["Title"] = "Appointment History";
 }
 <div class="container-fluid py-4 min-vh-100">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 animate-fade-in-up">
         <div>
-            <h2 class="h4 fw-bold text-gray-800 mb-0">Past Appointments</h2>
+            <h2 class="h4 fw-bold text-dark mb-0" style="letter-spacing:-0.03em;">Past <span class="text-gradient">Appointments</span></h2>
             <p class="text-muted small mb-0">Archive of all previous consultations.</p>
         </div>
         <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 btn-sm fw-bold">
@@ -14,7 +14,7 @@
     </div>
     @if (Model.Any())
     {
-        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="card border-0 animate-fade-in-up delay-1">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
                     <thead class="bg-light text-uppercase text-muted small fw-bold">

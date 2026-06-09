@@ -9,27 +9,60 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Hospital MS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-<body class="bg-light d-flex align-items-center justify-content-center" style="min-height: 100vh;">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-5 col-lg-4">
-                <div class="text-center mb-4">
-                    <a href="/" class="text-decoration-none">
-                        <i class="bi bi-hospital-fill text-primary display-4"></i>
-                        <h2 class="fw-bold text-dark mt-2">Hospital MS</h2>
-                    </a>
-                    <p class="text-secondary">Sign in to your account</p>
+<body style="min-height: 100vh; margin:0; font-family:'Inter',sans-serif;">
+    <div class="row g-0" style="min-height: 100vh;">
+        <!-- Left: Gradient Panel -->
+        <div class="col-lg-5 d-none d-lg-flex auth-gradient-bg align-items-center justify-content-center p-5">
+            <div class="text-center text-white position-relative" style="z-index:1;">
+                <div class="mb-4 animate-float">
+                    <div class="mx-auto d-flex align-items-center justify-content-center" style="width:90px; height:90px; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.15); border-radius: 1.5rem;">
+                        <i class="bi bi-hospital-fill fs-1"></i>
+                    </div>
                 </div>
-                
-                <div class="card border-0 shadow-sm bg-white" style="border-radius: 1rem;">
+                <h2 class="fw-bold mb-3 display-6" style="letter-spacing:-0.03em;">Hospital MS</h2>
+                <p class="mb-5 mx-auto" style="max-width:300px; color:rgba(255,255,255,0.6);">
+                    Professional healthcare management at your fingertips. Secure, reliable, and intuitive.
+                </p>
+                <div class="d-flex gap-3 justify-content-center">
+                    <div class="text-center px-3 py-2" style="background:rgba(255,255,255,0.06); border-radius:0.75rem; border:1px solid rgba(255,255,255,0.08);">
+                        <i class="bi bi-shield-check d-block mb-1" style="color:#60a5fa;"></i>
+                        <small style="color:rgba(255,255,255,0.5); font-size:0.7rem;">Secure</small>
+                    </div>
+                    <div class="text-center px-3 py-2" style="background:rgba(255,255,255,0.06); border-radius:0.75rem; border:1px solid rgba(255,255,255,0.08);">
+                        <i class="bi bi-lightning-charge d-block mb-1" style="color:#a78bfa;"></i>
+                        <small style="color:rgba(255,255,255,0.5); font-size:0.7rem;">Fast</small>
+                    </div>
+                    <div class="text-center px-3 py-2" style="background:rgba(255,255,255,0.06); border-radius:0.75rem; border:1px solid rgba(255,255,255,0.08);">
+                        <i class="bi bi-heart-pulse d-block mb-1" style="color:#34d399;"></i>
+                        <small style="color:rgba(255,255,255,0.5); font-size:0.7rem;">Reliable</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Login Form -->
+        <div class="col-lg-7 d-flex align-items-center justify-content-center bg-light p-4" style="background-image: var(--gradient-mesh); background-attachment: fixed;">
+            <div class="w-100 animate-fade-in-up" style="max-width: 420px;">
+                <div class="text-center mb-4 d-lg-none">
+                    <i class="bi bi-hospital-fill fs-1 text-primary"></i>
+                </div>
+                <div class="mb-4">
+                    <h2 class="fw-bold text-dark mb-1" style="letter-spacing:-0.03em;">Welcome back</h2>
+                    <p class="text-secondary">Sign in to your account to continue</p>
+                </div>
+
+                <div class="card border-0 shadow-lg" style="border-radius: 1.25rem; overflow:hidden;">
                     <div class="card-body p-4 p-md-5">
                         <form id="account" method="post">
                             <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
-                            
+
                             <div class="mb-4">
                                 <label asp-for="Email" class="form-label text-dark fw-bold">Email Address</label>
                                 <div class="input-group">
@@ -40,7 +73,7 @@
                                 </div>
                                 <span asp-validation-for="Email" class="text-danger small mt-1 d-block"></span>
                             </div>
-                            
+
                             <div class="mb-4">
                                 <div class="d-flex justify-content-between align-items-center mb-1">
                                     <label asp-for="Password" class="form-label text-dark fw-bold mb-0">Password</label>
@@ -54,11 +87,11 @@
                                 </div>
                                 <span asp-validation-for="Password" class="text-danger small mt-1 d-block"></span>
                             </div>
-                            
-                            <button id="login-submit" type="submit" class="btn btn-primary w-100 py-2 fw-bold mb-4">
-                                Sign In
+
+                            <button id="login-submit" type="submit" class="btn btn-primary w-100 py-3 fw-bold mb-4" style="border-radius: 0.75rem; font-size:1rem;">
+                                <i class="bi bi-box-arrow-in-right me-2"></i> Sign In
                             </button>
-                            
+
                             <div class="text-center">
                                 <span class="text-secondary small">Don't have an account?</span>
                                 <a asp-action="Register" class="text-primary text-decoration-none small fw-bold ms-1">Register now</a>
@@ -69,7 +102,7 @@
             </div>
         </div>
     </div>
-    
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <partial name="_ValidationScriptsPartial" />

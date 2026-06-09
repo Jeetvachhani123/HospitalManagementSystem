@@ -5,20 +5,20 @@
 <div class="container py-4">
     @if (User.IsInRole("Admin"))
     {
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-4 animate-fade-in-up">
             <div>
-                <h1 class="h3 fw-bold text-gray-800">Manage Doctors</h1>
+                <h1 class="h3 fw-bold text-dark" style="letter-spacing:-0.03em;">Manage <span class="text-gradient">Doctors</span></h1>
                 <p class="text-muted mb-0">Overview of all medical staff and their availability.</p>
             </div>
-            <a asp-action="Create" class="btn btn-primary rounded-pill px-4 shadow-sm">
+            <a asp-action="Create" class="btn btn-primary rounded-pill px-4">
                 <i class="bi bi-person-plus-fill me-2"></i> Add New Doctor
             </a>
         </div>
-        <div class="card border-0 shadow-sm mb-4">
+        <div class="card border-0 mb-4 animate-fade-in-up delay-1">
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
-                        <thead class="bg-light text-muted small text-uppercase">
+                        <thead>
                             <tr>
                                 <th class="ps-4">Doctor Name</th>
                                 <th>Specialization</th>
@@ -30,10 +30,10 @@
                         <tbody>
                             @foreach (var doctor in Model.Doctors)
                             {
-                                <tr>
+                                <tr class="stagger-item">
                                     <td class="ps-4">
                                         <div class="d-flex align-items-center">
-                                            <div class="avatar-circle bg-primary-subtle text-primary rounded-circle me-3 fw-bold d-flex align-items-center justify-content-center" style="width:40px;height:40px;">
+                                            <div class="avatar-circle rounded-circle me-3 fw-bold d-flex align-items-center justify-content-center" style="width:40px;height:40px;font-size:0.85rem;">
                                                 @doctor.FullName.Substring(0, 1)
                                             </div>
                                             <div>
@@ -42,24 +42,24 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td><span class="badge bg-light text-dark border fw-normal">@doctor.Specialization</span></td>
+                                    <td><span class="badge bg-primary">@doctor.Specialization</span></td>
                                     <td class="text-muted small">@doctor.YearsOfExperience Years</td>
                                     <td>
                                         @if (doctor.IsAvailable)
                                         {
-                                            <span class="badge bg-success-subtle text-success rounded-pill px-3">Available</span>
+                                            <span class="badge bg-success rounded-pill px-3">Available</span>
                                         }
                                         else
                                         {
-                                            <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3">Unavailable</span>
+                                            <span class="badge bg-secondary rounded-pill px-3">Unavailable</span>
                                         }
                                     </td>
                                     <td class="text-end pe-4">
                                         <div class="btn-group">
-                                            <a asp-action="Edit" asp-route-id="@doctor.Id" class="btn btn-sm btn-outline-secondary" title="Edit">
+                                            <a asp-action="Edit" asp-route-id="@doctor.Id" class="btn btn-sm btn-outline-secondary rounded-pill" title="Edit">
                                                 <i class="bi bi-pencil"></i>
                                             </a>
-                                            <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-doctor-id="@doctor.Id" data-doctor-name="Dr. @doctor.FullName" title="Delete">
+                                            <button class="btn btn-sm btn-outline-danger rounded-pill" data-bs-toggle="modal" data-bs-target="#deleteModal" data-doctor-id="@doctor.Id" data-doctor-name="Dr. @doctor.FullName" title="Delete">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </div>
@@ -95,12 +95,14 @@
     }
     else
     {
-        <div class="text-center mb-5">
-            <h1 class="display-6 fw-bold text-gray-800">Find Your Specialist</h1>
+        <div class="text-center mb-5 animate-fade-in-up">
+            <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle px-3 py-2 mb-3 d-inline-block fw-bold text-uppercase" style="letter-spacing:1px; font-size:0.7rem;">Our Specialists</span>
+            <h1 class="display-5 fw-bold text-dark" style="letter-spacing:-0.03em;">Find Your <span class="text-gradient">Specialist</span></h1>
             <p class="text-muted lead mx-auto" style="max-width: 600px;">
                 Browse our list of qualified doctors and book an appointment online.
             </p>
-            <div class="card border-0 shadow-sm p-2 mx-auto mt-4" style="max-width: 700px; border-radius: 50px;">
+            <!-- Premium Search Bar -->
+            <div class="card border-0 shadow-lg p-2 mx-auto mt-4 glass-panel" style="max-width: 700px; border-radius: 50px;">
                 <form method="get" asp-action="Index" class="d-flex align-items-center">
                     <div class="flex-grow-1 border-end position-relative">
                         <i class="bi bi-search position-absolute text-muted" style="left: 20px; top: 50%; transform: translateY(-50%);"></i>
@@ -115,7 +117,7 @@
                             }
                         </select>
                     </div>
-                    <button type="submit" class="btn btn-primary rounded-pill px-4 py-2 m-1 fw-bold shadow-sm">Search</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 py-2 m-1 fw-bold">Search</button>
                 </form>
             </div>
             @if (!string.IsNullOrWhiteSpace(Model.SearchQuery) || !string.IsNullOrWhiteSpace(Model.SelectedSpecialization))
@@ -131,19 +133,19 @@
             <div class="row g-4">
                 @foreach (var doctor in Model.Doctors)
                 {
-                    <div class="col-md-6 col-lg-4">
-                        <div class="card h-100 border-0 shadow-sm hover-lift transition-all">
+                    <div class="col-md-6 col-lg-4 animate-fade-in-up">
+                        <div class="card h-100 border-0 feature-card hover-lift">
                             <div class="card-body p-4 text-center">
                                 <div class="mb-3 position-relative d-inline-block">
-                                    <div class="avatar-circle bg-light text-primary fw-bold d-flex align-items-center justify-content-center rounded-circle mx-auto" style="width: 80px; height: 80px; font-size: 2rem;">
+                                    <div class="avatar-circle d-flex align-items-center justify-content-center rounded-circle mx-auto" style="width: 80px; height: 80px; font-size: 1.8rem;">
                                         @doctor.FullName.Substring(0, 1)
                                     </div>
-                                    <span class="position-absolute bottom-0 end-0 p-1 bg-@(doctor.IsAvailable ? "success" : "secondary") border border-white rounded-circle">
+                                    <span class="position-absolute bottom-0 end-0 p-1 bg-@(doctor.IsAvailable ? "success" : "secondary") border border-white rounded-circle" style="width:14px;height:14px;">
                                         <span class="visually-hidden">@(doctor.IsAvailable ? "Available" : "Unavailable")</span>
                                     </span>
                                 </div>
                                 <h5 class="card-title fw-bold text-dark mb-1">Dr. @doctor.FullName</h5>
-                                <p class="text-primary small text-uppercase fw-bold mb-3">@doctor.Specialization</p>
+                                <p class="small text-uppercase fw-bold mb-3 text-gradient">@doctor.Specialization</p>
                                 <div class="d-flex justify-content-center gap-3 mb-4 text-muted small">
                                     <div><i class="bi bi-briefcase me-1"></i> @doctor.YearsOfExperience Years</div>
                                     <div class="vr"></div>
@@ -154,7 +156,7 @@
                                     {
                                         if (doctor.IsAvailable)
                                         {
-                                            <a asp-controller="Appointment" asp-action="Request" asp-route-doctorId="@doctor.Id" class="btn btn-primary rounded-pill shadow-sm fw-bold">
+                                            <a asp-controller="Appointment" asp-action="Request" asp-route-doctorId="@doctor.Id" class="btn btn-primary rounded-pill fw-bold">
                                                 Book Appointment
                                             </a>
                                         }
@@ -170,7 +172,7 @@
                                         </a>
                                     }
                                     <a asp-controller="Doctor" asp-action="Details" asp-route-id="@doctor.Id" class="btn btn-link text-decoration-none text-muted small">
-                                        View Profile
+                                        View Profile →
                                     </a>
                                 </div>
                             </div>
@@ -201,7 +203,7 @@
                 <i class="bi bi-search display-1 text-muted opacity-25"></i>
                 <h3 class="mt-3 text-muted">No doctors found</h3>
                 <p class="text-muted">Try adjusting your filters or search terms.</p>
-                <a asp-action="Index" class="btn btn-outline-primary mt-3">Reset Filters</a>
+                <a asp-action="Index" class="btn btn-outline-primary mt-3 rounded-pill px-4">Reset Filters</a>
             </div>
         }
     }

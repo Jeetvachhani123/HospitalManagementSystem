@@ -9,29 +9,74 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Hospital MS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-<body class="bg-light d-flex align-items-center justify-content-center" style="min-height: 100vh; padding: 2rem 0;">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-6">
-                <div class="text-center mb-4">
-                    <a href="/" class="text-decoration-none">
-                        <i class="bi bi-hospital-fill text-primary display-4"></i>
-                        <h2 class="fw-bold text-dark mt-2">Create Account</h2>
-                    </a>
+<body style="min-height: 100vh; margin:0; font-family:'Inter',sans-serif;">
+    <div class="row g-0" style="min-height: 100vh;">
+        <!-- Left: Gradient Panel -->
+        <div class="col-lg-4 d-none d-lg-flex auth-gradient-bg align-items-center justify-content-center p-5">
+            <div class="text-center text-white position-relative" style="z-index:1;">
+                <div class="mb-4 animate-float">
+                    <div class="mx-auto d-flex align-items-center justify-content-center" style="width:90px; height:90px; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.15); border-radius: 1.5rem;">
+                        <i class="bi bi-hospital-fill fs-1"></i>
+                    </div>
+                </div>
+                <h2 class="fw-bold mb-3" style="letter-spacing:-0.03em;">Join Us Today</h2>
+                <p class="mx-auto" style="max-width:280px; color:rgba(255,255,255,0.6);">
+                    Create your account and start managing your healthcare journey with confidence.
+                </p>
+                <div class="mt-5">
+                    <div class="d-flex align-items-center mb-3 text-start" style="color:rgba(255,255,255,0.7);">
+                        <div class="me-3 d-flex align-items-center justify-content-center" style="width:36px;height:36px;background:rgba(255,255,255,0.08);border-radius:0.5rem;">
+                            <i class="bi bi-check2 text-success"></i>
+                        </div>
+                        <small>Book appointments online instantly</small>
+                    </div>
+                    <div class="d-flex align-items-center mb-3 text-start" style="color:rgba(255,255,255,0.7);">
+                        <div class="me-3 d-flex align-items-center justify-content-center" style="width:36px;height:36px;background:rgba(255,255,255,0.08);border-radius:0.5rem;">
+                            <i class="bi bi-check2 text-success"></i>
+                        </div>
+                        <small>Access your medical records securely</small>
+                    </div>
+                    <div class="d-flex align-items-center text-start" style="color:rgba(255,255,255,0.7);">
+                        <div class="me-3 d-flex align-items-center justify-content-center" style="width:36px;height:36px;background:rgba(255,255,255,0.08);border-radius:0.5rem;">
+                            <i class="bi bi-check2 text-success"></i>
+                        </div>
+                        <small>Get real-time appointment updates</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Register Form -->
+        <div class="col-lg-8 d-flex align-items-center justify-content-center p-4" style="background-color: var(--brand-body-bg); background-image: var(--gradient-mesh); overflow-y:auto;">
+            <div class="w-100 animate-fade-in-up" style="max-width: 600px; padding: 1rem 0;">
+                <div class="text-center mb-4 d-lg-none">
+                    <i class="bi bi-hospital-fill fs-1 text-primary"></i>
+                </div>
+                <div class="mb-4">
+                    <h2 class="fw-bold text-dark mb-1" style="letter-spacing:-0.03em;">Create Account</h2>
                     <p class="text-secondary">Join our hospital management platform</p>
                 </div>
-                
-                <div class="card border-0 shadow-sm bg-white" style="border-radius: 1rem;">
+
+                <div class="card border-0 shadow-lg" style="border-radius: 1.25rem;">
                     <div class="card-body p-4 p-md-5">
                         <form id="registerForm" method="post">
                             <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
-                            
-                            <h5 class="fw-bold text-dark mb-4 border-bottom pb-2">Personal Details</h5>
-                            
+
+                            <!-- Section: Personal Details -->
+                            <div class="d-flex align-items-center mb-4">
+                                <div class="icon-box-primary p-2 me-3" style="width:36px;height:36px;border-radius:0.5rem;">
+                                    <i class="bi bi-person fs-6"></i>
+                                </div>
+                                <h5 class="fw-bold text-dark mb-0">Personal Details</h5>
+                            </div>
+
                             <div class="row g-3 mb-4">
                                 <div class="col-md-6">
                                     <label asp-for="FirstName" class="form-label text-dark fw-bold">First Name</label>
@@ -62,7 +107,7 @@
                                     <span asp-validation-for="Gender" class="text-danger small mt-1 d-block"></span>
                                 </div>
                             </div>
-                            
+
                             <div class="mb-4">
                                 <label asp-for="BloodGroup" class="form-label text-dark fw-bold">Blood Group</label>
                                 <select asp-for="BloodGroup" class="form-select">
@@ -78,9 +123,16 @@
                                 </select>
                                 <span asp-validation-for="BloodGroup" class="text-danger small mt-1 d-block"></span>
                             </div>
-                            
-                            <h5 class="fw-bold text-dark mb-4 border-bottom pb-2 mt-5">Account Details</h5>
-                            
+
+                            <!-- Section: Account Details -->
+                            <hr class="my-4" style="border-color: var(--border-color);">
+                            <div class="d-flex align-items-center mb-4">
+                                <div class="icon-box-info p-2 me-3" style="width:36px;height:36px;border-radius:0.5rem;">
+                                    <i class="bi bi-shield-lock fs-6"></i>
+                                </div>
+                                <h5 class="fw-bold text-dark mb-0">Account Details</h5>
+                            </div>
+
                             <div class="mb-4">
                                 <label asp-for="Email" class="form-label text-dark fw-bold">Email Address</label>
                                 <input asp-for="Email" class="form-control" placeholder="name@example.com" autocomplete="username" aria-required="true" />
@@ -99,11 +151,11 @@
                                     <span asp-validation-for="ConfirmPassword" class="text-danger small mt-1 d-block"></span>
                                 </div>
                             </div>
-                            
-                            <button id="registerSubmit" type="submit" class="btn btn-primary w-100 py-2 fw-bold mb-4 mt-2">
-                                Complete Registration
+
+                            <button id="registerSubmit" type="submit" class="btn btn-primary w-100 py-3 fw-bold mb-4 mt-2" style="border-radius: 0.75rem; font-size:1rem;">
+                                <i class="bi bi-person-plus me-2"></i> Complete Registration
                             </button>
-                            
+
                             <div class="text-center">
                                 <span class="text-secondary small">Already have an account?</span>
                                 <a asp-action="Login" class="text-primary text-decoration-none small fw-bold ms-1">Sign in instead</a>
@@ -114,7 +166,7 @@
             </div>
         </div>
     </div>
-    
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <partial name="_ValidationScriptsPartial" />

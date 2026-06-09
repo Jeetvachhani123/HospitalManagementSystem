@@ -3,17 +3,17 @@
     ViewData["Title"] = "Admin Dashboard";
 }
 <div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4 animate-fade-in-up">
         <div>
-            <h1 class="h3 fw-bold text-dark mb-1">
-                <i class="bi bi-speedometer2 text-primary me-2"></i>
-                Administrator Dashboard
+            <h1 class="h3 fw-bold text-dark mb-1" style="letter-spacing:-0.03em;">
+                <span class="text-gradient">Administrator</span> Dashboard
             </h1>
             <p class="text-secondary fw-medium mb-0">Overview of hospital performance and daily activities.</p>
         </div>
         <div class="d-flex gap-2">
             <div class="dropdown">
-                <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <button class="btn btn-outline-secondary btn-sm dropdown-toggle rounded-pill px-3" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="bi bi-download me-1"></i> Export Report
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
@@ -23,94 +23,98 @@
                     <li><a class="dropdown-item" href="javascript:void(0);" data-export="print"><i class="bi bi-printer text-primary me-2"></i> Print</a></li>
                 </ul>
             </div>
-            <a asp-controller="Appointment" asp-action="Index" class="btn btn-primary btn-sm" id="btnNewAppointment">
-                <i class="bi bi-eye me-1"></i> All Appointment
+            <a asp-controller="Appointment" asp-action="Index" class="btn btn-primary btn-sm rounded-pill px-3" id="btnNewAppointment">
+                <i class="bi bi-eye me-1"></i> All Appointments
             </a>
         </div>
     </div>
+
+    <!-- Stat Cards -->
     <div class="row g-4 mb-4">
-        <div class="col-xl-3 col-md-6">
-            <div class="card dashboard-card border-0 shadow-sm h-100 border-start border-4 border-primary hover-lift" data-type="Doctors" style="cursor:pointer; border-radius: 1rem;">
-                <div class="card-body">
+        <div class="col-xl-3 col-md-6 animate-fade-in-up delay-1">
+            <div class="card dashboard-card border-0 h-100 border-start border-4 border-primary hover-lift hover-glow" data-type="Doctors" style="cursor:pointer;">
+                <div class="card-body p-4">
                     <div class="d-flex align-items-center justify-content-between">
                         <div>
-                            <div class="text-uppercase text-primary small fw-bold mb-1">
+                            <div class="text-uppercase text-primary small fw-bold mb-2" style="letter-spacing:0.05em; font-size:0.7rem;">
                                 Total Doctors
                             </div>
-                            <div class="h3 mb-0 fw-bold text-gray-800">
+                            <div class="h2 mb-0 fw-bold text-dark stat-counter" data-count-to="@Model.TotalDoctors" data-count-duration="1200">
                                 @Model.TotalDoctors
                             </div>
                         </div>
-                        <div class="fs-1 text-gray-300 text-primary opacity-25">
-                            <i class="bi bi-person-badge"></i>
+                        <div class="icon-box-primary p-3" style="width:52px;height:52px;border-radius:0.75rem;">
+                            <i class="bi bi-person-badge fs-4"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="card dashboard-card border-0 shadow-sm h-100 border-start border-4 border-success hover-lift" data-type="Patients" style="cursor:pointer; border-radius: 1rem;">
-                <div class="card-body">
+        <div class="col-xl-3 col-md-6 animate-fade-in-up delay-2">
+            <div class="card dashboard-card border-0 h-100 border-start border-4 border-success hover-lift hover-glow" data-type="Patients" style="cursor:pointer;">
+                <div class="card-body p-4">
                     <div class="d-flex align-items-center justify-content-between">
                         <div>
-                            <div class="text-uppercase text-success small fw-bold mb-1">
+                            <div class="text-uppercase text-success small fw-bold mb-2" style="letter-spacing:0.05em; font-size:0.7rem;">
                                 Total Patients
                             </div>
-                            <div class="h3 mb-0 fw-bold text-gray-800">
+                            <div class="h2 mb-0 fw-bold text-dark stat-counter" data-count-to="@Model.TotalPatients" data-count-duration="1400">
                                 @Model.TotalPatients
                             </div>
                         </div>
-                        <div class="fs-1 text-gray-300 text-success opacity-25">
-                            <i class="bi bi-people"></i>
+                        <div class="icon-box-success p-3" style="width:52px;height:52px;border-radius:0.75rem;">
+                            <i class="bi bi-people fs-4"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="card dashboard-card border-0 shadow-sm h-100 border-start border-4 border-info hover-lift" data-type="TodayAppointments" style="cursor:pointer;">
-                <div class="card-body">
+        <div class="col-xl-3 col-md-6 animate-fade-in-up delay-3">
+            <div class="card dashboard-card border-0 h-100 border-start border-4 border-info hover-lift hover-glow" data-type="TodayAppointments" style="cursor:pointer;">
+                <div class="card-body p-4">
                     <div class="d-flex align-items-center justify-content-between">
                         <div>
-                            <div class="text-uppercase text-info small fw-bold mb-1">
+                            <div class="text-uppercase small fw-bold mb-2" style="letter-spacing:0.05em; font-size:0.7rem; color: var(--brand-info);">
                                 Appointments (Today)
                             </div>
-                            <div class="h3 mb-0 fw-bold text-gray-800">
+                            <div class="h2 mb-0 fw-bold text-dark stat-counter" data-count-to="@Model.AppointmentsToday" data-count-duration="800">
                                 @Model.AppointmentsToday
                             </div>
                         </div>
-                        <div class="fs-1 text-gray-300 text-info opacity-25">
-                            <i class="bi bi-calendar-check"></i>
+                        <div class="icon-box-info p-3" style="width:52px;height:52px;border-radius:0.75rem;">
+                            <i class="bi bi-calendar-check fs-4"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="card dashboard-card border-0 shadow-sm h-100 border-start border-4 border-warning hover-lift" data-type="PendingApprovals" style="cursor:pointer; border-radius: 1rem;">
-                <div class="card-body">
+        <div class="col-xl-3 col-md-6 animate-fade-in-up delay-4">
+            <div class="card dashboard-card border-0 h-100 border-start border-4 border-warning hover-lift hover-glow" data-type="PendingApprovals" style="cursor:pointer;">
+                <div class="card-body p-4">
                     <div class="d-flex align-items-center justify-content-between">
                         <div>
-                            <div class="text-uppercase text-warning small fw-bold mb-1">
+                            <div class="text-uppercase text-warning small fw-bold mb-2" style="letter-spacing:0.05em; font-size:0.7rem;">
                                 Pending Approvals
                             </div>
-                            <div class="h3 mb-0 fw-bold text-gray-800">
+                            <div class="h2 mb-0 fw-bold text-dark stat-counter" data-count-to="@Model.PendingApprovals" data-count-duration="800">
                                 @Model.PendingApprovals
                             </div>
                         </div>
-                        <div class="fs-1 text-gray-300 text-warning opacity-25">
-                            <i class="bi bi-hourglass-split"></i>
+                        <div class="icon-box-warning p-3" style="width:52px;height:52px;border-radius:0.75rem;">
+                            <i class="bi bi-hourglass-split fs-4"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Chart + Recent -->
     <div class="row g-4">
-        <div class="col-lg-8">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-header bg-white py-3 d-flex flex-row align-items-center justify-content-between border-bottom">
-                    <h6 class="m-0 fw-bold text-primary">Appointment Overview</h6>
+        <div class="col-lg-8 animate-fade-in-up delay-3">
+            <div class="card border-0 h-100">
+                <div class="card-header bg-white py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 fw-bold text-gradient">📊 Appointment Overview</h6>
                 </div>
                 <div class="card-body">
                     <div class="d-flex justify-content-center align-items-center h-100 text-muted" style="min-height: 300px;">
@@ -119,11 +123,11 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-header bg-white py-3 d-flex align-items-center justify-content-between border-bottom">
-                    <h6 class="m-0 fw-bold text-primary">Recent Appointments</h6>
-                    <a asp-controller="Appointment" asp-action="Index" class="small text-decoration-none">View All</a>
+        <div class="col-lg-4 animate-fade-in-up delay-4">
+            <div class="card border-0 h-100">
+                <div class="card-header bg-white py-3 d-flex align-items-center justify-content-between">
+                    <h6 class="m-0 fw-bold text-gradient">🕐 Recent Appointments</h6>
+                    <a asp-controller="Appointment" asp-action="Index" class="small text-decoration-none fw-bold">View All</a>
                 </div>
                 <div class="card-body p-0">
                     <div class="list-group list-group-flush">
@@ -131,9 +135,9 @@
                         {
                             foreach (var appt in Model.RecentAppointments)
                             {
-                                <div class="list-group-item d-flex align-items-center px-4 py-3 border-0 border-bottom">
+                                <div class="list-group-item d-flex align-items-center px-4 py-3 border-0 border-bottom stagger-item">
                                     <div class="me-3">
-                                        <div class="icon-circle bg-light text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                        <div class="icon-box-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
                                             <i class="bi bi-calendar4-event"></i>
                                         </div>
                                     </div>
@@ -143,7 +147,7 @@
                                     </div>
                                     <div class="text-end">
                                         <small class="text-muted d-block">@appt.AppointmentDate.ToString("MMM dd")</small>
-                                        <span class="badge bg-@(appt.Status == "Confirmed" ? "success" : appt.Status == "Pending" ? "warning" : "secondary") rounded-pill" style="font-size: 0.65rem;">
+                                        <span class="badge bg-@(appt.Status == "Confirmed" ? "success" : appt.Status == "Pending" ? "warning" : "secondary")" style="font-size: 0.65rem;">
                                             @appt.Status
                                         </span>
                                     </div>
@@ -160,16 +164,18 @@
                     </div>
                 </div>
                 <div class="card-footer bg-white text-center py-3 border-0">
-                    <a asp-controller="Appointment" asp-action="History" class="btn btn-sm btn-light w-100 text-muted fw-bold">View Full Activity Log</a>
+                    <a asp-controller="Appointment" asp-action="History" class="btn btn-sm btn-light w-100 text-muted fw-bold rounded-pill">View Full Activity Log</a>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Modal -->
     <div class="modal fade" id="detailsModal" tabindex="-1">
         <div class="modal-dialog modal-xl modal-dialog-centered">
-            <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-content border-0 shadow-lg">
                 <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title">Details</h5>
+                    <h5 class="modal-title fw-bold">Details</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
@@ -180,24 +186,26 @@
             </div>
         </div>
     </div>
+
+    <!-- Rates -->
     <div class="row g-4 mt-2">
-        <div class="col-md-6">
-            <div class="card border-0 shadow-sm">
+        <div class="col-md-6 animate-fade-in-up delay-5">
+            <div class="card border-0">
                 <div class="card-body text-center p-4">
-                    <h6 class="text-muted text-uppercase small fw-bold">Completion Rate</h6>
-                    <div class="display-6 fw-bold text-dark my-2">@Model.CompletionRate.ToString("0")%</div>
-                    <div class="progress" style="height: 5px;">
+                    <h6 class="text-muted text-uppercase small fw-bold" style="letter-spacing:0.05em;">Completion Rate</h6>
+                    <div class="display-6 fw-bold my-2 text-gradient">@Model.CompletionRate.ToString("0")%</div>
+                    <div class="progress" style="height: 6px;">
                         <div class="progress-bar bg-info" role="progressbar" style="width: @Model.CompletionRate.ToString("0", System.Globalization.CultureInfo.InvariantCulture)%"></div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="card border-0 shadow-sm">
+        <div class="col-md-6 animate-fade-in-up delay-6">
+            <div class="card border-0">
                 <div class="card-body text-center p-4">
-                    <h6 class="text-muted text-uppercase small fw-bold">No-Show Rate</h6>
+                    <h6 class="text-muted text-uppercase small fw-bold" style="letter-spacing:0.05em;">No-Show Rate</h6>
                     <div class="display-6 fw-bold text-danger my-2">@Model.NoShowRate.ToString("0")%</div>
-                    <div class="progress" style="height: 5px;">
+                    <div class="progress" style="height: 6px;">
                         <div class="progress-bar bg-danger" role="progressbar" style="width: @Model.NoShowRate.ToString("0", System.Globalization.CultureInfo.InvariantCulture)%"></div>
                     </div>
                 </div>
@@ -226,11 +234,11 @@
                     .then(function (data) {
                         var html = '';
                         if (!data || data.length === 0) {
-                            html = "<div class='text-center text-muted py-4'>No records found</div>";
+                            html = "<div class='text-center text-muted py-4'><i class='bi bi-inbox fs-2 d-block mb-2 opacity-50'></i>No records found</div>";
                         } else {
                             html += "<div class='table-responsive'>";
                             html += "<table class='table table-hover align-middle'>";
-                            html += "<thead class='table-light'><tr>";
+                            html += "<thead><tr>";
                             if (type === 'Doctors') {
                                 html += '<th>Name</th><th>Email</th><th>Specialization</th><th>Experience</th>';
                             } else if (type === 'Patients') {
@@ -272,14 +280,20 @@
                         data: {
                             labels: labels,
                             datasets: [
-                                { label: 'Total', data: total, backgroundColor: 'rgba(79, 70, 229, 0.8)', borderRadius: 4 },
-                                { label: 'Completed', data: completed, backgroundColor: 'rgba(16, 185, 129, 0.8)', borderRadius: 4 },
-                                { label: 'Cancelled', data: cancelled, backgroundColor: 'rgba(239, 68, 68, 0.8)', borderRadius: 4 }
+                                { label: 'Total', data: total, backgroundColor: 'rgba(37, 99, 235, 0.8)', borderRadius: 6, borderSkipped: false },
+                                { label: 'Completed', data: completed, backgroundColor: 'rgba(16, 185, 129, 0.8)', borderRadius: 6, borderSkipped: false },
+                                { label: 'Cancelled', data: cancelled, backgroundColor: 'rgba(239, 68, 68, 0.8)', borderRadius: 6, borderSkipped: false }
                             ]
                         },
                         options: {
                             responsive: true,
-                            plugins: { legend: { position: 'top' } }
+                            plugins: {
+                                legend: { position: 'top', labels: { usePointStyle: true, padding: 20, font: { family: 'Inter', weight: '600' } } }
+                            },
+                            scales: {
+                                y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { family: 'Inter' } } },
+                                x: { grid: { display: false }, ticks: { font: { family: 'Inter' } } }
+                            }
                         }
                     });
                 });

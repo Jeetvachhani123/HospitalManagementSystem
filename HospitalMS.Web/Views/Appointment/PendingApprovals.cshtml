@@ -3,9 +3,9 @@
     ViewData["Title"] = "Pending Approvals";
 }
 <div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 animate-fade-in-up">
         <div>
-            <h1 class="h3 fw-bold text-gray-800">Appointment Requests</h1>
+            <h1 class="h3 fw-bold text-dark" style="letter-spacing:-0.03em;">Appointment <span class="text-gradient">Requests</span></h1>
             <p class="text-muted mb-0">Review pending appointments from patients.</p>
         </div>
         <div class="badge bg-warning text-dark px-3 py-2 rounded-pill">
@@ -20,7 +20,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
-    <div class="card shadow-sm border-0">
+    <div class="card border-0 animate-fade-in-up delay-1">
         @if (Model.Any())
         {
             <div class="card-body p-0">
