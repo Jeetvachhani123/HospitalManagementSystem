@@ -300,8 +300,7 @@ public class AppointmentsController : ControllerBase
         _logger.LogInformation("Exported {Count} appointments to Excel", data.Count);
 
         return File(ms.ToArray(),
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            $"appointments_{DateTime.UtcNow:yyyyMMdd_HHmm}.xlsx");
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"appointments_{DateTime.UtcNow:yyyyMMdd_HHmm}.xlsx");
     }
 
     //  GET api/appointments/export/pdf 

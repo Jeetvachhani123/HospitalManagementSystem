@@ -238,14 +238,10 @@ public class ReportsController : ControllerBase
             PatientId = patient.Id,
             PatientName = patient.FullName,
             UpcomingAppointmentsCount = appointments.Count(a =>
-                (a.Status == "Scheduled" || a.Status == "Confirmed") &&
-                a.ApprovalStatus == "Approved" &&
-                a.AppointmentDate.Date >= DateTime.UtcNow.Date),
+                (a.Status == "Scheduled" || a.Status == "Confirmed") && a.ApprovalStatus == "Approved" && a.AppointmentDate.Date >= DateTime.UtcNow.Date),
             CompletedAppointmentsCount = appointments.Count(a => a.Status == "Completed"),
-            CancelledAppointmentsCount = appointments.Count(a =>
-                a.Status == "Cancelled" || a.Status == "NoShow" || a.ApprovalStatus == "Rejected"),
-            PendingApprovalsCount = appointments.Count(a =>
-                a.ApprovalStatus == "Pending" && a.Status == "Scheduled"),
+            CancelledAppointmentsCount = appointments.Count(a => a.Status == "Cancelled" || a.Status == "NoShow" || a.ApprovalStatus == "Rejected"),
+            PendingApprovalsCount = appointments.Count(a => a.ApprovalStatus == "Pending" && a.Status == "Scheduled"),
             TotalAppointments = appointments.Count,
             RecentAppointments = appointments
                 .OrderByDescending(a => a.AppointmentDate)

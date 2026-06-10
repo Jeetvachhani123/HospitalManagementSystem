@@ -223,14 +223,7 @@ public class AppointmentService : IAppointmentService
 
             if (newStartTime >= newEndTime)
                 throw new ValidationException("Start time must be before end time");
-            var hasConflict = await _unitOfWork.Appointments.HasConflictAsync(
-                appointment.DoctorId,
-                newDate,
-                newStartTime,
-                newEndTime,
-                excludeAppointmentId: id,
-                cancellationToken: cancellationToken
-            );
+            var hasConflict = await _unitOfWork.Appointments.HasConflictAsync(appointment.DoctorId,newDate,newStartTime,newEndTime,excludeAppointmentId: id,cancellationToken: cancellationToken);
 
             if (hasConflict)
             {
