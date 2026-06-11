@@ -28,7 +28,6 @@ builder.Services.AddScoped<IPaymentService, StripePaymentService>();
 builder.Services.AddScoped<IRealTimeNotificationService, SignalRNotificationService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 
-// Decoupled from DATA layer
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<UserRegistrationCoordinator>();
 builder.Services.AddScoped<IDoctorService, DoctorService>();

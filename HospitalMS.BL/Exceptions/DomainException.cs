@@ -3,7 +3,6 @@ namespace HospitalMS.BL.Exceptions;
 public class DomainException : Exception
 {
     public string ErrorCode { get; }
-
     public Dictionary<string, object>? AdditionalData { get; }
 
     public DomainException(string message, string errorCode = "DOMAIN_ERROR") : base(message)

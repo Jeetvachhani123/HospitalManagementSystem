@@ -16,44 +16,27 @@ public class HospitalDbContext : DbContext
     }
 
     public DbSet<User> Users { get; set; }
-
     public DbSet<Doctor> Doctors { get; set; }
-
     public DbSet<Patient> Patients { get; set; }
-
     public DbSet<Appointment> Appointments { get; set; }
-
     public DbSet<DoctorWorkingHours> DoctorWorkingHours { get; set; }
-
     public DbSet<AppointmentStatusHistory> AppointmentStatusHistories { get; set; }
-
     public DbSet<Invoice> Invoices { get; set; }
-
     public DbSet<MedicalRecord> MedicalRecords { get; set; }
-
     public DbSet<Department> Departments { get; set; }
 
     // configure entity models
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-
         modelBuilder.Entity<User>().HasQueryFilter(u => !u.IsDeleted);
-
         modelBuilder.Entity<Doctor>().HasQueryFilter(d => !d.IsDeleted);
-
         modelBuilder.Entity<Patient>().HasQueryFilter(p => !p.IsDeleted);
-
         modelBuilder.Entity<Appointment>().HasQueryFilter(a => !a.IsDeleted);
-
         modelBuilder.Entity<DoctorWorkingHours>().HasQueryFilter(dw => !dw.IsDeleted);
-
         modelBuilder.Entity<Invoice>().HasQueryFilter(i => !i.IsDeleted);
-
         modelBuilder.Entity<MedicalRecord>().HasQueryFilter(m => !m.IsDeleted);
-
         modelBuilder.Entity<Department>().HasQueryFilter(d => !d.IsDeleted);
     }
 
@@ -61,7 +44,6 @@ public class HospitalDbContext : DbContext
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         UpdateAuditFields();
-
         return base.SaveChangesAsync(cancellationToken);
     }
 
@@ -69,7 +51,6 @@ public class HospitalDbContext : DbContext
     public override int SaveChanges()
     {
         UpdateAuditFields();
-
         return base.SaveChanges();
     }
 

@@ -33,7 +33,6 @@ builder.Services.AddScoped<ISearchService, SearchService>();
 builder.Services.AddScoped<IRealTimeNotificationService, RealTimeNotificationService>();
 builder.Services.AddScoped<IAppointmentNotificationService, AppointmentNotificationService>();
 
-// Decoupled from DATA layer
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<UserRegistrationCoordinator>();
 builder.Services.AddScoped<IDoctorService, DoctorService>();
@@ -46,7 +45,6 @@ builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<IWorkingHoursService, WorkingHoursService>();
 builder.Services.AddScoped<IEmailNotificationService, EmailNotificationService>();
 
-// Add user context accessor
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile).Assembly);
@@ -90,9 +88,7 @@ builder.Services.AddSwaggerDocumentation();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy => policy
-            .WithOrigins(
-                "http://localhost:3000", "https://localhost:7058",
-                "http://localhost:5000", "https://localhost:5001")
+            .WithOrigins("http://localhost:3000", "https://localhost:7058", "http://localhost:5000", "https://localhost:5001")
             .AllowAnyMethod()
             .AllowAnyHeader());
 });

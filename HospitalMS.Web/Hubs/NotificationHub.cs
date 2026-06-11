@@ -42,8 +42,7 @@ public class NotificationHub : Hub
         var notification = new
         {
             type = "AppointmentRequested",
-            appointmentId,
-            patientName,
+            appointmentId, patientName,
             appointmentDate = appointmentDate.ToString("yyyy-MM-dd HH:mm"),
             timestamp = DateTime.UtcNow
         };
@@ -57,8 +56,7 @@ public class NotificationHub : Hub
         var notification = new
         {
             type = "AppointmentApproved",
-            appointmentId,
-            doctorName,
+            appointmentId, doctorName,
             appointmentDate = appointmentDate.ToString("yyyy-MM-dd HH:mm"),
             message = $"Your appointment with Dr. {doctorName} has been approved!",
             timestamp = DateTime.UtcNow
@@ -89,9 +87,7 @@ public class NotificationHub : Hub
         var notification = new
         {
             type = "AppointmentCompleted",
-            appointmentId,
-            doctorName,
-            diagnosis,
+            appointmentId, doctorName, diagnosis,
             message = $"Your appointment with Dr. {doctorName} has been completed.",
             timestamp = DateTime.UtcNow
         };

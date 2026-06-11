@@ -72,13 +72,8 @@ public class DoctorsController : ControllerBase
             Year = targetYear,
             Appointments = filteredAppointments.OrderBy(a => a.AppointmentDate).ThenBy(a => a.StartTime).Select(a => new
             {
-                a.Id,
-                a.PatientName,
-                a.AppointmentDate,
-                a.StartTime,
-                a.EndTime,
-                a.Status,
-                a.ApprovalStatus
+                a.Id, a.PatientName, a.AppointmentDate,
+                a.StartTime, a.EndTime, a.Status, a.ApprovalStatus
             })
         }));
     }

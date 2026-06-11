@@ -48,8 +48,7 @@ public class EmailNotificationService : IEmailNotificationService
                     <p><strong>Time:</strong> {startTime:hh\\:mm}</p>
                 </div>
                 <p>The doctor will review your request and notify you of their decision shortly.</p>
-                <p>Thank you for choosing our hospital.</p>
-            ");
+                <p>Thank you for choosing our hospital.</p>");
             await SendEmailAsync(patientEmail, subject, body);
         }
         catch (Exception ex)
@@ -75,8 +74,7 @@ public class EmailNotificationService : IEmailNotificationService
                 </div>
                 <p>Please arrive 10 minutes early for your appointment.</p>
                 <p>If you need to reschedule, please contact us as soon as possible.</p>
-                <p>Best regards,<br/>Hospital Management System</p>
-            ");
+                <p>Best regards,<br/>Hospital Management System</p>");
             await SendEmailAsync(patientEmail, subject, body);
         }
         catch (Exception ex)
@@ -104,8 +102,7 @@ public class EmailNotificationService : IEmailNotificationService
                     <li>Contact the doctor's office for more information</li>
                     <li>Request an appointment with another doctor</li>
                 </ul>
-                <p>We regret any inconvenience. Thank you for your understanding.</p>
-            ");
+                <p>We regret any inconvenience. Thank you for your understanding.</p>");
             await SendEmailAsync(patientEmail, subject, body);
         }
         catch (Exception ex)
@@ -135,8 +132,7 @@ public class EmailNotificationService : IEmailNotificationService
                     <li>Bring any relevant medical documents</li>
                     <li>Bring your insurance card if applicable</li>
                 </ul>
-                <p>If you need to reschedule, please contact us immediately.</p>
-            ");
+                <p>If you need to reschedule, please contact us immediately.</p>");
             await SendEmailAsync(patientEmail, subject, body);
         }
         catch (Exception ex)
@@ -165,8 +161,7 @@ public class EmailNotificationService : IEmailNotificationService
                 </div>
                 <p>Please follow the doctor's recommendations and take your medications as prescribed.</p>
                 <p>If you have any questions, don't hesitate to contact us.</p>
-                <p>Thank you for your trust in our hospital.</p>
-            ");
+                <p>Thank you for your trust in our hospital.</p>");
             await SendEmailAsync(patientEmail, subject, body);
         }
         catch (Exception ex)
@@ -190,8 +185,7 @@ public class EmailNotificationService : IEmailNotificationService
                     <p><strong>Requested Date:</strong> {requestedDate:MMMM dd, yyyy}</p>
                     <p><strong>Reason:</strong> {reason}</p>
                 </div>
-                <p>Please review this request and respond accordingly.</p>
-            ");
+                <p>Please review this request and respond accordingly.</p>");
             await SendEmailAsync(doctorEmail, subject, body);
         }
         catch (Exception ex)
@@ -216,8 +210,7 @@ public class EmailNotificationService : IEmailNotificationService
                     <p><strong>Reason:</strong> {reason}</p>
                 </div>
                 <p>If you have an appointment scheduled during this time, we will contact you to reschedule.</p>
-                <p>Thank you for your understanding.</p>
-            ");
+                <p>Thank you for your understanding.</p>");
             await SendEmailAsync(patientEmail, subject, body);
         }
         catch (Exception ex)
@@ -235,26 +228,25 @@ public class EmailNotificationService : IEmailNotificationService
     // build html email body
     private string BuildHtmlBody(string content)
     {
-        return $@"
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <style>
-                    body {{ font-family: Arial, sans-serif; color: #333; }}
-                    a {{ color: #2196F3; text-decoration: none; }}
-                    a:hover {{ text-decoration: underline; }}
-                </style>
-            </head>
-            <body>
-                <div style='max-width: 600px; margin: 0 auto; padding: 20px;'>
-                    {content}
-                    <hr style='margin: 30px 0; border: none; border-top: 1px solid #eee;' />
-                    <p style='font-size: 12px; color: #999;'>
-                        This is an automated message from Hospital Management System.<br/>
-                        Please do not reply to this email.
-                    </p>
-                </div>
-            </body>
-            </html>";
+        return $@"<!DOCTYPE html>
+                  <html>
+                  <head>
+                      <style>
+                          body {{ font-family: Arial, sans-serif; color: #333; }}
+                          a {{ color: #2196F3; text-decoration: none; }}
+                          a:hover {{ text-decoration: underline; }}
+                      </style>
+                  </head>
+                  <body>
+                      <div style='max-width: 600px; margin: 0 auto; padding: 20px;'>
+                          {content}
+                          <hr style='margin: 30px 0; border: none; border-top: 1px solid #eee;' />
+                          <p style='font-size: 12px; color: #999;'>
+                              This is an automated message from Hospital Management System.<br/>
+                              Please do not reply to this email.
+                          </p>
+                      </div>
+                  </body>
+                  </html>";
     }
 }

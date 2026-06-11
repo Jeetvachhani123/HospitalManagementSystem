@@ -1,7 +1,5 @@
-/* ═══════════════════════════════════════════════════════════
-   Hospital Management System — Premium UI Interactions
-   Scroll animations, counters, ripple effects & transitions
-   ═══════════════════════════════════════════════════════════ */
+/* Hospital Management System — Premium UI Interactions
+   Scroll animations, counters, ripple effects & transitions */
 
 (function () {
     'use strict';
@@ -31,7 +29,7 @@
         // Auto-apply to common elements
         document.querySelectorAll('.card, .list-group-item, .table tbody tr').forEach(function (el) {
             if (!el.closest('.modal') && !el.classList.contains('no-animate')) {
-                el.style.opacity = '1'; // Ensure visible without animation class
+                el.style.opacity = '1'; 
             }
         });
     }

@@ -6,7 +6,6 @@
     var isAdmin = User.IsInRole("Admin");
 }
 <div class="container-fluid py-4">
-    <!-- Header -->
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 animate-fade-in-up">
         <div>
             <h1 class="h3 fw-bold text-dark" style="letter-spacing:-0.03em;">
@@ -37,7 +36,6 @@
         </div>
     </div>
 
-    <!-- Filter Panel -->
     <div class="collapse mb-4 @((!string.IsNullOrEmpty(Model.SearchQuery) || Model.FromDate.HasValue) ? "show" : "")" id="filterPanel">
         <div class="card border-0 glass-panel animate-fade-in-up">
             <div class="card-body">
@@ -62,7 +60,6 @@
         </div>
     </div>
 
-    <!-- Table -->
     <div class="card border-0 animate-fade-in-up delay-1">
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -198,7 +195,6 @@
     </div>
 </div>
 
-<!-- Cancel Modal -->
 <div class="modal fade" id="cancelModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow">

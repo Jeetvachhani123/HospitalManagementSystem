@@ -237,8 +237,7 @@ public class ReportsController : ControllerBase
         {
             PatientId = patient.Id,
             PatientName = patient.FullName,
-            UpcomingAppointmentsCount = appointments.Count(a =>
-                (a.Status == "Scheduled" || a.Status == "Confirmed") && a.ApprovalStatus == "Approved" && a.AppointmentDate.Date >= DateTime.UtcNow.Date),
+            UpcomingAppointmentsCount = appointments.Count(a => (a.Status == "Scheduled" || a.Status == "Confirmed") && a.ApprovalStatus == "Approved" && a.AppointmentDate.Date >= DateTime.UtcNow.Date),
             CompletedAppointmentsCount = appointments.Count(a => a.Status == "Completed"),
             CancelledAppointmentsCount = appointments.Count(a => a.Status == "Cancelled" || a.Status == "NoShow" || a.ApprovalStatus == "Rejected"),
             PendingApprovalsCount = appointments.Count(a => a.ApprovalStatus == "Pending" && a.Status == "Scheduled"),
@@ -273,31 +272,23 @@ public class ReportsController : ControllerBase
                 var doctors = await _doctorService.GetAllAsync();
                 return Ok(ApiResponse<object>.SuccessResponse(doctors.Select(d => new
                 {
-                    d.Id,
-                    name = d.FullName,
-                    d.Email,
-                    d.Specialization,
-                    experience = d.YearsOfExperience,
-                    d.IsAvailable
+                    d.Id, name = d.FullName, d.Email,
+                    d.Specialization, experience = d.YearsOfExperience, d.IsAvailable
                 })));
 
             case "Patients":
                 var patients = await _patientService.GetAllAsync();
                 return Ok(ApiResponse<object>.SuccessResponse(patients.Select(p => new
                 {
-                    p.Id,
-                    name = p.FullName,
-                    p.Email,
-                    phone = p.PhoneNumber,
-                    p.BloodGroup
+                    p.Id, name = p.FullName, p.Email,
+                    phone = p.PhoneNumber, p.BloodGroup
                 })));
 
             case "TodayAppointments":
                 var todayAppts = await _appointmentService.GetTodaysAppointmentsAsync();
                 return Ok(ApiResponse<object>.SuccessResponse(todayAppts.Select(a => new
                 {
-                    patient = a.PatientName,
-                    doctor = a.DoctorName,
+                    patient = a.PatientName, doctor = a.DoctorName,
                     date = a.AppointmentDate.ToString("MMM dd, yyyy"),
                     time = a.StartTime.ToString(@"hh\:mm"),
                     a.Status
@@ -305,12 +296,10 @@ public class ReportsController : ControllerBase
 
             case "PendingApprovals":
                 var all = await _appointmentService.GetAllAsync();
-                var pending = all.Where(a =>
-                    a.ApprovalStatus == "Pending" && a.Status == "Scheduled");
+                var pending = all.Where(a => a.ApprovalStatus == "Pending" && a.Status == "Scheduled");
                 return Ok(ApiResponse<object>.SuccessResponse(pending.Select(a => new
                 {
-                    patient = a.PatientName,
-                    doctor = a.DoctorName,
+                    patient = a.PatientName, doctor = a.DoctorName,
                     date = a.AppointmentDate.ToString("MMM dd, yyyy"),
                     a.Status
                 })));
@@ -372,143 +361,91 @@ public class ReportsController : ControllerBase
 public class RecentAppointmentSummaryDto
 {
     public int Id { get; set; }
-
     public string PatientName { get; set; } = string.Empty;
-
     public string DoctorName { get; set; } = string.Empty;
-
     public string Status { get; set; } = string.Empty;
-
     public DateTime AppointmentDate { get; set; }
 }
 
 public class AdminDashboardApiDto
 {
     public int TotalDoctors { get; set; }
-
     public int TotalPatients { get; set; }
-
     public int TotalAppointments { get; set; }
-
     public int AppointmentsToday { get; set; }
-
     public int PendingApprovals { get; set; }
-
     public decimal CompletionRate { get; set; }
-
     public decimal NoShowRate { get; set; }
-
     public List<RecentAppointmentSummaryDto> RecentAppointments { get; set; } = new();
 }
 
 public class DoctorDashboardApiDto
 {
     public int DoctorId { get; set; }
-
     public string DoctorName { get; set; } = string.Empty;
-
     public string Specialization { get; set; } = string.Empty;
-
     public bool IsAvailable { get; set; }
-
     public int TodayAppointmentsCount { get; set; }
-
     public int PendingApprovalsCount { get; set; }
-
     public int TotalAppointments { get; set; }
-
     public int CompletedAppointments { get; set; }
-
     public decimal ApprovalRate { get; set; }
-
     public int PatientsServed { get; set; }
-
     public List<RecentAppointmentSummaryDto> UpcomingAppointments { get; set; } = new();
 }
 
 public class PatientDashboardApiDto
 {
     public int PatientId { get; set; }
-
     public string PatientName { get; set; } = string.Empty;
-
     public int TotalAppointments { get; set; }
-
     public int UpcomingAppointmentsCount { get; set; }
-
     public int CompletedAppointmentsCount { get; set; }
-
     public int CancelledAppointmentsCount { get; set; }
-
     public int PendingApprovalsCount { get; set; }
-
     public List<RecentAppointmentSummaryDto> RecentAppointments { get; set; } = new();
 }
 
 public class DoctorSummaryDto
 {
     public int Id { get; set; }
-
     public string Name { get; set; } = string.Empty;
-
     public string Email { get; set; } = string.Empty;
-
     public string Specialization { get; set; } = string.Empty;
-
     public int YearsOfExperience { get; set; }
-
     public string Phone { get; set; } = string.Empty;
 }
 
 public class PatientSummaryDto
 {
     public int Id { get; set; }
-
     public string Name { get; set; } = string.Empty;
-
     public string Email { get; set; } = string.Empty;
-
     public string Phone { get; set; } = string.Empty;
-
     public string BloodGroup { get; set; } = string.Empty;
-
     public DateTime DateOfBirth { get; set; }
 }
 
 public class FullReportApiDto
 {
     public AppointmentReportDto Stats { get; set; } = new();
-
     public List<DoctorSummaryDto> Doctors { get; set; } = new();
-
     public List<PatientSummaryDto> Patients { get; set; } = new();
-
     public List<RecentAppointmentSummaryDto> TodayAppointments { get; set; } = new();
-
     public DateTime GeneratedAt { get; set; }
 }
 
 public class DashboardStatsDto
 {
     public int TotalDoctors { get; set; }
-
     public int TotalPatients { get; set; }
-
     public int TotalAppointments { get; set; }
-
     public int AppointmentsToday { get; set; }
-
     public int UpcomingAppointments { get; set; }
-
     public int CompletedAppointments { get; set; }
-
     public int PendingApprovals { get; set; }
-
     public decimal CompletionRate { get; set; }
-
     public decimal NoShowRate { get; set; }
-
     public decimal ApprovalRate { get; set; }
-
     public int PatientsServed { get; set; }
 }

@@ -12,7 +12,6 @@ public class GlobalExceptionFilter : IExceptionFilter
         _logger = logger;
     }
 
-    // handle unhandled exceptions
     public void OnException(ExceptionContext context)
     {
         _logger.LogError(context.Exception, "An unhandled exception occurred");

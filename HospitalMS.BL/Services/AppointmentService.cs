@@ -526,11 +526,7 @@ public class AppointmentService : IAppointmentService
 
     public Task<int> GetAppointmentsCountAsync(int doctorId, AppointmentStatus? status = null, DateTime? date = null, CancellationToken cancellationToken = default)
     {
-        return _unitOfWork.Appointments.CountAsync(a =>
-            a.DoctorId == doctorId &&
-            (!status.HasValue || a.Status == status.Value) &&
-            (!date.HasValue || a.AppointmentDate.Date == date.Value.Date),
-            cancellationToken);
+        return _unitOfWork.Appointments.CountAsync(a => a.DoctorId == doctorId && (!status.HasValue || a.Status == status.Value) && (!date.HasValue || a.AppointmentDate.Date == date.Value.Date), cancellationToken);
     }
 
     public async Task<(IEnumerable<AppointmentResponseDto> Items, int TotalCount)> SearchAsync(string? searchTerm, int? doctorId, int? patientId, DateTime? fromDate, DateTime? toDate, AppointmentStatus? status, int page, int pageSize, CancellationToken cancellationToken = default)

@@ -239,14 +239,10 @@ public class AppointmentsController : ControllerBase
         sb.AppendLine("Id,PatientId,PatientName,DoctorId,DoctorName,Specialization,Date,StartTime,EndTime,Status,ApprovalStatus,Reason,Diagnosis,Prescription,Notes,CreatedAt");
         foreach (var a in data)
         {
-            sb.AppendLine(string.Join(",",
-                a.Id, a.PatientId, Csv(a.PatientName),
-                a.DoctorId, Csv(a.DoctorName), Csv(a.DoctorSpecialization),
-                a.AppointmentDate.ToString("yyyy-MM-dd"),
-                a.StartTime.ToString(@"hh\:mm"), a.EndTime.ToString(@"hh\:mm"),
-                a.Status, a.ApprovalStatus,
-                Csv(a.Reason), Csv(a.Diagnosis), Csv(a.Prescription), Csv(a.Notes),
-                a.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")));
+            sb.AppendLine(string.Join(",", a.Id, a.PatientId, Csv(a.PatientName),
+                a.DoctorId, Csv(a.DoctorName), Csv(a.DoctorSpecialization), a.AppointmentDate.ToString("yyyy-MM-dd"),
+                a.StartTime.ToString(@"hh\:mm"), a.EndTime.ToString(@"hh\:mm"), a.Status, a.ApprovalStatus,
+                Csv(a.Reason), Csv(a.Diagnosis), Csv(a.Prescription), Csv(a.Notes), a.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")));
         }
 
         var bytes = Encoding.UTF8.GetBytes(sb.ToString());
@@ -395,11 +391,7 @@ public class AppointmentsController : ControllerBase
 
         var today = DateTime.UtcNow.Date;
         var (items, _) = await _appointmentService.SearchAsync(searchTerm: null, doctorId: doctorId, patientId: patientId, fromDate: null, toDate: today.AddDays(-1), status: null, page: 1, pageSize: 1000, cancellationToken: cancellationToken);
-        var history = items.Where(a =>
-            a.AppointmentDate < today ||
-            a.StatusEnum == AppointmentStatus.Completed ||
-            a.StatusEnum == AppointmentStatus.Cancelled ||
-            a.StatusEnum == AppointmentStatus.NoShow)
+        var history = items.Where(a => a.AppointmentDate < today || a.StatusEnum == AppointmentStatus.Completed || a.StatusEnum == AppointmentStatus.Cancelled || a.StatusEnum == AppointmentStatus.NoShow)
             .OrderByDescending(a => a.AppointmentDate);
 
         return Ok(ApiResponse<IEnumerable<AppointmentResponseDto>>.SuccessResponse(history));

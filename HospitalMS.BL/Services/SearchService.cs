@@ -70,12 +70,7 @@ public class SearchService : ISearchService
 
         var doctors = await _doctorRepository.GetAllAsync();
         var lowerQuery = query.ToLower();
-        var results = doctors.Where(d =>
-            d.User.FirstName.ToLower().Contains(lowerQuery) ||
-            d.User.LastName.ToLower().Contains(lowerQuery) ||
-            d.Specialization.ToLower().Contains(lowerQuery) ||
-            d.LicenseNumber.ToLower().Contains(lowerQuery)
-        );
+        var results = doctors.Where(d => d.User.FirstName.ToLower().Contains(lowerQuery) || d.User.LastName.ToLower().Contains(lowerQuery) || d.Specialization.ToLower().Contains(lowerQuery) || d.LicenseNumber.ToLower().Contains(lowerQuery));
 
         return results.Select(d => new DoctorSearchResultDto
         {
@@ -93,12 +88,7 @@ public class SearchService : ISearchService
             return new List<PatientSearchResultDto>();
         var patients = await _patientRepository.GetAllAsync();
         var lowerQuery = query.ToLower();
-        var results = patients.Where(p =>
-            p.User.FirstName.ToLower().Contains(lowerQuery) ||
-            p.User.LastName.ToLower().Contains(lowerQuery) ||
-            p.User.Email.ToLower().Contains(lowerQuery) ||
-            (p.User.PhoneNumber != null && p.User.PhoneNumber.Contains(query))
-        );
+        var results = patients.Where(p => p.User.FirstName.ToLower().Contains(lowerQuery) || p.User.LastName.ToLower().Contains(lowerQuery) || p.User.Email.ToLower().Contains(lowerQuery) || (p.User.PhoneNumber != null && p.User.PhoneNumber.Contains(query)));
 
         return results.Select(p => new PatientSearchResultDto
         {

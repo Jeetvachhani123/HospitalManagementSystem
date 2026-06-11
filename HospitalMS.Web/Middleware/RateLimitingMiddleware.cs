@@ -113,13 +113,9 @@ public class RateLimitingMiddleware
     private class RequestInfo
     {
         public int RequestCount { get; set; }
-
         public int LoginAttempts { get; set; }
-
         public DateTime WindowStart { get; set; } = DateTime.UtcNow;
-
         public bool IsBlocked { get; set; }
-
         public DateTime BlockedUntil { get; set; }
     }
 }

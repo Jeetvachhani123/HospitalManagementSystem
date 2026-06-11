@@ -419,7 +419,6 @@ public class AppointmentController : Controller
         if (appointment == null)
             return NotFound();
 
-        // only allow rescheduling of Scheduled or Confirmed appointments
         if (appointment.Status == "Completed" || appointment.Status == "Cancelled")
         {
             TempData["ErrorMessage"] = "Only scheduled or confirmed appointments can be rescheduled.";
