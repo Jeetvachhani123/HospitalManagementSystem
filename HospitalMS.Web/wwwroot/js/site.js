@@ -147,6 +147,8 @@
             toggle.checked = true;
         }
         toggle.addEventListener('change', function (e) {
+            document.documentElement.classList.add('theme-transition');
+            
             if (this.checked) {
                 document.body.classList.add('dark-mode');
                 localStorage.setItem('theme', 'dark');
@@ -154,6 +156,10 @@
                 document.body.classList.remove('dark-mode');
                 localStorage.setItem('theme', 'light');
             }
+            
+            setTimeout(() => {
+                document.documentElement.classList.remove('theme-transition');
+            }, 400);
         });
     }
     document.addEventListener('DOMContentLoaded', function () {
