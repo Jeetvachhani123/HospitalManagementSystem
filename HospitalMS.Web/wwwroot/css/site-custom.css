@@ -1,0 +1,75 @@
+/* Premium Design System */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --primary-hue: 200; /* teal */
+  --primary-saturation: 70%;
+  --primary-lightness: 50%;
+  --bg-light: hsl(0, 0%, 100%);
+  --bg-dark: hsl(220, 10%, 12%);
+  --text-light: hsl(0, 0%, 10%);
+  --text-dark: hsl(0, 0%, 90%);
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg-light);
+  color: var(--text-light);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+body.dark-mode {
+  background: var(--bg-dark);
+  color: var(--text-dark);
+}
+
+/* Glassmorphism Navbar */
+.navbar-glass {
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(12px);
+  border: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+body.dark-mode .navbar-glass {
+  background: rgba(0,0,0,0.45);
+}
+
+/* Gradient Accent for Buttons */
+.btn-primary {
+  background: linear-gradient(45deg, hsl(var(--primary-hue), var(--primary-saturation), 45%), hsl(var(--primary-hue), var(--primary-saturation), 60%));
+  border: none;
+  transition: transform 0.2s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+}
+
+/* Nav Link Hover Animation */
+.nav-link {
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 2px;
+  background: hsl(var(--primary-hue), var(--primary-saturation), 55%);
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+}
+
+.nav-link:hover::after {
+  transform: translateX(0);
+}
+
+/* Toast Styling */
+.toast {
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}

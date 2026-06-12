@@ -29,7 +29,7 @@
         // Auto-apply to common elements
         document.querySelectorAll('.card, .list-group-item, .table tbody tr').forEach(function (el) {
             if (!el.closest('.modal') && !el.classList.contains('no-animate')) {
-                el.style.opacity = '1'; 
+                el.style.opacity = '1';
             }
         });
     }
@@ -137,20 +137,35 @@
     }
 
     // ─── Initialize everything on DOM ready ───
+
+    function initDarkModeToggle() {
+        const toggle = document.getElementById('dark-mode-toggle');
+        if (!toggle) return;
+        // Apply saved theme on load
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+        toggle.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        });
+    }
     document.addEventListener('DOMContentLoaded', function () {
         initScrollAnimations();
         animateCounters();
         initNavbarScroll();
         initRippleEffect();
         initCardEntrance();
+        initDarkModeToggle();
 
         // Add scroll-reveal visible class style
         if (!document.getElementById('scroll-reveal-style')) {
             var style = document.createElement('style');
             style.id = 'scroll-reveal-style';
             style.textContent =
-                '.scroll-reveal{opacity:0;transform:translateY(20px);transition:opacity 0.6s cubic-bezier(0.16,1,0.3,1),transform 0.6s cubic-bezier(0.16,1,0.3,1);}' +
-                '.scroll-reveal.is-visible{opacity:1;transform:translateY(0);}';
+                '.scroll-reveal{opacity:0;transform:translateY(20px);transition:opacity 0.6s cubic-bezier(0.16,1,0.3,1),transform 0.6s cubic-bezier(0.16,1,0.3,1);}' + '.scroll-reveal.is-visible{opacity:1;transform:translateY(0);}';
             document.head.appendChild(style);
         }
     });
