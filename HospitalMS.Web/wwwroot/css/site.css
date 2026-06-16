@@ -1113,11 +1113,21 @@ footer::before, .footer::before {
 }
 
 /* ─── Smooth Theme Transition ─── */
-.theme-transition,
-.theme-transition *,
-.theme-transition *::before,
-.theme-transition *::after {
-    transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease, background 0.4s ease !important;
+.theme-transition body,
+.theme-transition .card,
+.theme-transition .navbar,
+.theme-transition .form-control,
+.theme-transition .form-select,
+.theme-transition .dropdown-menu,
+.theme-transition .table,
+.theme-transition th,
+.theme-transition td,
+.theme-transition .bg-light,
+.theme-transition .bg-white,
+.theme-transition .text-dark,
+.theme-transition h1, .theme-transition h2, .theme-transition h3, .theme-transition h4, .theme-transition h5, .theme-transition h6,
+.theme-transition p, .theme-transition span {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, background 0.3s ease !important;
 }
 
 /* ─── Dark Mode Premium Styles ─── */
