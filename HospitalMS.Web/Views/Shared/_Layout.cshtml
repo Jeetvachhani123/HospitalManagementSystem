@@ -228,14 +228,15 @@
 
     <div class="toast-container p-3" id="toastContainer" style="top: 70px; right: 20px; z-index: 9999;"></div>
 
-    <main role="main" class="pb-5" style="margin-top: 76px; min-height: calc(100vh - 140px);">
+    <main role="main" style="margin-top: 76px; min-height: calc(100vh - 140px);">
         @RenderBody()
     </main>
 
-    <footer class="py-4 mt-auto">
-        <div class="container text-center text-muted small">
-            <p class="mb-1"><i class="bi bi-hospital-fill me-1 text-primary"></i> Hospital Management System</p>
-            <p class="mb-0 opacity-75">&copy; @DateTime.Now.Year All rights reserved. Crafted with <i class="bi bi-heart-fill text-danger" style="font-size:0.65rem;"></i> for better healthcare.</p>
+    <footer class="py-4 mt-auto" style="background: #0f172a; color: rgba(255,255,255,0.7); position: relative; border-top: 1px solid rgba(255,255,255,0.1) !important;">
+        <div class="position-absolute top-0 start-0 w-100" style="height: 2px; background: linear-gradient(90deg, #3b82f6, #ec4899); opacity: 0.8;"></div>
+        <div class="container text-center small position-relative" style="z-index: 1;">
+            <p class="mb-2 fs-6 fw-bold text-white"><i class="bi bi-hospital-fill me-2" style="color: #38bdf8;"></i> Hospital Management System</p>
+            <p class="mb-0">&copy; @DateTime.Now.Year All rights reserved. Crafted with <i class="bi bi-heart-fill text-danger mx-1" style="font-size:0.8rem;"></i> for better healthcare.</p>
         </div>
     </footer>
 

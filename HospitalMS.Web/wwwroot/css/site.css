@@ -186,7 +186,6 @@ body {
     color: var(--text-primary);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    margin-bottom: 60px;
     line-height: 1.6;
     letter-spacing: 0.01em;
 }
@@ -664,9 +663,10 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 
 /* ─── Footer — Premium ─── */
 footer, .footer {
-    background: var(--surface-color) !important;
+    background: #0f172a !important;
     border-top: none !important;
     position: relative;
+    color: rgba(255,255,255,0.7) !important;
 }
 footer::before, .footer::before {
     content: '';
@@ -676,7 +676,7 @@ footer::before, .footer::before {
     right: 0;
     height: 2px;
     background: var(--gradient-primary);
-    opacity: 0.4;
+    opacity: 0.8;
 }
 
 /* ─── Avatar — Premium Circle ─── */

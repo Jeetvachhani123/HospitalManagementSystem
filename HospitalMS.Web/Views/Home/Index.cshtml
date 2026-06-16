@@ -3,29 +3,34 @@
     bool isAuthenticated = User.Identity?.IsAuthenticated == true;
 }
 
-<div class="hero-gradient text-white" style="min-height: 90vh; padding-top: 5rem;">
-    <div class="container py-5 position-relative" style="z-index:1;">
+<div class="hero-gradient text-white position-relative overflow-hidden d-flex align-items-center" style="min-height: calc(100vh - 76px); background: #0f172a;">
+    <!-- Floating Glowing Orbs -->
+    <div class="position-absolute rounded-circle" style="top: 10%; left: 15%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(99,102,241,0.4) 0%, rgba(99,102,241,0) 70%); filter: blur(40px); animation: float 6s ease-in-out infinite;"></div>
+    <div class="position-absolute rounded-circle" style="top: 40%; right: 10%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(236,72,153,0.3) 0%, rgba(236,72,153,0) 70%); filter: blur(50px); animation: float 8s ease-in-out infinite reverse;"></div>
+    <div class="position-absolute rounded-circle" style="bottom: -10%; left: 40%; width: 350px; height: 350px; background: radial-gradient(circle, rgba(14,165,233,0.35) 0%, rgba(14,165,233,0) 70%); filter: blur(45px); animation: float 7s ease-in-out infinite 1s;"></div>
+    
+    <div class="container py-5 position-relative" style="z-index: 2;">
         <div class="row align-items-center py-5">
             <div class="col-lg-6 py-5 animate-fade-in-up">
                 <div class="pe-lg-5">
-                    <span class="badge bg-white bg-opacity-10 border border-white border-opacity-25 px-3 py-2 mb-4 d-inline-flex align-items-center text-uppercase text-white" style="letter-spacing: 1px; backdrop-filter: blur(10px);">
-                        <i class="bi bi-shield-check me-2 fs-6"></i> Trusted Healthcare Platform
+                    <span class="badge bg-white bg-opacity-10 border border-white border-opacity-25 px-4 py-2 mb-4 d-inline-flex align-items-center text-uppercase text-white rounded-pill" style="letter-spacing: 2px; backdrop-filter: blur(10px); box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                        <i class="bi bi-stars me-2 fs-5 text-warning"></i> Next-Gen Healthcare
                     </span>
-                    <h1 class="display-3 fw-bold lh-tight mb-4" style="letter-spacing:-0.03em;">
+                    <h1 class="display-3 fw-bold lh-tight mb-4" style="letter-spacing:-0.03em; text-shadow: 0 10px 30px rgba(0,0,0,0.3);">
                         Excellence in <br />
-                        <span style="background: linear-gradient(135deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Medical Care</span> <br />
+                        <span style="background: linear-gradient(135deg, #38bdf8, #c084fc, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-size: 200% auto; animation: shimmer 3s linear infinite;">Medical Care</span> <br />
                         for your family.
                     </h1>
-                    <p class="lead mb-5 pe-lg-4 fs-5" style="color: rgba(255,255,255,0.7);">
-                        Experience seamless patient care, efficient scheduling, and secure medical records — all powered by a professional platform connecting top doctors with patients.
+                    <p class="lead mb-5 pe-lg-4 fs-5 fw-light" style="color: rgba(255,255,255,0.85); line-height: 1.8;">
+                        Experience seamless patient care, efficient scheduling, and highly secure medical records — powered by an ultra-modern platform connecting elite doctors with patients.
                     </p>
                     <div class="d-flex flex-column flex-sm-row gap-3 mb-5">
                         @if (!isAuthenticated)
                         {
-                            <a asp-controller="Account" asp-action="Register" class="btn btn-lg px-5 py-3 fw-bold d-inline-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); border:none; color:white; border-radius:50px; box-shadow: 0 8px 30px rgba(59,130,246,0.4);">
-                                Register as Patient <i class="bi bi-arrow-right ms-2"></i>
+                            <a asp-controller="Account" asp-action="Register" class="btn btn-lg px-5 py-3 fw-bold d-inline-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, #4f46e5, #ec4899); border:none; color:white; border-radius:50px; box-shadow: 0 10px 25px rgba(236,72,153,0.4); transition: all 0.3s ease;">
+                                Register as Patient <i class="bi bi-arrow-right-short fs-4 ms-1"></i>
                             </a>
-                            <a asp-controller="Account" asp-action="Login" class="btn btn-lg px-5 py-3 d-inline-flex align-items-center justify-content-center fw-bold" style="background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.25); color:white; border-radius:50px; backdrop-filter: blur(10px);">
+                            <a asp-controller="Account" asp-action="Login" class="btn btn-lg px-5 py-3 d-inline-flex align-items-center justify-content-center fw-bold" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color:white; border-radius:50px; backdrop-filter: blur(15px); transition: all 0.3s ease;">
                                 Staff Login
                             </a>
                         }
@@ -33,38 +38,38 @@
                         {
                             @if (User.IsInRole("Admin"))
                             {
-                                <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-lg px-5 py-3 fw-bold" style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); border:none; color:white; border-radius:50px; box-shadow: 0 8px 30px rgba(59,130,246,0.4);">
+                                <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-lg px-5 py-3 fw-bold" style="background: linear-gradient(135deg, #4f46e5, #ec4899); border:none; color:white; border-radius:50px; box-shadow: 0 10px 25px rgba(236,72,153,0.4);">
                                     <i class="bi bi-speedometer2 me-2"></i> Admin Dashboard
                                 </a>
                             }
                             else if (User.IsInRole("Doctor"))
                             {
-                                <a asp-controller="Doctor" asp-action="Dashboard" class="btn btn-lg px-5 py-3 fw-bold" style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); border:none; color:white; border-radius:50px; box-shadow: 0 8px 30px rgba(59,130,246,0.4);">
+                                <a asp-controller="Doctor" asp-action="Dashboard" class="btn btn-lg px-5 py-3 fw-bold" style="background: linear-gradient(135deg, #4f46e5, #ec4899); border:none; color:white; border-radius:50px; box-shadow: 0 10px 25px rgba(236,72,153,0.4);">
                                     <i class="bi bi-calendar-check-fill me-2"></i> Doctor Portal
                                 </a>
                             }
                             else
                             {
-                                <a asp-controller="Patient" asp-action="Dashboard" class="btn btn-lg px-5 py-3 fw-bold" style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); border:none; color:white; border-radius:50px; box-shadow: 0 8px 30px rgba(59,130,246,0.4);">
+                                <a asp-controller="Patient" asp-action="Dashboard" class="btn btn-lg px-5 py-3 fw-bold" style="background: linear-gradient(135deg, #4f46e5, #ec4899); border:none; color:white; border-radius:50px; box-shadow: 0 10px 25px rgba(236,72,153,0.4);">
                                     <i class="bi bi-person-fill me-2"></i> Patient Portal
                                 </a>
                             }
                         }
                     </div>
-                    <div class="d-flex gap-4 flex-wrap animate-fade-in-up delay-3">
+                    <div class="d-flex gap-5 flex-wrap animate-fade-in-up delay-3 p-4 rounded-xl" style="background: rgba(255,255,255,0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05);">
                         <div class="text-center">
-                            <div class="h3 fw-bold mb-0" style="color:#60a5fa;" data-count-to="500" data-count-duration="1500">0</div>
-                            <small style="color:rgba(255,255,255,0.5);">Expert Doctors</small>
+                            <div class="h2 fw-bold mb-0" style="color:#38bdf8; text-shadow: 0 0 15px rgba(56,189,248,0.5);" data-count-to="500" data-count-duration="1500">500+</div>
+                            <small class="text-uppercase fw-bold" style="color:rgba(255,255,255,0.5); letter-spacing: 1px; font-size: 0.75rem;">Expert Doctors</small>
                         </div>
-                        <div style="width:1px; background:rgba(255,255,255,0.15);"></div>
+                        <div style="width:1px; background:rgba(255,255,255,0.1);"></div>
                         <div class="text-center">
-                            <div class="h3 fw-bold mb-0" style="color:#a78bfa;" data-count-to="10000" data-count-duration="2000">0</div>
-                            <small style="color:rgba(255,255,255,0.5);">Patients Served</small>
+                            <div class="h2 fw-bold mb-0" style="color:#c084fc; text-shadow: 0 0 15px rgba(192,132,252,0.5);" data-count-to="10000" data-count-duration="2000">10k+</div>
+                            <small class="text-uppercase fw-bold" style="color:rgba(255,255,255,0.5); letter-spacing: 1px; font-size: 0.75rem;">Patients Served</small>
                         </div>
-                        <div style="width:1px; background:rgba(255,255,255,0.15);"></div>
+                        <div style="width:1px; background:rgba(255,255,255,0.1);"></div>
                         <div class="text-center">
-                            <div class="h3 fw-bold mb-0" style="color:#34d399;">24/7</div>
-                            <small style="color:rgba(255,255,255,0.5);">Support Available</small>
+                            <div class="h2 fw-bold mb-0" style="color:#34d399; text-shadow: 0 0 15px rgba(52,211,153,0.5);">24/7</div>
+                            <small class="text-uppercase fw-bold" style="color:rgba(255,255,255,0.5); letter-spacing: 1px; font-size: 0.75rem;">Support Ready</small>
                         </div>
                     </div>
                 </div>
@@ -72,44 +77,42 @@
 
             <div class="col-lg-6 d-none d-lg-block position-relative">
                 <div class="position-relative animate-fade-in-up delay-2">
-                    <div class="p-4 p-xl-5 animate-float" style="background: rgba(255,255,255,0.08); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.12); border-radius: 1.5rem;">
-                        <div class="d-flex align-items-center mb-4">
-                            <div class="p-3 me-4" style="background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(139,92,246,0.15)); border-radius: 1rem;">
-                                <i class="bi bi-heart-pulse text-white fs-2"></i>
+                    <div class="p-4 p-xl-5 animate-float shadow-xl" style="background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.1); border-radius: 2rem; transform: perspective(1000px) rotateY(-5deg); transform-style: preserve-3d;">
+                        <div class="d-flex align-items-center mb-5" style="transform: translateZ(30px);">
+                            <div class="p-4 me-4" style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); border-radius: 1.2rem; box-shadow: 0 10px 20px rgba(99,102,241,0.3);">
+                                <i class="bi bi-heart-pulse text-white fs-1"></i>
                             </div>
                             <div>
-                                <h4 class="fw-bold mb-1 text-white">Expert Physicians</h4>
-                                <span style="color:rgba(255,255,255,0.6);" class="fw-medium">Over 50+ specialists available</span>
+                                <h3 class="fw-bold mb-1 text-white">Elite Physicians</h3>
+                                <span style="color:rgba(255,255,255,0.6);" class="fw-medium fs-6">Over 50+ world-class specialists</span>
                             </div>
                         </div>
-                        <div class="d-flex align-items-center mb-4">
-                            <div class="p-3 me-4" style="background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(13,148,136,0.15)); border-radius: 1rem;">
-                                <i class="bi bi-clipboard2-pulse text-white fs-2"></i>
+                        <div class="d-flex align-items-center mb-5" style="transform: translateZ(40px);">
+                            <div class="p-4 me-4" style="background: linear-gradient(135deg, #10b981, #0d9488); border-radius: 1.2rem; box-shadow: 0 10px 20px rgba(16,185,129,0.3);">
+                                <i class="bi bi-shield-lock text-white fs-1"></i>
                             </div>
                             <div>
-                                <h4 class="fw-bold mb-1 text-white">Digital Records</h4>
-                                <span style="color:rgba(255,255,255,0.6);" class="fw-medium">100% secure & private health tracking</span>
+                                <h3 class="fw-bold mb-1 text-white">Bank-Grade Security</h3>
+                                <span style="color:rgba(255,255,255,0.6);" class="fw-medium fs-6">100% encrypted & private health tracking</span>
                             </div>
                         </div>
-                        <div class="d-flex align-items-center">
-                            <div class="p-3 me-4" style="background: linear-gradient(135deg, rgba(14,165,233,0.2), rgba(6,182,212,0.15)); border-radius: 1rem;">
-                                <i class="bi bi-calendar-check text-white fs-2"></i>
+                        <div class="d-flex align-items-center" style="transform: translateZ(20px);">
+                            <div class="p-4 me-4" style="background: linear-gradient(135deg, #f43f5e, #f97316); border-radius: 1.2rem; box-shadow: 0 10px 20px rgba(244,63,94,0.3);">
+                                <i class="bi bi-calendar2-check text-white fs-1"></i>
                             </div>
                             <div>
-                                <h4 class="fw-bold mb-1 text-white">Easy Scheduling</h4>
-                                <span style="color:rgba(255,255,255,0.6);" class="fw-medium">Book appointments in seconds</span>
+                                <h3 class="fw-bold mb-1 text-white">Instant Scheduling</h3>
+                                <span style="color:rgba(255,255,255,0.6);" class="fw-medium fs-6">Book top-rated doctors in seconds</span>
                             </div>
                         </div>
                     </div>
-                    <div class="position-absolute" style="top:-30px; right:-20px; width:80px; height:80px; background:linear-gradient(135deg, rgba(139,92,246,0.3), rgba(59,130,246,0.2)); border-radius:50%; filter:blur(1px); animation: float 4s ease-in-out infinite;"></div>
-                    <div class="position-absolute" style="bottom:-20px; left:-30px; width:60px; height:60px; background:linear-gradient(135deg, rgba(16,185,129,0.3), rgba(14,165,233,0.2)); border-radius:50%; filter:blur(1px); animation: float 5s ease-in-out infinite reverse;"></div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="py-5" style="background: white;">
+<div class="py-5 bg-white theme-transition">
     <div class="container py-5">
         <div class="text-center mb-5 mx-auto animate-fade-in-up" style="max-width: 700px;">
             <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle px-3 py-2 mb-3 d-inline-block fw-bold text-uppercase" style="letter-spacing:1px; font-size:0.7rem;">Our Services</span>
