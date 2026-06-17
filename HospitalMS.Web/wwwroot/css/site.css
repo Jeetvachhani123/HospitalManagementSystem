@@ -663,10 +663,10 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 
 /* ─── Footer — Premium ─── */
 footer, .footer {
-    background: #0f172a !important;
-    border-top: none !important;
+    background: #f1f5f9 !important;
+    border-top: 1px solid rgba(0,0,0,0.08) !important;
     position: relative;
-    color: rgba(255,255,255,0.7) !important;
+    color: #475569 !important;
 }
 footer::before, .footer::before {
     content: '';
@@ -677,6 +677,9 @@ footer::before, .footer::before {
     height: 2px;
     background: var(--gradient-primary);
     opacity: 0.8;
+}
+footer p.fw-bold, footer p.fw-bold * {
+    color: #1e293b !important;
 }
 
 /* ─── Avatar — Premium Circle ─── */
@@ -1197,7 +1200,15 @@ body.dark-mode .dropdown-item:hover {
 }
 
 body.dark-mode footer, body.dark-mode .footer {
-    background: var(--surface-color) !important;
+    background: #0f172a !important;
+    border-top: 1px solid rgba(255,255,255,0.1) !important;
+    color: rgba(255,255,255,0.7) !important;
+}
+body.dark-mode footer p, body.dark-mode footer p * {
+    color: rgba(255,255,255,0.7) !important;
+}
+body.dark-mode footer p.fw-bold, body.dark-mode footer p.fw-bold * {
+    color: #ffffff !important;
 }
 
 body.dark-mode .text-dark {
