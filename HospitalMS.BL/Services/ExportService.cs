@@ -38,7 +38,6 @@ public class ExportService : IExportService
         QuestPDF.Settings.License = LicenseType.Community;
     }
 
-    // export to csv
     public Task<byte[]> ExportAppointmentsToCSVAsync(List<AppointmentExportDto> appointments)
     {
         static string Q(string? s) =>
@@ -83,7 +82,6 @@ public class ExportService : IExportService
         return Task.FromResult(bytes);
     }
 
-    // export to excel
     public Task<byte[]> ExportAppointmentsToExcelAsync(List<AppointmentExportDto> appointments)
     {
         using var workbook = new XLWorkbook();
@@ -197,7 +195,7 @@ public class ExportService : IExportService
 
         return Task.FromResult(stream.ToArray());
     }
-    // export to pdf
+
     public Task<byte[]> ExportAppointmentsToPdfAsync(List<AppointmentExportDto> appointments)
     {
         var document = Document.Create(container =>

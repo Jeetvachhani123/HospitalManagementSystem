@@ -16,7 +16,6 @@ public class UserRegistrationCoordinator
         _logger = logger;
     }
 
-    // register new user
     public async Task<User?> RegisterUserAsync(RegisterDto registerDto, Func<string, string> passwordHasher)
     {
         if (await _unitOfWork.Users.EmailExistsAsync(registerDto.Email))
@@ -44,7 +43,6 @@ public class UserRegistrationCoordinator
         }
     }
 
-    // create patient profile
     private async Task CreatePatientProfileAsync(User user, RegisterDto dto)
     {
         var patient = new Patient
@@ -59,7 +57,6 @@ public class UserRegistrationCoordinator
         await _unitOfWork.Patients.AddAsync(patient);
     }
 
-    // create doctor profile
     private async Task CreateDoctorProfileAsync(User user, RegisterDto dto)
     {
         var doctor = new Doctor

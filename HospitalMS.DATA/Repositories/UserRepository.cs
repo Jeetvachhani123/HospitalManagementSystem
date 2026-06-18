@@ -25,7 +25,6 @@ public class UserRepository : IUserRepository
         _context = context;
     }
 
-    // get user by id
     public async Task<User?> GetByIdAsync(int id)
     {
         return await _context.Users
@@ -34,7 +33,6 @@ public class UserRepository : IUserRepository
             .FirstOrDefaultAsync(u => u.Id == id);
     }
 
-    // get user by email
     public async Task<User?> GetByEmailAsync(string email)
     {
         return await _context.Users
@@ -43,7 +41,6 @@ public class UserRepository : IUserRepository
             .FirstOrDefaultAsync(u => u.Email == email);
     }
 
-    // get all users
     public async Task<IEnumerable<User>> GetAllAsync()
     {
         return await _context.Users
@@ -52,7 +49,6 @@ public class UserRepository : IUserRepository
             .ToListAsync();
     }
 
-    // get users by role
     public async Task<IEnumerable<User>> GetByRoleAsync(Models.Enums.UserRole role)
     {
         return await _context.Users
@@ -62,20 +58,17 @@ public class UserRepository : IUserRepository
             .ToListAsync();
     }
 
-    // add user
     public async Task<User> AddAsync(User user)
     {
         await _context.Users.AddAsync(user);
         return user;
     }
 
-    // update user
     public void Update(User user)
     {
         _context.Users.Update(user);
     }
 
-    // soft delete user
     public void Delete(User user)
     {
         user.IsDeleted = true;
@@ -83,7 +76,6 @@ public class UserRepository : IUserRepository
         _context.Users.Update(user);
     }
 
-    // check email exists
     public async Task<bool> EmailExistsAsync(string email)
     {
         return await _context.Users.AnyAsync(u => u.Email == email);

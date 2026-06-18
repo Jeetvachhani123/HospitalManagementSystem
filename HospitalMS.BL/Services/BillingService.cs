@@ -27,37 +27,31 @@ public class BillingService : IBillingService
         _logger = logger;
     }
 
-    // get invoice by id
     public async Task<Invoice?> GetInvoiceByIdAsync(int id)
     {
         return await _unitOfWork.Invoices.GetByIdAsync(id);
     }
 
-    // get invoice by appointment
     public async Task<Invoice?> GetInvoiceByAppointmentIdAsync(int appointmentId)
     {
         return await _unitOfWork.Invoices.GetByAppointmentIdAsync(appointmentId);
     }
 
-    // get all invoices
     public async Task<IEnumerable<Invoice>> GetAllInvoicesAsync()
     {
         return await _unitOfWork.Invoices.GetAllAsync();
     }
 
-    // get patient invoices
     public async Task<IEnumerable<Invoice>> GetPatientInvoicesAsync(int patientId)
     {
         return await _unitOfWork.Invoices.GetByPatientIdAsync(patientId);
     }
 
-    // get pending invoices
     public async Task<IEnumerable<Invoice>> GetPendingInvoicesAsync(int patientId)
     {
         return await _unitOfWork.Invoices.GetPendingByPatientIdAsync(patientId);
     }
 
-    // generate invoice
     public async Task<Invoice> GenerateInvoiceAsync(int appointmentId, decimal amount, DateTime dueDate)
     {
         var existingInvoice = await _unitOfWork.Invoices.GetByAppointmentIdAsync(appointmentId);
@@ -75,7 +69,6 @@ public class BillingService : IBillingService
         return invoice;
     }
 
-    // process payment
     public async Task<bool> ProcessPaymentAsync(int invoiceId, string paymentMethod)
     {
         var invoice = await _unitOfWork.Invoices.GetByIdAsync(invoiceId);
@@ -104,7 +97,6 @@ public class BillingService : IBillingService
         }
     }
 
-    // cancel invoice
     public async Task<bool> CancelInvoiceAsync(int invoiceId)
     {
         var invoice = await _unitOfWork.Invoices.GetByIdAsync(invoiceId);

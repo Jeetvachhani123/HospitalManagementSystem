@@ -10,7 +10,6 @@ public class ErrorResponse
     public Dictionary<string, string[]>? ValidationErrors { get; set; }
     public string? Path { get; set; }
 
-    // create error response
     public static ErrorResponse Create(string message, string errorCode, int statusCode, string? correlationId = null, Dictionary<string, string[]>? validationErrors = null, string? path = null)
     {
         return new ErrorResponse

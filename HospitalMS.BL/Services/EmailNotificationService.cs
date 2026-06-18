@@ -32,7 +32,6 @@ public class EmailNotificationService : IEmailNotificationService
         _logger = logger;
     }
 
-    // send appointment request email
     public async Task SendAppointmentRequestEmailAsync(string patientEmail, string patientName, string doctorName, DateTime appointmentDate, TimeSpan startTime)
     {
         try
@@ -57,7 +56,6 @@ public class EmailNotificationService : IEmailNotificationService
         }
     }
 
-    // send appointment approved email
     public async Task SendAppointmentApprovedEmailAsync(string patientEmail, string patientName, string doctorName, DateTime appointmentDate, TimeSpan startTime)
     {
         try
@@ -83,7 +81,6 @@ public class EmailNotificationService : IEmailNotificationService
         }
     }
 
-    // send appointment rejected email
     public async Task SendAppointmentRejectedEmailAsync(string patientEmail, string patientName, string doctorName, string rejectionReason)
     {
         try
@@ -111,7 +108,6 @@ public class EmailNotificationService : IEmailNotificationService
         }
     }
 
-    // send appointment reminder email
     public async Task SendAppointmentReminderEmailAsync(string patientEmail, string patientName, string doctorName, DateTime appointmentDate, TimeSpan startTime)
     {
         try
@@ -141,7 +137,6 @@ public class EmailNotificationService : IEmailNotificationService
         }
     }
 
-    // send completed appointment email
     public async Task SendAppointmentCompletedEmailAsync(string patientEmail, string patientName, string doctorName, string? diagnosis, string? prescription)
     {
         try
@@ -170,7 +165,6 @@ public class EmailNotificationService : IEmailNotificationService
         }
     }
 
-    // send reschedule request email
     public async Task SendRescheduleRequestEmailAsync(string doctorEmail, string patientName, DateTime currentDate, DateTime requestedDate, string reason)
     {
         try
@@ -194,7 +188,6 @@ public class EmailNotificationService : IEmailNotificationService
         }
     }
 
-    // send unavailability notification
     public async Task SendDoctorUnavailabilityNotificationAsync(string patientEmail, string patientName, string doctorName, DateTime startDate, DateTime endDate, string reason)
     {
         try
@@ -219,13 +212,11 @@ public class EmailNotificationService : IEmailNotificationService
         }
     }
 
-    // send email via service
     private async Task SendEmailAsync(string toAddress, string subject, string htmlBody)
     {
         await _emailService.SendEmailAsync(toAddress, subject, htmlBody);
     }
 
-    // build html email body
     private string BuildHtmlBody(string content)
     {
         return $@"<!DOCTYPE html>

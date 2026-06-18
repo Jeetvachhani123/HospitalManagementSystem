@@ -20,7 +20,6 @@ public class AdminController : Controller
         _reportingService = reportingService;
     }
 
-    // admin dashboard
     public async Task<IActionResult> Dashboard()
     {
         var recentAppointments = await _appointmentService.GetRecentAppointmentsAsync(5);
@@ -48,7 +47,6 @@ public class AdminController : Controller
         return View(model);
     }
 
-    // get card details for dashboard (AJAX)
     [HttpGet]
     public async Task<IActionResult> GetCardDetails(string type)
     {
@@ -109,7 +107,6 @@ public class AdminController : Controller
         return Json(new { });
     }
 
-    // generate appointment report
     public async Task<IActionResult> GenerateReport(DateTime? startDate, DateTime? endDate)
     {
         var report = await _reportingService.GenerateAppointmentReportAsync(startDate, endDate);
@@ -117,7 +114,6 @@ public class AdminController : Controller
         return Json(report);
     }
 
-    // get full report data (AJAX)
     [HttpGet]
     public async Task<IActionResult> GetFullReportData()
     {
@@ -163,7 +159,6 @@ public class AdminController : Controller
         });
     }
 
-    // get monthly trend data
     public async Task<IActionResult> GetMonthlyTrend(int months = 12)
     {
         var trend = await _reportingService.GetMonthlyTrendAsync(months);

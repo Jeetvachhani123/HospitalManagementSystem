@@ -22,7 +22,6 @@ public class MedicalRecordRepository : IMedicalRecordRepository
         _context = context;
     }
 
-    // get record by id
     public async Task<MedicalRecord?> GetByIdAsync(int id)
     {
         return await _context.MedicalRecords
@@ -33,7 +32,6 @@ public class MedicalRecordRepository : IMedicalRecordRepository
             .FirstOrDefaultAsync(m => m.Id == id);
     }
 
-    // get records by patient
     public async Task<IEnumerable<MedicalRecord>> GetByPatientIdAsync(int patientId)
     {
         return await _context.MedicalRecords
@@ -44,7 +42,6 @@ public class MedicalRecordRepository : IMedicalRecordRepository
             .ToListAsync();
     }
 
-    // get records by doctor
     public async Task<IEnumerable<MedicalRecord>> GetByDoctorIdAsync(int doctorId)
     {
         return await _context.MedicalRecords
@@ -55,19 +52,16 @@ public class MedicalRecordRepository : IMedicalRecordRepository
             .ToListAsync();
     }
 
-    // add medical record
     public async Task AddAsync(MedicalRecord medicalRecord)
     {
         await _context.MedicalRecords.AddAsync(medicalRecord);
     }
 
-    // update medical record
     public void Update(MedicalRecord medicalRecord)
     {
         _context.MedicalRecords.Update(medicalRecord);
     }
 
-    // soft delete record
     public void Delete(MedicalRecord medicalRecord)
     {
         medicalRecord.IsDeleted = true;

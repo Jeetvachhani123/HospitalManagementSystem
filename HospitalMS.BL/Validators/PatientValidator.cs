@@ -36,7 +36,6 @@ public class PatientCreateValidator : AbstractValidator<PatientCreateDto>
             .WithMessage("Invalid Blood Group (A+, A-, B+, B-, AB+, AB-, O+, O-)");
     }
 
-    // check valid blood group
     private bool BeValidBloodGroup(string? bloodGroup)
     {
         var validGroups = new[] { "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-" };

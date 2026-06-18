@@ -29,7 +29,6 @@ public class PatientService : IPatientService
         _mapper = mapper;
     }
 
-    // get patient by id
     public async Task<PatientResponseDto?> GetByIdAsync(int id)
     {
         var patient = await _unitOfWork.Patients.GetByIdAsync(id);
@@ -37,7 +36,6 @@ public class PatientService : IPatientService
         return patient == null ? null : MapToPatientResponse(patient);
     }
 
-    // get patient by user id
     public async Task<PatientResponseDto?> GetByUserIdAsync(int userId)
     {
         var patient = await _unitOfWork.Patients.GetByUserIdAsync(userId);
@@ -45,7 +43,6 @@ public class PatientService : IPatientService
         return patient == null ? null : MapToPatientResponse(patient);
     }
 
-    // get all patients
     public async Task<IEnumerable<PatientResponseDto>> GetAllAsync(int page = 1, int pageSize = 100)
     {
         var patients = await _unitOfWork.Patients.GetAllAsync(page, pageSize);
@@ -53,7 +50,6 @@ public class PatientService : IPatientService
         return patients.Select(MapToPatientResponse);
     }
 
-    // create new patient
     public async Task<PatientResponseDto?> CreateAsync(PatientCreateDto patientDto)
     {
         if (await _unitOfWork.Users.EmailExistsAsync(patientDto.Email))
@@ -73,7 +69,6 @@ public class PatientService : IPatientService
         });
     }
 
-    // delete patient
     public async Task<bool> DeleteAsync(int id)
     {
         var patient = await _unitOfWork.Patients.GetByIdAsync(id);
@@ -89,7 +84,6 @@ public class PatientService : IPatientService
         return true;
     }
 
-    // update patient
     public async Task<PatientResponseDto?> UpdateAsync(int id, PatientUpdateDto patientDto)
     {
         var patient = await _unitOfWork.Patients.GetByIdAsync(id);
@@ -109,7 +103,6 @@ public class PatientService : IPatientService
         return MapToPatientResponse(patient);
     }
 
-    // search patients
     public async Task<(IEnumerable<PatientResponseDto> Items, int TotalCount)> SearchAsync(string? searchTerm, int page, int pageSize)
     {
         var result = await _unitOfWork.Patients.SearchAsync(searchTerm, page, pageSize);
@@ -117,7 +110,6 @@ public class PatientService : IPatientService
         return (result.Items.Select(MapToPatientResponse), result.TotalCount);
     }
 
-    // map to response dto
     private PatientResponseDto MapToPatientResponse(Patient patient)
     {
         return new PatientResponseDto
@@ -142,7 +134,6 @@ public class PatientService : IPatientService
         };
     }
 
-    // hash password
     private string HashPassword(string password)
     {
         return BCrypt.Net.BCrypt.HashPassword(password, workFactor: 12);

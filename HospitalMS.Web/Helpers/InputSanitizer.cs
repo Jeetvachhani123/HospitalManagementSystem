@@ -5,7 +5,6 @@ namespace HospitalMS.Web.Helpers;
 
 public static class InputSanitizer
 {
-    // sanitize html input
     public static string SanitizeHtml(string? input)
     {
         if (string.IsNullOrWhiteSpace(input))
@@ -14,7 +13,6 @@ public static class InputSanitizer
         return WebUtility.HtmlEncode(input);
     }
 
-    // sanitize medical text
     public static string SanitizeMedicalText(string? input)
     {
         if (string.IsNullOrWhiteSpace(input))
@@ -31,7 +29,6 @@ public static class InputSanitizer
         return sanitized;
     }
 
-    // sanitize allergy info
     public static string SanitizeAllergies(string? input)
     {
         if (string.IsNullOrWhiteSpace(input))
@@ -46,7 +43,6 @@ public static class InputSanitizer
         return sanitized;
     }
 
-    // sanitize general text
     public static string SanitizeText(string? input)
     {
         if (string.IsNullOrWhiteSpace(input))
@@ -58,7 +54,6 @@ public static class InputSanitizer
         return sanitized;
     }
 
-    // sanitize phone number
     public static string SanitizePhoneNumber(string? input)
     {
         if (string.IsNullOrWhiteSpace(input))
@@ -69,7 +64,6 @@ public static class InputSanitizer
         return sanitized.Trim();
     }
 
-    // sanitize email address
     public static string SanitizeEmail(string? input)
     {
         if (string.IsNullOrWhiteSpace(input))
@@ -82,7 +76,6 @@ public static class InputSanitizer
         return sanitized;
     }
 
-    // validate sql input
     public static string ValidateSqlInput(string? input)
     {
         if (string.IsNullOrWhiteSpace(input))

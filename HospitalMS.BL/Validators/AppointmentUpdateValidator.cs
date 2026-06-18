@@ -65,7 +65,6 @@ public class AppointmentUpdateValidator : AbstractValidator<AppointmentUpdateDto
             .When(x => !string.IsNullOrWhiteSpace(x.Prescription));
     }
 
-    // check within working hours
     private bool BeWithinWorkingHours(TimeSpan? time)
     {
         if (!time.HasValue)
@@ -74,7 +73,6 @@ public class AppointmentUpdateValidator : AbstractValidator<AppointmentUpdateDto
         return time.Value >= WorkingHoursStart && time.Value <= WorkingHoursEnd;
     }
 
-    // check valid appointment duration
     private bool HaveValidDuration(AppointmentUpdateDto dto)
     {
         if (!dto.StartTime.HasValue || !dto.EndTime.HasValue)
@@ -84,7 +82,6 @@ public class AppointmentUpdateValidator : AbstractValidator<AppointmentUpdateDto
         return duration >= MinimumDuration && duration <= MaximumDuration;
     }
 
-    // check safe text
     private bool BeSafeText(string? text)
     {
         if (string.IsNullOrWhiteSpace(text))
@@ -94,7 +91,6 @@ public class AppointmentUpdateValidator : AbstractValidator<AppointmentUpdateDto
         return !dangerousPatterns.Any(pattern => text.Contains(pattern, StringComparison.OrdinalIgnoreCase));
     }
 
-    // check safe medical text
     private bool BeSafeMedicalText(string? text)
     {
         if (string.IsNullOrWhiteSpace(text))
@@ -104,7 +100,6 @@ public class AppointmentUpdateValidator : AbstractValidator<AppointmentUpdateDto
         return !dangerousPatterns.Any(pattern => text.Contains(pattern, StringComparison.OrdinalIgnoreCase));
     }
 
-    // check valid medical terms
     private bool ContainValidMedicalTerms(string? diagnosis)
     {
         if (string.IsNullOrWhiteSpace(diagnosis))
@@ -115,7 +110,6 @@ public class AppointmentUpdateValidator : AbstractValidator<AppointmentUpdateDto
         return hasLetters && notTooManySpecialChars;
     }
 
-    // check valid prescription format
     private bool ContainValidPrescriptionFormat(string? prescription)
     {
         if (string.IsNullOrWhiteSpace(prescription))

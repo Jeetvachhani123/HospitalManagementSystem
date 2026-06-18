@@ -24,7 +24,6 @@ public class InvoiceRepository : IInvoiceRepository
         _context = context;
     }
 
-    // get invoice by id
     public async Task<Invoice?> GetByIdAsync(int id)
     {
         return await _context.Invoices
@@ -36,7 +35,6 @@ public class InvoiceRepository : IInvoiceRepository
             .FirstOrDefaultAsync(i => i.Id == id);
     }
 
-    // get all invoices
     public async Task<IEnumerable<Invoice>> GetAllAsync()
     {
         return await _context.Invoices
@@ -49,7 +47,6 @@ public class InvoiceRepository : IInvoiceRepository
             .ToListAsync();
     }
 
-    // get patient invoices
     public async Task<IEnumerable<Invoice>> GetByPatientIdAsync(int patientId)
     {
         return await _context.Invoices
@@ -63,7 +60,6 @@ public class InvoiceRepository : IInvoiceRepository
             .ToListAsync();
     }
 
-    // get invoice by appointment
     public async Task<Invoice?> GetByAppointmentIdAsync(int appointmentId)
     {
         return await _context.Invoices
@@ -72,7 +68,6 @@ public class InvoiceRepository : IInvoiceRepository
             .FirstOrDefaultAsync(i => i.AppointmentId == appointmentId);
     }
 
-    // get pending invoices
     public async Task<IEnumerable<Invoice>> GetPendingByPatientIdAsync(int patientId)
     {
         return await _context.Invoices
@@ -86,19 +81,16 @@ public class InvoiceRepository : IInvoiceRepository
             .ToListAsync();
     }
 
-    // add invoice
     public async Task AddAsync(Invoice invoice)
     {
         await _context.Invoices.AddAsync(invoice);
     }
 
-    // update invoice
     public void Update(Invoice invoice)
     {
         _context.Invoices.Update(invoice);
     }
 
-    // soft delete invoice
     public void Delete(Invoice invoice)
     {
         invoice.IsDeleted = true;

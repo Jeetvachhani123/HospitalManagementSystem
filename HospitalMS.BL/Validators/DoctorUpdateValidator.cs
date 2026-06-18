@@ -39,7 +39,6 @@ public class DoctorUpdateValidator : AbstractValidator<DoctorUpdateDto>
             .When(x => x.ConsultationFee.HasValue);
     }
 
-    // check safe phone number
     private bool BeSafePhoneNumber(string? phoneNumber)
     {
         if (string.IsNullOrWhiteSpace(phoneNumber))
@@ -48,7 +47,6 @@ public class DoctorUpdateValidator : AbstractValidator<DoctorUpdateDto>
         return Regex.IsMatch(phoneNumber, @"^[\d\s\-\(\)\+]+$");
     }
 
-    // check safe text
     private bool BeSafeText(string? text)
     {
         if (string.IsNullOrWhiteSpace(text))

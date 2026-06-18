@@ -40,7 +40,6 @@ public class AuthService : IAuthService
         _registrationCoordinator = registrationCoordinator;
     }
 
-    // login user
     public async Task<AuthResponseDto?> LoginAsync(LoginDto loginDto)
     {
         _logger.LogInformation("Login attempt for email: {Email}", loginDto.Email);
@@ -71,7 +70,6 @@ public class AuthService : IAuthService
         return new AuthResponseDto { Token = token, UserId = user.Id, Email = user.Email, FirstName = user.FirstName, LastName = user.LastName, Role = user.Role.ToString(), ExpiresAt = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpirationInMinutes) };
     }
 
-    // register user
     public async Task<AuthResponseDto?> RegisterAsync(RegisterDto registerDto)
     {
         var user = await _registrationCoordinator.RegisterUserAsync(registerDto, HashPassword);
@@ -93,7 +91,6 @@ public class AuthService : IAuthService
         };
     }
 
-    // validate jwt token
     public Task<bool> ValidateTokenAsync(string token)
     {
         try
@@ -119,7 +116,6 @@ public class AuthService : IAuthService
         }
     }
 
-    // generate jwt token
     private string GenerateJwtToken(User user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
@@ -130,7 +126,6 @@ public class AuthService : IAuthService
         return tokenHandler.WriteToken(token);
     }
 
-    // get user profile
     public async Task<UserProfileDto?> GetProfileAsync(int userId)
     {
         var user = await _unitOfWork.Users.GetByIdAsync(userId);
@@ -171,7 +166,6 @@ public class AuthService : IAuthService
         return profile;
     }
 
-    // update user profile
     public async Task<UserProfileDto?> UpdateProfileAsync(int userId, ProfileUpdateDto profileDto)
     {
         var user = await _unitOfWork.Users.GetByIdAsync(userId);
@@ -223,7 +217,6 @@ public class AuthService : IAuthService
         return await GetProfileAsync(userId);
     }
 
-    // change user password
     public async Task<bool> ChangePasswordAsync(int userId, ChangePasswordDto passwordDto)
     {
         if (passwordDto.NewPassword != passwordDto.ConfirmNewPassword)
@@ -252,13 +245,11 @@ public class AuthService : IAuthService
         return true;
     }
 
-    // hash password
     private string HashPassword(string password)
     {
         return BCrypt.Net.BCrypt.HashPassword(password, workFactor: 12);
     }
 
-    // verify password hash
     private bool VerifyPassword(string password, string hash)
     {
         try

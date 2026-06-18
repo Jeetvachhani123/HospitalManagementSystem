@@ -24,7 +24,6 @@ public class StripePaymentService : IPaymentService
         StripeConfiguration.ApiKey = _configuration["Stripe:SecretKey"];
     }
 
-    // create checkout session
     public async Task<string> CreateCheckoutSessionAsync(int invoiceId, decimal amount, string currency, string successUrl, string cancelUrl)
     {
         try
@@ -67,7 +66,6 @@ public class StripePaymentService : IPaymentService
         }
     }
 
-    // handle stripe webhook
     public async Task<bool> HandleWebhookAsync(string json, string signature)
     {
         try

@@ -19,7 +19,6 @@ public class RateLimitingMiddleware
         _logger = logger;
     }
 
-    // invoke middleware
     public async Task InvokeAsync(HttpContext context)
     {
         var ipAddress = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
@@ -70,7 +69,6 @@ public class RateLimitingMiddleware
         await _next(context);
     }
 
-    // clean expired entries
     private void CleanupOldEntries()
     {
         if (DateTime.UtcNow - _lastCleanup < TimeSpan.FromMinutes(CleanupIntervalMinutes))
@@ -109,7 +107,6 @@ public class RateLimitingMiddleware
         }
     }
 
-    // request tracking info
     private class RequestInfo
     {
         public int RequestCount { get; set; }

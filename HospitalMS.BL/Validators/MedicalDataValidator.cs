@@ -4,7 +4,6 @@ namespace HospitalMS.BL.Validators;
 
 public static class MedicalDataValidator
 {
-    // validate diagnosis text
     public static (bool IsValid, string? ErrorMessage) ValidateDiagnosis(string? diagnosis)
     {
         if (string.IsNullOrWhiteSpace(diagnosis))
@@ -22,7 +21,6 @@ public static class MedicalDataValidator
         return (true, null);
     }
 
-    // validate prescription text
     public static (bool IsValid, string? ErrorMessage) ValidatePrescription(string? prescription)
     {
         if (string.IsNullOrWhiteSpace(prescription))
@@ -40,7 +38,6 @@ public static class MedicalDataValidator
         return (true, null);
     }
 
-    // validate allergies text
     public static (bool IsValid, string? ErrorMessage) ValidateAllergies(string? allergies)
     {
         if (string.IsNullOrWhiteSpace(allergies))
@@ -58,7 +55,6 @@ public static class MedicalDataValidator
         return (true, null);
     }
 
-    // validate medical history
     public static (bool IsValid, string? ErrorMessage) ValidateMedicalHistory(string? medicalHistory)
     {
         if (string.IsNullOrWhiteSpace(medicalHistory))
@@ -73,7 +69,6 @@ public static class MedicalDataValidator
         return (true, null);
     }
 
-    // validate blood group
     public static (bool IsValid, string? ErrorMessage) ValidateBloodGroup(string? bloodGroup)
     {
 
@@ -87,7 +82,6 @@ public static class MedicalDataValidator
         return (true, null);
     }
 
-    // validate dosage format
     public static (bool IsValid, string? ErrorMessage) ValidateDosage(string? dosage)
     {
         if (string.IsNullOrWhiteSpace(dosage))
@@ -99,7 +93,6 @@ public static class MedicalDataValidator
         return (true, null);
     }
 
-    // validate frequency format
     public static (bool IsValid, string? ErrorMessage) ValidateFrequency(string? frequency)
     {
         if (string.IsNullOrWhiteSpace(frequency))
@@ -120,7 +113,6 @@ public static class MedicalDataValidator
         return (true, null);
     }
 
-    // check dangerous patterns
     private static bool ContainsDangerousPatterns(string text)
     {
         var dangerousPatterns = new[]
@@ -133,7 +125,6 @@ public static class MedicalDataValidator
         return dangerousPatterns.Any(pattern => text.Contains(pattern, StringComparison.OrdinalIgnoreCase));
     }
 
-    // check valid medical content
     private static bool ContainsValidMedicalContent(string text)
     {
         var hasLetters = Regex.IsMatch(text, @"[a-zA-Z]{3,}");
@@ -142,7 +133,6 @@ public static class MedicalDataValidator
         return hasLetters && notTooManySpecialChars;
     }
 
-    // check valid prescription format
     private static bool ContainsValidPrescriptionFormat(string text)
     {
         var hasLetters = Regex.IsMatch(text, @"[a-zA-Z]{3,}");

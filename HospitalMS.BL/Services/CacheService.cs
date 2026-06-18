@@ -30,7 +30,6 @@ public class CacheService : ICacheService
     }
 
     #region Generic Cache Operations
-    // get cached value
     public async Task<T?> GetAsync<T>(string key)
     {
         try
@@ -50,7 +49,6 @@ public class CacheService : ICacheService
         }
     }
 
-    // set cached value
     public async Task SetAsync<T>(string key, T value, TimeSpan? absoluteExpireTime = null, TimeSpan? slidingExpireTime = null)
     {
         try
@@ -71,7 +69,6 @@ public class CacheService : ICacheService
         }
     }
 
-    // remove cached key
     public async Task RemoveAsync(string key)
     {
         try
@@ -84,7 +81,6 @@ public class CacheService : ICacheService
         }
     }
 
-    // get or create cache
     public async Task<T> GetOrCreateAsync<T>(string key, Func<Task<T>> factory, TimeSpan? expiration = null) where T : class
     {
         var cachedData = await GetAsync<T>(key);
@@ -101,37 +97,31 @@ public class CacheService : ICacheService
     #endregion
 
     #region Doctor Caching
-    // get doctor list cache
     public Task<T?> GetDoctorListAsync<T>()
     {
         return GetAsync<T>(DoctorListKey);
     }
 
-    // set doctor list cache
     public Task SetDoctorListAsync<T>(T doctors)
     {
         return SetAsync(DoctorListKey, doctors, DoctorListExpiration);
     }
 
-    // invalidate doctor list
     public Task InvalidateDoctorListAsync()
     {
         return RemoveAsync(DoctorListKey);
     }
 
-    // get doctor by id cache
     public Task<T?> GetDoctorByIdAsync<T>(int doctorId)
     {
         return GetAsync<T>($"{DoctorByIdKeyPrefix}{doctorId}");
     }
 
-    // set doctor by id cache
     public Task SetDoctorByIdAsync<T>(int doctorId, T doctor)
     {
         return SetAsync($"{DoctorByIdKeyPrefix}{doctorId}", doctor, DoctorListExpiration);
     }
 
-    // invalidate doctor by id
     public Task InvalidateDoctorByIdAsync(int doctorId)
     {
         return RemoveAsync($"{DoctorByIdKeyPrefix}{doctorId}");
@@ -139,19 +129,16 @@ public class CacheService : ICacheService
     #endregion
 
     #region Specializations Caching
-    // get specializations cache
     public Task<T?> GetSpecializationsAsync<T>()
     {
         return GetAsync<T>(SpecializationsKey);
     }
 
-    // set specializations cache
     public Task SetSpecializationsAsync<T>(T specializations)
     {
         return SetAsync(SpecializationsKey, specializations, SpecializationsExpiration);
     }
 
-    // invalidate specializations
     public Task InvalidateSpecializationsAsync()
     {
         return RemoveAsync(SpecializationsKey);
@@ -159,19 +146,16 @@ public class CacheService : ICacheService
     #endregion
 
     #region Medical History Caching
-    // get medical history cache
     public Task<T?> GetMedicalHistoryAsync<T>(int patientId)
     {
         return GetAsync<T>($"{MedicalHistoryKeyPrefix}{patientId}");
     }
 
-    // set medical history cache
     public Task SetMedicalHistoryAsync<T>(int patientId, T medicalHistory)
     {
         return SetAsync($"{MedicalHistoryKeyPrefix}{patientId}", medicalHistory, MedicalHistoryExpiration);
     }
 
-    // invalidate medical history
     public Task InvalidateMedicalHistoryAsync(int patientId)
     {
         return RemoveAsync($"{MedicalHistoryKeyPrefix}{patientId}");
@@ -179,7 +163,6 @@ public class CacheService : ICacheService
     #endregion
 
     #region Bulk Operations
-    // invalidate all doctor caches
     public async Task InvalidateAllDoctorCachesAsync()
     {
         await InvalidateDoctorListAsync();

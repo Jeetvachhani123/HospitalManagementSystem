@@ -34,7 +34,6 @@ public class AppointmentRepository : IAppointmentRepository
         _context = context;
     }
 
-    // get appointment by id
     public async Task<Appointment?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
         return await _context.Appointments
@@ -46,7 +45,6 @@ public class AppointmentRepository : IAppointmentRepository
             .FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
     }
 
-    // read-only get by id
     public async Task<Appointment?> GetByIdForReadAsync(int id, CancellationToken cancellationToken = default)
     {
         return await _context.Appointments
@@ -59,7 +57,6 @@ public class AppointmentRepository : IAppointmentRepository
             .FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
     }
 
-    // get all appointments
     public async Task<IEnumerable<Appointment>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         return await _context.Appointments
@@ -73,7 +70,6 @@ public class AppointmentRepository : IAppointmentRepository
             .ToListAsync(cancellationToken);
     }
 
-    // get by patient
     public async Task<IEnumerable<Appointment>> GetByPatientIdAsync(int patientId, CancellationToken cancellationToken = default)
     {
         return await _context.Appointments
@@ -85,7 +81,6 @@ public class AppointmentRepository : IAppointmentRepository
             .ToListAsync(cancellationToken);
     }
 
-    // get by doctor
     public async Task<IEnumerable<Appointment>> GetByDoctorIdAsync(int doctorId, CancellationToken cancellationToken = default)
     {
         return await _context.Appointments
@@ -97,7 +92,6 @@ public class AppointmentRepository : IAppointmentRepository
             .ToListAsync(cancellationToken);
     }
 
-    // get by date range
     public async Task<IEnumerable<Appointment>> GetByDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
     {
         return await _context.Appointments
@@ -113,7 +107,6 @@ public class AppointmentRepository : IAppointmentRepository
             .ToListAsync(cancellationToken);
     }
 
-    // get by status
     public async Task<IEnumerable<Appointment>> GetByStatusAsync(AppointmentStatus status, CancellationToken cancellationToken = default)
     {
         return await _context.Appointments
@@ -128,7 +121,6 @@ public class AppointmentRepository : IAppointmentRepository
             .ToListAsync(cancellationToken);
     }
 
-    // get pending approvals
     public async Task<IEnumerable<Appointment>> GetPendingApprovalsAsync(int doctorId, CancellationToken cancellationToken = default)
     {
         return await _context.Appointments
@@ -140,7 +132,6 @@ public class AppointmentRepository : IAppointmentRepository
             .ToListAsync(cancellationToken);
     }
 
-    // get today's appointments
     public async Task<IEnumerable<Appointment>> GetTodaysAppointmentsAsync(CancellationToken cancellationToken = default)
     {
         var todayUtc = DateTime.UtcNow.Date;
@@ -157,7 +148,6 @@ public class AppointmentRepository : IAppointmentRepository
             .ToListAsync(cancellationToken);
     }
 
-    // check time slot conflict
     public async Task<bool> HasConflictAsync(int doctorId, DateTime appointmentDate, TimeSpan startTime, TimeSpan endTime, int? excludeAppointmentId = null, CancellationToken cancellationToken = default)
     {
         var query = _context.Appointments
@@ -170,7 +160,6 @@ public class AppointmentRepository : IAppointmentRepository
         return await query.AnyAsync(cancellationToken);
     }
 
-    // get available time slots
     public async Task<IEnumerable<TimeSpan>> GetAvailableSlotsAsync(int doctorId, DateTime date, int slotDurationMinutes = 30, CancellationToken cancellationToken = default)
     {
         var today = DateTime.Today;
@@ -239,7 +228,6 @@ public class AppointmentRepository : IAppointmentRepository
         return availableSlots;
     }
 
-    // add appointment
     public async Task<Appointment> AddAsync(Appointment appointment, CancellationToken cancellationToken = default)
     {
         await _context.Appointments.AddAsync(appointment, cancellationToken);
@@ -247,13 +235,11 @@ public class AppointmentRepository : IAppointmentRepository
         return appointment;
     }
 
-    // update appointment
     public void Update(Appointment appointment)
     {
         _context.Appointments.Update(appointment);
     }
 
-    // soft delete appointment
     public void Delete(Appointment appointment)
     {
         appointment.IsDeleted = true;
@@ -261,7 +247,6 @@ public class AppointmentRepository : IAppointmentRepository
         _context.Appointments.Update(appointment);
     }
 
-    // count appointments
     public async Task<int> CountAsync(System.Linq.Expressions.Expression<Func<Appointment, bool>>? predicate = null, CancellationToken cancellationToken = default)
     {
         var query = _context.Appointments.AsNoTracking();
@@ -273,7 +258,6 @@ public class AppointmentRepository : IAppointmentRepository
         return await query.CountAsync(cancellationToken);
     }
 
-    // get recent appointments
     public async Task<IEnumerable<Appointment>> GetRecentAsync(int count, CancellationToken cancellationToken = default)
     {
         return await _context.Appointments
@@ -288,7 +272,6 @@ public class AppointmentRepository : IAppointmentRepository
             .ToListAsync(cancellationToken);
     }
 
-    // search appointments
     public async Task<(IEnumerable<Appointment> Items, int TotalCount)> SearchAsync(string? searchTerm, int? doctorId, int? patientId, DateTime? fromDate, DateTime? toDate, AppointmentStatus? status, int page, int pageSize, CancellationToken cancellationToken = default)
     {
         var query = _context.Appointments

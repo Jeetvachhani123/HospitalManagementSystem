@@ -62,7 +62,6 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
         _logger = logger;
     }
 
-    // request appointment
     public async Task<AppointmentResponseDto?> RequestAppointmentAsync(AppointmentCreateDto dto, int patientId)
     {
         try
@@ -122,7 +121,6 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
         }
     }
 
-    // approve appointment
     public async Task<AppointmentResponseDto?> ApproveAppointmentAsync(int appointmentId, int doctorId)
     {
         try
@@ -183,7 +181,6 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
         }
     }
 
-    // reject appointment
     public async Task<AppointmentResponseDto?> RejectAppointmentAsync(int appointmentId, int doctorId, string rejectionReason)
     {
         try
@@ -246,7 +243,6 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
         }
     }
 
-    // complete appointment
     public async Task<AppointmentResponseDto?> CompleteAppointmentAsync(int appointmentId, int doctorId, string? diagnosis, string? prescription, string? notes)
     {
         try
@@ -327,7 +323,6 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
         }
     }
 
-    // cancel appointment
     public async Task<bool> CancelAppointmentAsync(int appointmentId, int userId, string cancelledBy, string? reason = null)
     {
         try
@@ -385,7 +380,6 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
         }
     }
 
-    // reschedule appointment
     public async Task<AppointmentResponseDto?> RescheduleAppointmentAsync(int appointmentId, int userId, DateTime newDate, TimeSpan newStartTime, TimeSpan newEndTime)
     {
         try
@@ -457,7 +451,6 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
         }
     }
 
-    // mark as no-show
     public async Task<bool> MarkAsNoShowAsync(int appointmentId)
     {
         try
@@ -491,7 +484,6 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
         }
     }
 
-    // get pending approvals
     public async Task<IEnumerable<AppointmentResponseDto>> GetPendingApprovalsAsync(int doctorId)
     {
         try
@@ -506,7 +498,6 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
         }
     }
 
-    // get status history
     public async Task<IEnumerable<AppointmentStatusHistoryDto>> GetStatusHistoryAsync(int appointmentId)
     {
         try
@@ -531,7 +522,6 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
         }
     }
 
-    // get available slots
     public async Task<IEnumerable<TimeSlotDto>> GetAvailableSlotsAsync(int doctorId, DateTime date)
     {
         try
@@ -546,7 +536,6 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
         }
     }
 
-    // validate doctor working hours
     private async Task<bool> ValidateDoctorWorkingHoursAsync(int doctorId, DateTime appointmentDate, TimeSpan startTime, TimeSpan endTime)
     {
         try
@@ -571,7 +560,6 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
         }
     }
 
-    // notify dashboard update
     private async Task NotifyDashboardUpdateAsync()
     {
         try

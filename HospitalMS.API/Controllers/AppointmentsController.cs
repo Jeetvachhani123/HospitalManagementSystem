@@ -147,8 +147,7 @@ public class AppointmentsController : ControllerBase
                 status switch
                 {
                     "Upcoming" => (a.Status == "Scheduled" || a.Status == "Confirmed") && a.ApprovalStatus == "Approved" && a.AppointmentDate.Date >= DateTime.Today,
-                    "Pending" => a.ApprovalStatus == "Pending" && a.Status == "Scheduled",
-                    "Completed" => a.Status == "Completed",
+                    "Pending" => a.ApprovalStatus == "Pending" && a.Status == "Scheduled", "Completed" => a.Status == "Completed",
                     "Cancelled" => a.Status == "Cancelled" || a.Status == "NoShow" || a.ApprovalStatus == "Rejected",
                     _ => a.Status.Equals(status, StringComparison.OrdinalIgnoreCase) || a.ApprovalStatus.Equals(status, StringComparison.OrdinalIgnoreCase)
                 });
@@ -295,8 +294,7 @@ public class AppointmentsController : ControllerBase
         wb.SaveAs(ms);
         _logger.LogInformation("Exported {Count} appointments to Excel", data.Count);
 
-        return File(ms.ToArray(),
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"appointments_{DateTime.UtcNow:yyyyMMdd_HHmm}.xlsx");
+        return File(ms.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"appointments_{DateTime.UtcNow:yyyyMMdd_HHmm}.xlsx");
     }
 
     //  GET api/appointments/export/pdf 

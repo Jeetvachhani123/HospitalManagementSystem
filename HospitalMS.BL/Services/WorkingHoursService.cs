@@ -21,7 +21,6 @@ public class WorkingHoursService : IWorkingHoursService
         _logger = logger;
     }
 
-    // get working hours
     public async Task<List<WorkingHoursDto>> GetWorkingHoursAsync(int doctorId)
     {
         var hours = await _unitOfWork.DoctorWorkingHours.GetByDoctorIdAsync(doctorId);
@@ -47,7 +46,6 @@ public class WorkingHoursService : IWorkingHoursService
         }).ToList();
     }
 
-    // update working hours
     public async Task UpdateWorkingHoursAsync(int doctorId, List<WorkingHoursDto> hoursDto)
     {
         var existingHours = await _unitOfWork.DoctorWorkingHours.GetByDoctorIdAsync(doctorId);

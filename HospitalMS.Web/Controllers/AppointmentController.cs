@@ -708,7 +708,6 @@ public class AppointmentController : Controller
         return File(pdfBytes, "application/pdf", $"appointments_{DateTime.Now:yyyyMMdd}.pdf");
     }
 
-    // get user appointments helper
     private async Task<IEnumerable<AppointmentResponseDto>> GetUserAppointmentsAsync(int userId)
     {
         if (User.IsInRole("Doctor"))

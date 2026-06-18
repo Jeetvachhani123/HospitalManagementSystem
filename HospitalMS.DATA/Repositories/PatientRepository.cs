@@ -23,7 +23,6 @@ public class PatientRepository : IPatientRepository
         _context = context;
     }
 
-    // get patient by id
     public async Task<Patient?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
         return await _context.Patients
@@ -32,7 +31,6 @@ public class PatientRepository : IPatientRepository
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
 
-    // get patient by user id
     public async Task<Patient?> GetByUserIdAsync(int userId, CancellationToken cancellationToken = default)
     {
         return await _context.Patients
@@ -41,7 +39,6 @@ public class PatientRepository : IPatientRepository
             .FirstOrDefaultAsync(p => p.UserId == userId, cancellationToken);
     }
 
-    // get all patients
     public async Task<IEnumerable<Patient>> GetAllAsync(int page = 1, int pageSize = 100, CancellationToken cancellationToken = default)
     {
         return await _context.Patients
@@ -52,20 +49,17 @@ public class PatientRepository : IPatientRepository
             .ToListAsync(cancellationToken);
     }
 
-    // add patient
     public async Task<Patient> AddAsync(Patient patient, CancellationToken cancellationToken = default)
     {
         await _context.Patients.AddAsync(patient, cancellationToken);
         return patient;
     }
 
-    // update patient
     public void Update(Patient patient)
     {
         _context.Patients.Update(patient);
     }
 
-    // soft delete patient
     public void Delete(Patient patient)
     {
         patient.IsDeleted = true;
@@ -73,7 +67,6 @@ public class PatientRepository : IPatientRepository
         _context.Patients.Update(patient);
     }
 
-    // search patients
     public async Task<(IEnumerable<Patient> Items, int TotalCount)> SearchAsync(string? searchTerm, int page, int pageSize, CancellationToken cancellationToken = default)
     {
         var query = _context.Patients

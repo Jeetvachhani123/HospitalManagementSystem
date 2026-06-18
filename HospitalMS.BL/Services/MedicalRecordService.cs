@@ -28,7 +28,6 @@ public class MedicalRecordService : IMedicalRecordService
         _logger = logger;
     }
 
-    // get record by id
     public async Task<MedicalRecordDto?> GetByIdAsync(int id)
     {
         var record = await _unitOfWork.MedicalRecords.GetByIdAsync(id);
@@ -36,7 +35,6 @@ public class MedicalRecordService : IMedicalRecordService
         return _mapper.Map<MedicalRecordDto>(record);
     }
 
-    // get records by patient
     public async Task<IEnumerable<MedicalRecordDto>> GetByPatientIdAsync(int patientId)
     {
         var records = await _unitOfWork.MedicalRecords.GetByPatientIdAsync(patientId);
@@ -44,7 +42,6 @@ public class MedicalRecordService : IMedicalRecordService
         return _mapper.Map<IEnumerable<MedicalRecordDto>>(records);
     }
 
-    // get records by doctor
     public async Task<IEnumerable<MedicalRecordDto>> GetByDoctorIdAsync(int doctorId)
     {
         var records = await _unitOfWork.MedicalRecords.GetByDoctorIdAsync(doctorId);
@@ -52,7 +49,6 @@ public class MedicalRecordService : IMedicalRecordService
         return _mapper.Map<IEnumerable<MedicalRecordDto>>(records);
     }
 
-    // create medical record
     public async Task<MedicalRecordDto?> CreateAsync(MedicalRecordCreateDto dto)
     {
         try
@@ -72,7 +68,6 @@ public class MedicalRecordService : IMedicalRecordService
         }
     }
 
-    // delete medical record
     public async Task<bool> DeleteAsync(int id, int currentUserId)
     {
         try

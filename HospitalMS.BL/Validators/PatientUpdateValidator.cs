@@ -37,7 +37,6 @@ public class PatientUpdateValidator : AbstractValidator<PatientUpdateDto>
             .When(x => !string.IsNullOrWhiteSpace(x.Allergies));
     }
 
-    // check safe phone number
     private bool BeSafePhoneNumber(string? phoneNumber)
     {
         if (string.IsNullOrWhiteSpace(phoneNumber))
@@ -46,7 +45,6 @@ public class PatientUpdateValidator : AbstractValidator<PatientUpdateDto>
         return Regex.IsMatch(phoneNumber, @"^[\d\s\-\(\)\+]+$");
     }
 
-    // check valid blood group
     private bool BeValidBloodGroup(string? bloodGroup)
     {
         if (string.IsNullOrWhiteSpace(bloodGroup))
@@ -56,7 +54,6 @@ public class PatientUpdateValidator : AbstractValidator<PatientUpdateDto>
         return validBloodGroups.Contains(bloodGroup.Trim(), StringComparer.OrdinalIgnoreCase);
     }
 
-    // check valid gender
     private bool BeValidGender(string? gender)
     {
         if (string.IsNullOrWhiteSpace(gender))
@@ -66,7 +63,6 @@ public class PatientUpdateValidator : AbstractValidator<PatientUpdateDto>
         return validGenders.Contains(gender.Trim(), StringComparer.OrdinalIgnoreCase);
     }
 
-    // check safe medical text
     private bool BeSafeMedicalText(string? text)
     {
         if (string.IsNullOrWhiteSpace(text))
@@ -76,7 +72,6 @@ public class PatientUpdateValidator : AbstractValidator<PatientUpdateDto>
         return !dangerousPatterns.Any(pattern => text.Contains(pattern, StringComparison.OrdinalIgnoreCase));
     }
 
-    // check safe allergies
     private bool BeSafeAllergies(string? allergies)
     {
         if (string.IsNullOrWhiteSpace(allergies))

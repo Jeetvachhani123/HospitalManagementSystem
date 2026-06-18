@@ -17,7 +17,6 @@ public class GlobalExceptionHandlerMiddleware
         _environment = environment;
     }
 
-    // invoke middleware
     public async Task InvokeAsync(HttpContext context)
     {
         try
@@ -30,7 +29,6 @@ public class GlobalExceptionHandlerMiddleware
         }
     }
 
-    // handle exception response
     private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
         var correlationId = context.Response.Headers["X-Correlation-ID"].FirstOrDefault() ?? context.TraceIdentifier;
@@ -46,7 +44,6 @@ public class GlobalExceptionHandlerMiddleware
         await context.Response.WriteAsync(JsonSerializer.Serialize(errorResponse, options));
     }
 
-    // log exception details
     private void LogException(Exception exception, string correlationId, HttpContext context)
     {
         var logMessage = $"Exception occurred. CorrelationId: {correlationId}, " + $"Path: {context.Request.Path}, " + $"Method: {context.Request.Method}, " + $"User: {context.User?.Identity?.Name ?? "Anonymous"}";
@@ -82,7 +79,6 @@ public class GlobalExceptionHandlerMiddleware
         }
     }
 
-    // create error response
     private ErrorResponse CreateErrorResponse(Exception exception, string correlationId, string path)
     {
         return exception switch

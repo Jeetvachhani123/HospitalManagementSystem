@@ -26,7 +26,6 @@ public class DoctorRepository : IDoctorRepository
         _context = context;
     }
 
-    // get doctor by id
     public async Task<Doctor?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
         return await _context.Doctors
@@ -36,7 +35,6 @@ public class DoctorRepository : IDoctorRepository
            .FirstOrDefaultAsync(d => d.Id == id, cancellationToken);
     }
 
-    // get doctor by user id
     public async Task<Doctor?> GetByUserIdAsync(int userId, CancellationToken cancellationToken = default)
     {
         return await _context.Doctors
@@ -46,7 +44,6 @@ public class DoctorRepository : IDoctorRepository
             .FirstOrDefaultAsync(d => d.UserId == userId, cancellationToken);
     }
 
-    // get all doctors
     public async Task<IEnumerable<Doctor>> GetAllAsync(int page = 1, int pageSize = 100, CancellationToken cancellationToken = default)
     {
         return await _context.Doctors
@@ -58,7 +55,6 @@ public class DoctorRepository : IDoctorRepository
             .ToListAsync(cancellationToken);
     }
 
-    // get available doctors
     public async Task<IEnumerable<Doctor>> GetAvailableDoctorsAsync(int page = 1, int pageSize = 100, CancellationToken cancellationToken = default)
     {
         return await _context.Doctors
@@ -71,7 +67,6 @@ public class DoctorRepository : IDoctorRepository
             .ToListAsync(cancellationToken);
     }
 
-    // get by specialization
     public async Task<IEnumerable<Doctor>> GetBySpecializationAsync(string specialization, CancellationToken cancellationToken = default)
     {
         return await _context.Doctors
@@ -82,7 +77,6 @@ public class DoctorRepository : IDoctorRepository
             .ToListAsync(cancellationToken);
     }
 
-    // search doctors
     public async Task<(IEnumerable<Doctor> Items, int TotalCount)> SearchAsync(string? searchTerm, int page, int pageSize, CancellationToken cancellationToken = default)
     {
         var query = _context.Doctors
@@ -103,20 +97,17 @@ public class DoctorRepository : IDoctorRepository
         return (items, totalCount);
     }
 
-    // add doctor
     public async Task<Doctor> AddAsync(Doctor doctor, CancellationToken cancellationToken = default)
     {
         await _context.Doctors.AddAsync(doctor, cancellationToken);
         return doctor;
     }
 
-    // update doctor
     public void Update(Doctor doctor)
     {
         _context.Doctors.Update(doctor);
     }
 
-    // soft delete doctor
     public void Delete(Doctor doctor)
     {
         doctor.IsDeleted = true;
@@ -124,7 +115,6 @@ public class DoctorRepository : IDoctorRepository
         _context.Doctors.Update(doctor);
     }
 
-    // check license exists
     public async Task<bool> LicenseNumberExistsAsync(string licenseNumber)
     {
         return await _context.Doctors.AnyAsync(d => d.LicenseNumber == licenseNumber);

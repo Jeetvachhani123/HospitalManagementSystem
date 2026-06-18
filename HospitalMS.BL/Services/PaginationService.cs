@@ -24,7 +24,6 @@ public class PaginationService
     private const int DefaultPageSize = 10;
     private const int MaxPageSize = 100;
 
-    // create paged result
     public static PagedResult<T> Create<T>(IEnumerable<T> source, int pageNumber, int pageSize)
     {
         pageNumber = pageNumber < 1 ? 1 : pageNumber;
@@ -39,7 +38,6 @@ public class PaginationService
         return PagedResult<T>.Create(items, pageNumber, pageSize, totalCount);
     }
 
-    // validate page params
     public static (int pageNumber, int pageSize) ValidatePageParameters(int pageNumber, int pageSize)
     {
         pageNumber = pageNumber < 1 ? 1 : pageNumber;

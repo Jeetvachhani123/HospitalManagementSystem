@@ -91,19 +91,16 @@ public class UnitOfWork : IUnitOfWork
         });
     }
 
-    // save changes async
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         return await _context.SaveChangesAsync(cancellationToken);
     }
 
-    // save changes sync
     public int SaveChanges()
     {
         return _context.SaveChanges();
     }
 
-    // dispose context
     public void Dispose()
     {
         _context.Dispose();

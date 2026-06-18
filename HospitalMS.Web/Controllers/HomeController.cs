@@ -12,7 +12,6 @@ public class HomeController : Controller
         _logger = logger;
     }
 
-    // home landing page
     public IActionResult Index()
     {
         if (User.Identity?.IsAuthenticated == true)
@@ -30,13 +29,11 @@ public class HomeController : Controller
         return View();
     }
 
-    // privacy page
     public IActionResult Privacy()
     {
         return View();
     }
 
-    // error page
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {

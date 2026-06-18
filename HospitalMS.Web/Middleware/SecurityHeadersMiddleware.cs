@@ -11,7 +11,6 @@ public class SecurityHeadersMiddleware
         _next = next;
     }
 
-    // add security headers
     public async Task InvokeAsync(HttpContext context)
     {
         context.Response.Headers.Append("X-Content-Type-Options", "nosniff");

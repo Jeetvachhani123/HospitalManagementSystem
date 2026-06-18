@@ -14,14 +14,12 @@ public class DepartmentController : Controller
         _departmentService = departmentService;
     }
 
-    // list departments
     public async Task<IActionResult> Index()
     {
         var departments = await _departmentService.GetAllAsync();
         return View(departments);
     }
 
-    // department details
     public async Task<IActionResult> Details(int id)
     {
         var department = await _departmentService.GetByIdAsync(id);
@@ -31,14 +29,12 @@ public class DepartmentController : Controller
         return View(department);
     }
 
-    // show create form
     [Authorize(Roles = "Admin")]
     public IActionResult Create()
     {
         return View();
     }
 
-    // save new department
     [HttpPost]
     [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
@@ -54,7 +50,6 @@ public class DepartmentController : Controller
         return View(dto);
     }
 
-    // show edit form
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Edit(int id)
     {
@@ -66,7 +61,6 @@ public class DepartmentController : Controller
         return View(updateDto);
     }
 
-    // save department edits
     [HttpPost]
     [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
@@ -85,7 +79,6 @@ public class DepartmentController : Controller
         return View(dto);
     }
 
-    // delete department
     [HttpPost]
     [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]

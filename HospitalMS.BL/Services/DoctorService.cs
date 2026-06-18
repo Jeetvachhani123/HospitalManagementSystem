@@ -31,7 +31,6 @@ public class DoctorService : IDoctorService
         _mapper = mapper;
     }
 
-    // get doctor by id
     public async Task<DoctorResponseDto?> GetByIdAsync(int id)
     {
         var doctor = await _unitOfWork.Doctors.GetByIdAsync(id);
@@ -39,7 +38,6 @@ public class DoctorService : IDoctorService
         return doctor == null ? null : MapToDoctorResponse(doctor);
     }
 
-    // get doctor by user id
     public async Task<DoctorResponseDto?> GetByUserIdAsync(int userId)
     {
         var doctor = await _unitOfWork.Doctors.GetByUserIdAsync(userId);
@@ -47,7 +45,6 @@ public class DoctorService : IDoctorService
         return doctor == null ? null : MapToDoctorResponse(doctor);
     }
 
-    // get all doctors
     public async Task<IEnumerable<DoctorResponseDto>> GetAllAsync(int page = 1, int pageSize = 100)
     {
         var doctors = await _unitOfWork.Doctors.GetAllAsync(page, pageSize);
@@ -55,7 +52,6 @@ public class DoctorService : IDoctorService
         return doctors.Select(MapToDoctorResponse);
     }
 
-    // get available doctors
     public async Task<IEnumerable<DoctorResponseDto>> GetAvailableDoctorsAsync(int page = 1, int pageSize = 100)
     {
         var doctors = await _unitOfWork.Doctors.GetAvailableDoctorsAsync(page, pageSize);
@@ -63,7 +59,6 @@ public class DoctorService : IDoctorService
         return doctors.Select(MapToDoctorResponse);
     }
 
-    // get by specialization
     public async Task<IEnumerable<DoctorResponseDto>> GetBySpecializationAsync(string specialization)
     {
         var doctors = await _unitOfWork.Doctors.GetBySpecializationAsync(specialization);
@@ -71,7 +66,6 @@ public class DoctorService : IDoctorService
         return doctors.Select(MapToDoctorResponse);
     }
 
-    // create new doctor
     public async Task<DoctorResponseDto?> CreateAsync(DoctorCreateDto doctorDto)
     {
         if (await _unitOfWork.Users.EmailExistsAsync(doctorDto.Email))
@@ -94,7 +88,6 @@ public class DoctorService : IDoctorService
         });
     }
 
-    // create default working hours
     private async Task CreateDefaultWorkingHoursAsync(int doctorId)
     {
         var defaultWorkingHours = new List<DoctorWorkingHours>
@@ -115,7 +108,6 @@ public class DoctorService : IDoctorService
         await _unitOfWork.SaveChangesAsync();
     }
 
-    // update doctor
     public async Task<DoctorResponseDto?> UpdateAsync(int id, DoctorUpdateDto doctorDto)
     {
         var doctor = await _unitOfWork.Doctors.GetByIdAsync(id);
@@ -141,7 +133,6 @@ public class DoctorService : IDoctorService
         return MapToDoctorResponse(doctor);
     }
 
-    // delete doctor
     public async Task<bool> DeleteAsync(int id)
     {
         var doctor = await _unitOfWork.Doctors.GetByIdAsync(id);
@@ -154,7 +145,6 @@ public class DoctorService : IDoctorService
         return true;
     }
 
-    // search doctors
     public async Task<(IEnumerable<DoctorResponseDto> Items, int TotalCount)> SearchAsync(string? searchTerm, int page, int pageSize)
     {
         var result = await _unitOfWork.Doctors.SearchAsync(searchTerm, page, pageSize);
@@ -162,7 +152,6 @@ public class DoctorService : IDoctorService
         return (result.Items.Select(MapToDoctorResponse), result.TotalCount);
     }
 
-    // map to response dto
     private DoctorResponseDto MapToDoctorResponse(Doctor doctor)
     {
         return new DoctorResponseDto
@@ -189,7 +178,6 @@ public class DoctorService : IDoctorService
         };
     }
 
-    // hash password
     private string HashPassword(string password)
     {
         return BCrypt.Net.BCrypt.HashPassword(password, workFactor: 12);

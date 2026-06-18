@@ -27,7 +27,6 @@ public class DepartmentService : IDepartmentService
         _logger = logger;
     }
 
-    // get all departments
     public async Task<IEnumerable<DepartmentDto>> GetAllAsync()
     {
         var departments = await _unitOfWork.Departments.GetAllAsync();
@@ -35,7 +34,6 @@ public class DepartmentService : IDepartmentService
         return _mapper.Map<IEnumerable<DepartmentDto>>(departments);
     }
 
-    // get department by id
     public async Task<DepartmentDto?> GetByIdAsync(int id)
     {
         var department = await _unitOfWork.Departments.GetByIdAsync(id);
@@ -43,7 +41,6 @@ public class DepartmentService : IDepartmentService
         return _mapper.Map<DepartmentDto>(department);
     }
 
-    // create department
     public async Task<DepartmentDto> CreateAsync(CreateDepartmentDto dto)
     {
         var department = _mapper.Map<Department>(dto);
@@ -53,7 +50,6 @@ public class DepartmentService : IDepartmentService
         return _mapper.Map<DepartmentDto>(department);
     }
 
-    // update department
     public async Task<DepartmentDto?> UpdateAsync(int id, UpdateDepartmentDto dto)
     {
         var department = await _unitOfWork.Departments.GetByIdAsync(id);
@@ -68,7 +64,6 @@ public class DepartmentService : IDepartmentService
         return _mapper.Map<DepartmentDto>(department);
     }
 
-    // delete department
     public async Task<bool> DeleteAsync(int id)
     {
         var department = await _unitOfWork.Departments.GetByIdAsync(id);

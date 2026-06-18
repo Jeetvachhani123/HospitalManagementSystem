@@ -23,7 +23,6 @@ public class BillingController : Controller
         _logger = logger;
     }
 
-    // list invoices
     [HttpGet]
     public async Task<IActionResult> Index()
     {
@@ -65,7 +64,6 @@ public class BillingController : Controller
         return View(invoices);
     }
 
-    // invoice details
     [HttpGet]
     [Authorize(Roles = "Admin,Patient")]
     public async Task<IActionResult> Details(int id)
@@ -100,7 +98,6 @@ public class BillingController : Controller
         return View(model);
     }
 
-    // show create invoice form
     [HttpGet]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create(int appointmentId)
@@ -128,7 +125,6 @@ public class BillingController : Controller
         return View(model);
     }
 
-    // generate invoice
     [HttpPost]
     [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
@@ -153,7 +149,6 @@ public class BillingController : Controller
         }
     }
 
-    // show payment form
     [HttpGet]
     [Authorize(Roles = "Patient")]
     public async Task<IActionResult> Pay(int id)
@@ -183,7 +178,6 @@ public class BillingController : Controller
         return View(model);
     }
 
-    // process payment
     [HttpPost]
     [Authorize(Roles = "Patient")]
     [ValidateAntiForgeryToken]
@@ -234,7 +228,6 @@ public class BillingController : Controller
         }
     }
 
-    // stripe payment success redirect
     [HttpGet]
     [Authorize(Roles = "Patient")]
     public IActionResult PaymentSuccess(int id)
@@ -243,7 +236,6 @@ public class BillingController : Controller
         return RedirectToAction(nameof(Details), new { id });
     }
 
-    // stripe webhook handler
     [HttpPost]
     [AllowAnonymous]
     [Route("webhook")]

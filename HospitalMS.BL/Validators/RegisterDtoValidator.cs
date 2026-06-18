@@ -6,7 +6,6 @@ namespace HospitalMS.BL.Validators;
 
 public class RegisterDtoValidator : AbstractValidator<RegisterDto>
 {
-    // define validation rules
     public RegisterDtoValidator()
     {
         RuleFor(x => x.Email)

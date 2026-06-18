@@ -27,7 +27,6 @@ public class DoctorController : Controller
         _logger = logger;
     }
 
-    // doctor dashboard
     [Authorize(Roles = "Doctor")]
     public async Task<IActionResult> Dashboard()
     {
@@ -74,7 +73,6 @@ public class DoctorController : Controller
         }
     }
 
-    // list doctors
     [AllowAnonymous]
     public async Task<IActionResult> Index(string? searchQuery, string? specialization, int page = 1, int pageSize = 9)
     {
@@ -144,7 +142,6 @@ public class DoctorController : Controller
         }
     }
 
-    // doctor details
     public async Task<IActionResult> Details(int id)
     {
         var doctor = await _doctorService.GetByIdAsync(id);
@@ -173,7 +170,6 @@ public class DoctorController : Controller
         return View(model);
     }
 
-    // doctor appointment calendar
     [Authorize(Roles = "Doctor")]
     public async Task<IActionResult> Calendar(int month = 0, int year = 0)
     {
@@ -265,7 +261,6 @@ public class DoctorController : Controller
         }
     }
 
-    // show create form
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create()
     {
@@ -274,7 +269,6 @@ public class DoctorController : Controller
         return View();
     }
 
-    // save new doctor
     [HttpPost]
     [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
@@ -318,7 +312,6 @@ public class DoctorController : Controller
         }
     }
 
-    // show edit form
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Edit(int id)
     {
@@ -346,7 +339,6 @@ public class DoctorController : Controller
         return View(model);
     }
 
-    // save doctor edits
     [HttpPost]
     [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
@@ -391,7 +383,6 @@ public class DoctorController : Controller
         }
     }
 
-    // delete doctor
     [HttpPost]
     [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
@@ -416,7 +407,6 @@ public class DoctorController : Controller
         }
     }
 
-    // manage working hours (GET)
     [Authorize(Roles = "Doctor")]
     public async Task<IActionResult> ManageWorkingHours()
     {
@@ -443,7 +433,6 @@ public class DoctorController : Controller
         return View(model);
     }
 
-    // save working hours (POST)
     [HttpPost]
     [Authorize(Roles = "Doctor")]
     [ValidateAntiForgeryToken]

@@ -24,7 +24,6 @@ public class EmailService : IEmailService
         _fromName = _configuration["Email:FromName"] ?? "Hospital Management System";
     }
 
-    // send email
     public async Task SendEmailAsync(string to, string subject, string body)
     {
         try

@@ -81,7 +81,6 @@ public class ReportingService : IReportingService
         _patientRepository = patientRepository;
     }
 
-    // generate appointment report
     public async Task<AppointmentReportDto> GenerateAppointmentReportAsync(DateTime? startDate = null, DateTime? endDate = null)
     {
         var start = startDate ?? DateTime.Now.AddMonths(-1);
@@ -127,7 +126,6 @@ public class ReportingService : IReportingService
         return report;
     }
 
-    // generate doctor performance report
     public async Task<DoctorPerformanceReportDto> GenerateDoctorPerformanceReportAsync(int doctorId)
     {
         var doctor = await _doctorRepository.GetByIdAsync(doctorId);
@@ -153,7 +151,6 @@ public class ReportingService : IReportingService
         };
     }
 
-    // get system statistics
     public async Task<SystemStatisticsDto> GetSystemStatisticsAsync()
     {
         var totalDoctors = await _doctorRepository.GetAllAsync();
@@ -177,7 +174,6 @@ public class ReportingService : IReportingService
         };
     }
 
-    // get monthly trend
     public async Task<MonthlyTrendDto> GetMonthlyTrendAsync(int months = 12)
     {
         var startDate = DateTime.Now.AddMonths(-months);

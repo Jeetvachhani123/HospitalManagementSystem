@@ -53,7 +53,6 @@ public class SearchService : ISearchService
         _patientRepository = patientRepository;
     }
 
-    // search appointments
     public async Task<(IEnumerable<AppointmentSearchResultDto> Items, int TotalCount)> SearchAppointmentsAsync(string query, int? doctorId, int? patientId, DateTime? fromDate, DateTime? toDate, AppointmentStatus? status, int page, int pageSize)
     {
         var result = await _appointmentRepository.SearchAsync(query, doctorId, patientId, fromDate, toDate, status, page, pageSize);
@@ -62,7 +61,6 @@ public class SearchService : ISearchService
         return (dtos, result.TotalCount);
     }
 
-    // search doctors
     public async Task<List<DoctorSearchResultDto>> SearchDoctorsAsync(string query)
     {
         if (string.IsNullOrWhiteSpace(query))
@@ -81,7 +79,6 @@ public class SearchService : ISearchService
         }).ToList();
     }
 
-    // search patients
     public async Task<List<PatientSearchResultDto>> SearchPatientsAsync(string query)
     {
         if (string.IsNullOrWhiteSpace(query))

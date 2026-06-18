@@ -48,51 +48,45 @@ public class AppointmentService : IAppointmentService
         _logger = logger;
     }
 
-    // get appointment by id
     public async Task<AppointmentResponseDto?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
         var appointment = await _unitOfWork.Appointments.GetByIdForReadAsync(id, cancellationToken);
         return appointment == null ? null : MapToAppointmentResponse(appointment);
     }
 
-    // get all appointments
     public async Task<IEnumerable<AppointmentResponseDto>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         var appointments = await _unitOfWork.Appointments.GetAllAsync(cancellationToken);
         return appointments.Select(MapToAppointmentResponse);
     }
 
-    // get by patient id
     public async Task<IEnumerable<AppointmentResponseDto>> GetByPatientIdAsync(int patientId, CancellationToken cancellationToken = default)
     {
         var appointments = await _unitOfWork.Appointments.GetByPatientIdAsync(patientId, cancellationToken);
         return appointments.Select(MapToAppointmentResponse);
     }
 
-    // get by doctor id
     public async Task<IEnumerable<AppointmentResponseDto>> GetByDoctorIdAsync(int doctorId, CancellationToken cancellationToken = default)
     {
         var appointments = await _unitOfWork.Appointments.GetByDoctorIdAsync(doctorId, cancellationToken);
         return appointments.Select(MapToAppointmentResponse);
     }
 
-    // get by date range
     public async Task<IEnumerable<AppointmentResponseDto>> GetByDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
     {
         if (startDate > endDate)
             throw new ValidationException("Start date must be before or equal to end date");
+
         var appointments = await _unitOfWork.Appointments.GetByDateRangeAsync(startDate, endDate, cancellationToken);
         return appointments.Select(MapToAppointmentResponse);
     }
 
-    // get by status
     public async Task<IEnumerable<AppointmentResponseDto>> GetByStatusAsync(AppointmentStatus status, CancellationToken cancellationToken = default)
     {
         var appointments = await _unitOfWork.Appointments.GetByStatusAsync(status, cancellationToken);
         return appointments.Select(MapToAppointmentResponse);
     }
 
-    // create new appointment
     public async Task<AppointmentResponseDto> CreateAsync(AppointmentCreateDto appointmentDto, CancellationToken cancellationToken = default)
     {
         var fullDateTime = EnsureUtc(appointmentDto.AppointmentDate.Date + appointmentDto.StartTime);
@@ -148,7 +142,6 @@ public class AppointmentService : IAppointmentService
         return MapToAppointmentResponse(appointment);
     }
 
-    // update appointment status
     public async Task<AppointmentResponseDto?> UpdateStatusAsync(int id, AppointmentStatusDto statusDto, int? currentDoctorId = null, CancellationToken cancellationToken = default)
     {
         var appointment = await _unitOfWork.Appointments.GetByIdAsync(id, cancellationToken);
@@ -204,7 +197,6 @@ public class AppointmentService : IAppointmentService
         return MapToAppointmentResponse(appointment);
     }
 
-    // update appointment details
     public async Task<AppointmentResponseDto?> UpdateAsync(int id, AppointmentUpdateDto appointmentDto, CancellationToken cancellationToken = default)
     {
         var appointment = await _unitOfWork.Appointments.GetByIdAsync(id, cancellationToken);
@@ -223,7 +215,7 @@ public class AppointmentService : IAppointmentService
 
             if (newStartTime >= newEndTime)
                 throw new ValidationException("Start time must be before end time");
-            var hasConflict = await _unitOfWork.Appointments.HasConflictAsync(appointment.DoctorId,newDate,newStartTime,newEndTime,excludeAppointmentId: id,cancellationToken: cancellationToken);
+            var hasConflict = await _unitOfWork.Appointments.HasConflictAsync(appointment.DoctorId, newDate, newStartTime, newEndTime, excludeAppointmentId: id, cancellationToken: cancellationToken);
 
             if (hasConflict)
             {
@@ -271,7 +263,6 @@ public class AppointmentService : IAppointmentService
         }
     }
 
-    // cancel appointment
     public async Task<bool> CancelAsync(int id, string? cancellationReason = null, CancellationToken cancellationToken = default)
     {
         var appointment = await _unitOfWork.Appointments.GetByIdAsync(id, cancellationToken);
@@ -326,7 +317,6 @@ public class AppointmentService : IAppointmentService
         return true;
     }
 
-    // check slot conflict
     public async Task<bool> HasConflictAsync(int doctorId, DateTime appointmentDate, TimeSpan startTime, TimeSpan endTime, int? excludeAppointmentId = null, CancellationToken cancellationToken = default)
     {
         if (startTime >= endTime)
@@ -335,7 +325,6 @@ public class AppointmentService : IAppointmentService
         return await _unitOfWork.Appointments.HasConflictAsync(doctorId, appointmentDate, startTime, endTime, excludeAppointmentId, cancellationToken);
     }
 
-    // approve appointment
     public async Task<AppointmentResponseDto> ApproveAsync(int id, int doctorId, CancellationToken cancellationToken = default)
     {
         var appointment = await _unitOfWork.Appointments.GetByIdAsync(id, cancellationToken);
@@ -372,7 +361,6 @@ public class AppointmentService : IAppointmentService
         return MapToAppointmentResponse(appointment);
     }
 
-    // reject appointment
     public async Task<AppointmentResponseDto> RejectAsync(int id, int doctorId, string rejectionReason, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(rejectionReason))
@@ -412,28 +400,24 @@ public class AppointmentService : IAppointmentService
         return MapToAppointmentResponse(appointment);
     }
 
-    // get pending approvals
     public async Task<IEnumerable<AppointmentResponseDto>> GetPendingApprovalsAsync(int doctorId, CancellationToken cancellationToken = default)
     {
         var appointments = await _unitOfWork.Appointments.GetPendingApprovalsAsync(doctorId, cancellationToken);
         return appointments.Select(MapToAppointmentResponse);
     }
 
-    // get today's appointments
     public async Task<IEnumerable<AppointmentResponseDto>> GetTodaysAppointmentsAsync(CancellationToken cancellationToken = default)
     {
         var appointments = await _unitOfWork.Appointments.GetTodaysAppointmentsAsync(cancellationToken);
         return appointments.Select(MapToAppointmentResponse);
     }
 
-    // get recent appointments
     public async Task<IEnumerable<AppointmentResponseDto>> GetRecentAppointmentsAsync(int count, CancellationToken cancellationToken = default)
     {
         var appointments = await _unitOfWork.Appointments.GetRecentAsync(count, cancellationToken);
         return appointments.Select(MapToAppointmentResponse);
     }
 
-    // validate status transition
     private void ValidateStatusTransition(AppointmentStatus currentStatus, AppointmentStatus newStatus)
     {
         if (currentStatus == newStatus)
@@ -452,7 +436,6 @@ public class AppointmentService : IAppointmentService
         }
     }
 
-    // ensure utc datetime
     private DateTime EnsureUtc(DateTime dateTime)
     {
         if (dateTime.Kind == DateTimeKind.Utc)
@@ -464,7 +447,6 @@ public class AppointmentService : IAppointmentService
         return DateTime.SpecifyKind(dateTime, DateTimeKind.Utc);
     }
 
-    // map to response dto
     private AppointmentResponseDto MapToAppointmentResponse(Appointment appointment)
     {
         return new AppointmentResponseDto
@@ -492,7 +474,6 @@ public class AppointmentService : IAppointmentService
         };
     }
 
-    // check user appointment access
     public async Task<bool> UserHasAccessToAppointmentAsync(int userId, int appointmentId, CancellationToken cancellationToken = default)
     {
         var appointment = await _unitOfWork.Appointments.GetByIdAsync(appointmentId, cancellationToken);
@@ -504,7 +485,6 @@ public class AppointmentService : IAppointmentService
         return (patient != null && patient.User.Id == userId) || (doctor != null && doctor.User.Id == userId);
     }
 
-    // get doctor by user id
     public async Task<DoctorResponseDto?> GetDoctorByUserIdAsync(int userId, CancellationToken cancellationToken = default)
     {
         var doctor = await _unitOfWork.Doctors.GetByUserIdAsync(userId, cancellationToken);
@@ -514,7 +494,6 @@ public class AppointmentService : IAppointmentService
         return new DoctorResponseDto { Id = doctor.Id, UserId = doctor.User.Id, FullName = doctor.User.GetFullName(), Email = doctor.User.Email, Specialization = doctor.Specialization, LicenseNumber = doctor.LicenseNumber, ConsultationFee = doctor.ConsultationFee, IsAvailable = doctor.IsAvailable };
     }
 
-    // get patient by user id
     public async Task<PatientResponseDto?> GetPatientByUserIdAsync(int userId, CancellationToken cancellationToken = default)
     {
         var patient = await _unitOfWork.Patients.GetByUserIdAsync(userId, cancellationToken);

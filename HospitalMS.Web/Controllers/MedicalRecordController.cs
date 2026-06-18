@@ -24,7 +24,6 @@ namespace HospitalMS.Web.Controllers
             _logger = logger;
         }
 
-        // list medical records
         public async Task<IActionResult> Index(int? patientId)
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -81,7 +80,6 @@ namespace HospitalMS.Web.Controllers
             return View(viewModels);
         }
 
-        // show create form
         [Authorize(Roles = "Doctor,Admin")]
         public async Task<IActionResult> Create(int? patientId)
         {
@@ -105,7 +103,6 @@ namespace HospitalMS.Web.Controllers
             return View(viewModel);
         }
 
-        // save new record
         [HttpPost]
         [Authorize(Roles = "Doctor,Admin")]
         [ValidateAntiForgeryToken]
@@ -170,7 +167,6 @@ namespace HospitalMS.Web.Controllers
             return View(viewModel);
         }
 
-        // delete medical record
         [HttpPost]
         [Authorize(Roles = "Doctor,Admin")]
         [ValidateAntiForgeryToken]

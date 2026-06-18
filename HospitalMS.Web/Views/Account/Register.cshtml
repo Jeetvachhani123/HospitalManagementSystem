@@ -51,7 +51,6 @@
                 </div>
             </div>
         </div>
-
         <div class="col-lg-8 d-flex align-items-center justify-content-center p-4" style="background-color: var(--brand-body-bg); background-image: var(--gradient-mesh); overflow-y:auto;">
             <div class="w-100 animate-fade-in-up" style="max-width: 600px; padding: 1rem 0;">
                 <div class="text-center mb-4 d-lg-none">
@@ -61,19 +60,16 @@
                     <h2 class="fw-bold text-dark mb-1" style="letter-spacing:-0.03em;">Create Account</h2>
                     <p class="text-secondary">Join our hospital management platform</p>
                 </div>
-
                 <div class="card border-0 shadow-lg" style="border-radius: 1.25rem;">
                     <div class="card-body p-4 p-md-5">
                         <form id="registerForm" method="post">
                             <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
-
                             <div class="d-flex align-items-center mb-4">
                                 <div class="icon-box-primary p-2 me-3" style="width:36px;height:36px;border-radius:0.5rem;">
                                     <i class="bi bi-person fs-6"></i>
                                 </div>
                                 <h5 class="fw-bold text-dark mb-0">Personal Details</h5>
                             </div>
-
                             <div class="row g-3 mb-4">
                                 <div class="col-md-6">
                                     <label asp-for="FirstName" class="form-label text-dark fw-bold">First Name</label>
@@ -86,7 +82,6 @@
                                     <span asp-validation-for="LastName" class="text-danger small mt-1 d-block"></span>
                                 </div>
                             </div>
-
                             <div class="row g-3 mb-4">
                                 <div class="col-md-6">
                                     <label asp-for="DateOfBirth" class="form-label text-dark fw-bold">Date of Birth</label>
@@ -104,7 +99,6 @@
                                     <span asp-validation-for="Gender" class="text-danger small mt-1 d-block"></span>
                                 </div>
                             </div>
-
                             <div class="mb-4">
                                 <label asp-for="BloodGroup" class="form-label text-dark fw-bold">Blood Group</label>
                                 <select asp-for="BloodGroup" class="form-select">
@@ -120,7 +114,6 @@
                                 </select>
                                 <span asp-validation-for="BloodGroup" class="text-danger small mt-1 d-block"></span>
                             </div>
-
                             <hr class="my-4" style="border-color: var(--border-color);">
                             <div class="d-flex align-items-center mb-4">
                                 <div class="icon-box-info p-2 me-3" style="width:36px;height:36px;border-radius:0.5rem;">
@@ -128,13 +121,11 @@
                                 </div>
                                 <h5 class="fw-bold text-dark mb-0">Account Details</h5>
                             </div>
-
                             <div class="mb-4">
                                 <label asp-for="Email" class="form-label text-dark fw-bold">Email Address</label>
                                 <input asp-for="Email" class="form-control" placeholder="name@example.com" autocomplete="username" aria-required="true" />
                                 <span asp-validation-for="Email" class="text-danger small mt-1 d-block"></span>
                             </div>
-
                             <div class="row g-3 mb-4">
                                 <div class="col-md-6">
                                     <label asp-for="Password" class="form-label text-dark fw-bold">Password</label>
@@ -147,11 +138,9 @@
                                     <span asp-validation-for="ConfirmPassword" class="text-danger small mt-1 d-block"></span>
                                 </div>
                             </div>
-
                             <button id="registerSubmit" type="submit" class="btn btn-primary w-100 py-3 fw-bold mb-4 mt-2" style="border-radius: 0.75rem; font-size:1rem;">
                                 <i class="bi bi-person-plus me-2"></i> Complete Registration
                             </button>
-
                             <div class="text-center">
                                 <span class="text-secondary small">Already have an account?</span>
                                 <a asp-action="Login" class="text-primary text-decoration-none small fw-bold ms-1">Sign in instead</a>
@@ -162,7 +151,6 @@
             </div>
         </div>
     </div>
-
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <partial name="_ValidationScriptsPartial" />

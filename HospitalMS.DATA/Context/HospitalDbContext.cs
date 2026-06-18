@@ -25,7 +25,6 @@ public class HospitalDbContext : DbContext
     public DbSet<MedicalRecord> MedicalRecords { get; set; }
     public DbSet<Department> Departments { get; set; }
 
-    // configure entity models
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -40,21 +39,18 @@ public class HospitalDbContext : DbContext
         modelBuilder.Entity<Department>().HasQueryFilter(d => !d.IsDeleted);
     }
 
-    // save changes async
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         UpdateAuditFields();
         return base.SaveChangesAsync(cancellationToken);
     }
 
-    // save changes sync
     public override int SaveChanges()
     {
         UpdateAuditFields();
         return base.SaveChanges();
     }
 
-    // update audit timestamps and handle soft-delete
     private void UpdateAuditFields()
     {
         var now = DateTime.UtcNow;
@@ -90,7 +86,6 @@ public class HospitalDbContext : DbContext
             }
         }
 
-        // intercept hard-delete on AuditableEntity — convert to soft-delete
         foreach (var entry in ChangeTracker.Entries<AuditableEntity>())
         {
             if (entry.State == EntityState.Deleted)

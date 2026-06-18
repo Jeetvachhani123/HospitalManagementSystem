@@ -22,7 +22,6 @@ namespace HospitalMS.Web.Controllers
             _logger = logger;
         }
 
-        // patient dashboard
         [Authorize(Roles = "Patient")]
         public async Task<IActionResult> Dashboard()
         {
@@ -95,7 +94,6 @@ namespace HospitalMS.Web.Controllers
             }
         }
 
-        // list patients
         [Authorize(Roles = "Admin,Doctor")]
         public async Task<IActionResult> Index(string? searchQuery, int page = 1, int pageSize = 10)
         {
@@ -154,7 +152,6 @@ namespace HospitalMS.Web.Controllers
             }
         }
 
-        // patient details
         public async Task<IActionResult> Details(int id)
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -187,14 +184,12 @@ namespace HospitalMS.Web.Controllers
             return View(viewModel);
         }
 
-        // show create patient form
         [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
         }
 
-        // save new patient
         [HttpPost]
         [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
@@ -237,7 +232,6 @@ namespace HospitalMS.Web.Controllers
             }
         }
 
-        // show edit patient form
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id)
         {
@@ -262,7 +256,6 @@ namespace HospitalMS.Web.Controllers
             return View(model);
         }
 
-        // save patient edits
         [HttpPost]
         [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
@@ -304,7 +297,6 @@ namespace HospitalMS.Web.Controllers
             }
         }
 
-        // delete patient
         [HttpPost]
         [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]

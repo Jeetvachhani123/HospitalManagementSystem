@@ -2,7 +2,6 @@
 
 public static class Constants
 {
-    // role name constants
     public static class Roles
     {
         public const string Admin = "Admin";
@@ -10,7 +9,6 @@ public static class Constants
         public const string Patient = "Patient";
     }
 
-    // system message constants
     public static class Messages
     {
         public const string LoginSuccess = "Login successful";
@@ -29,7 +27,6 @@ public static class Constants
         public const string InvalidOperation = "Invalid operation";
     }
 
-    // validation message constants
     public static class ValidationMessages
     {
         public const string EmailRequired = "Email is required";

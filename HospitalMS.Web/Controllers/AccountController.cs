@@ -20,7 +20,6 @@ public class AccountController : Controller
         _logger = logger;
     }
 
-    // get current user id
     private int GetCurrentUserId()
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
@@ -28,7 +27,6 @@ public class AccountController : Controller
         return userIdClaim != null ? int.Parse(userIdClaim.Value) : 0;
     }
 
-    // show login form
     [HttpGet]
     public IActionResult Login(string? returnUrl = null)
     {
@@ -37,7 +35,6 @@ public class AccountController : Controller
         return View();
     }
 
-    // process login
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(LoginDto loginDto, string? returnUrl = null)
@@ -77,11 +74,9 @@ public class AccountController : Controller
         return RedirectToAction("Index", "Home");
     }
 
-    // show register form
     [HttpGet]
     public IActionResult Register() => View();
 
-    // process registration
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Register(RegisterViewModel model)
@@ -112,7 +107,6 @@ public class AccountController : Controller
         return RedirectToAction("Dashboard", "Patient");
     }
 
-    // logout user
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
@@ -121,11 +115,9 @@ public class AccountController : Controller
         return RedirectToAction("Index", "Home");
     }
 
-    // access denied page
     [HttpGet]
     public IActionResult AccessDenied() => View();
 
-    // view profile
     [HttpGet]
     [Authorize]
     public async Task<IActionResult> Profile()
@@ -153,7 +145,6 @@ public class AccountController : Controller
         return View(model);
     }
 
-    // show edit profile form
     [HttpGet]
     [Authorize]
     public async Task<IActionResult> EditProfile()
@@ -193,7 +184,6 @@ public class AccountController : Controller
         return View(model);
     }
 
-    // save profile edits
     [HttpPost]
     [Authorize]
     [ValidateAntiForgeryToken]
@@ -250,7 +240,6 @@ public class AccountController : Controller
         return RedirectToAction(nameof(Profile));
     }
 
-    // show change password form
     [HttpGet]
     [Authorize]
     public IActionResult ChangePassword()
@@ -258,7 +247,6 @@ public class AccountController : Controller
         return View(new ChangePasswordViewModel());
     }
 
-    // process password change
     [HttpPost]
     [Authorize]
     [ValidateAntiForgeryToken]
