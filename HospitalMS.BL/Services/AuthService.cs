@@ -31,13 +31,15 @@ public class AuthService : IAuthService
     private readonly JwtSettings _jwtSettings;
     private readonly ILogger<AuthService> _logger;
     private readonly UserRegistrationCoordinator _registrationCoordinator;
-    public AuthService(IUnitOfWork unitOfWork, IMapper mapper, IOptions<JwtSettings> jwtSettings, ILogger<AuthService> logger, UserRegistrationCoordinator registrationCoordinator)
+    private readonly IPasswordHasher _passwordHasher;
+    public AuthService(IUnitOfWork unitOfWork, IMapper mapper, IOptions<JwtSettings> jwtSettings, ILogger<AuthService> logger, UserRegistrationCoordinator registrationCoordinator, IPasswordHasher passwordHasher)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _jwtSettings = jwtSettings.Value;
         _logger = logger;
         _registrationCoordinator = registrationCoordinator;
+        _passwordHasher = passwordHasher;
     }
 
     public async Task<AuthResponseDto?> LoginAsync(LoginDto loginDto)
@@ -50,7 +52,7 @@ public class AuthService : IAuthService
             return null;
         }
         _logger.LogInformation("User found: {UserId}, IsActive: {IsActive}, Email: {Email}", user.Id, user.IsActive, user.Email);
-        if (!VerifyPassword(loginDto.Password, user.PasswordHash))
+        if (!_passwordHasher.VerifyPassword(loginDto.Password, user.PasswordHash))
         {
             _logger.LogWarning("Login failed: Invalid password for user {UserId} ({Email})", user.Id, loginDto.Email);
             return null;
@@ -72,7 +74,7 @@ public class AuthService : IAuthService
 
     public async Task<AuthResponseDto?> RegisterAsync(RegisterDto registerDto)
     {
-        var user = await _registrationCoordinator.RegisterUserAsync(registerDto, HashPassword);
+        var user = await _registrationCoordinator.RegisterUserAsync(registerDto, _passwordHasher.HashPassword);
         if (user == null)
         {
             return null;
@@ -232,33 +234,17 @@ public class AuthService : IAuthService
             return false;
         }
 
-        if (!VerifyPassword(passwordDto.CurrentPassword, user.PasswordHash))
+        if (!_passwordHasher.VerifyPassword(passwordDto.CurrentPassword, user.PasswordHash))
         {
             _logger.LogWarning("Password change failed for user {UserId}: current password is incorrect", userId);
             return false;
         }
 
-        user.PasswordHash = HashPassword(passwordDto.NewPassword);
+        user.PasswordHash = _passwordHasher.HashPassword(passwordDto.NewPassword);
         _unitOfWork.Users.Update(user);
         await _unitOfWork.SaveChangesAsync();
         _logger.LogInformation("Password changed successfully for user {UserId}", userId);
         return true;
     }
 
-    private string HashPassword(string password)
-    {
-        return BCrypt.Net.BCrypt.HashPassword(password, workFactor: 12);
-    }
-
-    private bool VerifyPassword(string password, string hash)
-    {
-        try
-        {
-            return BCrypt.Net.BCrypt.Verify(password, hash);
-        }
-        catch
-        {
-            return false;
-        }
-    }
 }

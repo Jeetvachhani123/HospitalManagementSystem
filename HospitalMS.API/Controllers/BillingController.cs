@@ -1,4 +1,5 @@
 using HospitalMS.BL.Common;
+using HospitalMS.BL.DTOs.Billing;
 using HospitalMS.BL.Services;
 using HospitalMS.Models.Entities;
 using Microsoft.AspNetCore.Authorization;
@@ -25,9 +26,9 @@ public class BillingController : ControllerBase
     [HttpGet]
     [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<ApiResponse<IEnumerable<Invoice>>>> GetAll()
+    public async Task<ActionResult<ApiResponse<IEnumerable<Invoice>>>> GetAll(CancellationToken ct)
     {
-        var invoices = await _billingService.GetAllInvoicesAsync();
+        var invoices = await _billingService.GetAllInvoicesAsync(ct);
         return Ok(ApiResponse<IEnumerable<Invoice>>.SuccessResponse(invoices));
     }
 
@@ -35,19 +36,20 @@ public class BillingController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<ActionResult<ApiResponse<Invoice>>> GetById(int id)
+    public async Task<ActionResult<ApiResponse<Invoice>>> GetById(int id, CancellationToken ct)
     {
-        var invoice = await _billingService.GetInvoiceByIdAsync(id);
+        var invoice = await _billingService.GetInvoiceByIdAsync(id, ct);
         if (invoice == null)
         {
             return NotFound(ApiResponse<Invoice>.ErrorResponse("Invoice not found"));
         }
 
-        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        if (!int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+            return Unauthorized();
         var role = User.FindFirstValue(ClaimTypes.Role);
         if (role == "Patient")
         {
-            var patient = await _appointmentService.GetPatientByUserIdAsync(userId);
+            var patient = await _appointmentService.GetPatientByUserIdAsync(userId, ct);
             if (patient == null || invoice.PatientId != patient.Id)
             {
                 return Forbid();
@@ -60,52 +62,55 @@ public class BillingController : ControllerBase
     [HttpGet("patient/{patientId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<ActionResult<ApiResponse<IEnumerable<Invoice>>>> GetByPatientId(int patientId)
+    public async Task<ActionResult<ApiResponse<IEnumerable<Invoice>>>> GetByPatientId(int patientId, CancellationToken ct)
     {
-        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        if (!int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+            return Unauthorized();
         var role = User.FindFirstValue(ClaimTypes.Role);
         if (role == "Patient")
         {
-            var patient = await _appointmentService.GetPatientByUserIdAsync(userId);
+            var patient = await _appointmentService.GetPatientByUserIdAsync(userId, ct);
             if (patient == null || patient.Id != patientId)
             {
                 return Forbid();
             }
         }
 
-        var invoices = await _billingService.GetPatientInvoicesAsync(patientId);
+        var invoices = await _billingService.GetPatientInvoicesAsync(patientId, ct);
         return Ok(ApiResponse<IEnumerable<Invoice>>.SuccessResponse(invoices));
     }
 
     [HttpGet("my-invoices")]
     [Authorize(Roles = "Patient")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<ApiResponse<IEnumerable<Invoice>>>> GetMyInvoices()
+    public async Task<ActionResult<ApiResponse<IEnumerable<Invoice>>>> GetMyInvoices(CancellationToken ct)
     {
-        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
-        var patient = await _appointmentService.GetPatientByUserIdAsync(userId);
+        if (!int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+            return Unauthorized();
+        var patient = await _appointmentService.GetPatientByUserIdAsync(userId, ct);
         if (patient == null)
         {
             return NotFound(ApiResponse<IEnumerable<Invoice>>.ErrorResponse("Patient profile not found"));
         }
 
-        var invoices = await _billingService.GetPatientInvoicesAsync(patient.Id);
+        var invoices = await _billingService.GetPatientInvoicesAsync(patient.Id, ct);
         return Ok(ApiResponse<IEnumerable<Invoice>>.SuccessResponse(invoices));
     }
 
     [HttpGet("pending")]
     [Authorize(Roles = "Patient")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<ApiResponse<IEnumerable<Invoice>>>> GetPendingInvoices()
+    public async Task<ActionResult<ApiResponse<IEnumerable<Invoice>>>> GetPendingInvoices(CancellationToken ct)
     {
-        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
-        var patient = await _appointmentService.GetPatientByUserIdAsync(userId);
+        if (!int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+            return Unauthorized();
+        var patient = await _appointmentService.GetPatientByUserIdAsync(userId, ct);
         if (patient == null)
         {
             return NotFound(ApiResponse<IEnumerable<Invoice>>.ErrorResponse("Patient profile not found"));
         }
 
-        var invoices = await _billingService.GetPendingInvoicesAsync(patient.Id);
+        var invoices = await _billingService.GetPendingInvoicesAsync(patient.Id, ct);
         return Ok(ApiResponse<IEnumerable<Invoice>>.SuccessResponse(invoices));
     }
 
@@ -115,16 +120,17 @@ public class BillingController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<ApiResponse<bool>>> ProcessPayment(int id, [FromBody] PaymentRequest request)
+    public async Task<ActionResult<ApiResponse<bool>>> ProcessPayment(int id, [FromBody] PaymentRequest request, CancellationToken ct)
     {
-        var invoice = await _billingService.GetInvoiceByIdAsync(id);
+        var invoice = await _billingService.GetInvoiceByIdAsync(id, ct);
         if (invoice == null)
         {
             return NotFound(ApiResponse<bool>.ErrorResponse("Invoice not found"));
         }
 
-        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
-        var patient = await _appointmentService.GetPatientByUserIdAsync(userId);
+        if (!int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+            return Unauthorized();
+        var patient = await _appointmentService.GetPatientByUserIdAsync(userId, ct);
         if (patient == null || invoice.PatientId != patient.Id)
         {
             return Forbid();
@@ -135,7 +141,7 @@ public class BillingController : ControllerBase
             return BadRequest(ApiResponse<bool>.ErrorResponse("Invoice already paid"));
         }
 
-        var result = await _billingService.ProcessPaymentAsync(id, request.PaymentMethod);
+        var result = await _billingService.ProcessPaymentAsync(id, request.PaymentMethod, ct);
         if (!result)
         {
             return BadRequest(ApiResponse<bool>.ErrorResponse("Payment processing failed"));
@@ -149,9 +155,9 @@ public class BillingController : ControllerBase
     [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<ApiResponse<bool>>> CancelInvoice(int id)
+    public async Task<ActionResult<ApiResponse<bool>>> CancelInvoice(int id, CancellationToken ct)
     {
-        var result = await _billingService.CancelInvoiceAsync(id);
+        var result = await _billingService.CancelInvoiceAsync(id, ct);
         if (!result)
         {
             return NotFound(ApiResponse<bool>.ErrorResponse("Invoice not found or already cancelled"));
@@ -160,9 +166,4 @@ public class BillingController : ControllerBase
         _logger.LogInformation("Invoice {InvoiceId} cancelled", id);
         return Ok(ApiResponse<bool>.SuccessResponse(true, "Invoice cancelled successfully"));
     }
-}
-
-public class PaymentRequest
-{
-    public string PaymentMethod { get; set; } = string.Empty;
 }

@@ -1,8 +1,8 @@
 using HospitalMS.API.Extensions;
 using HospitalMS.DATA;
-using HospitalMS.API.Filters;
 using HospitalMS.API.Hubs;
 using HospitalMS.API.Middlewares;
+using HospitalMS.API.Filters;
 using HospitalMS.API.Services;
 using HospitalMS.BL.Common;
 using HospitalMS.BL.Mappings;
@@ -45,13 +45,13 @@ builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<IWorkingHoursService, WorkingHoursService>();
 builder.Services.AddScoped<IEmailNotificationService, EmailNotificationService>();
 
+builder.Services.AddSingleton<IPasswordHasher, BcryptPasswordHasher>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile).Assembly);
 builder.Services.AddValidatorsFromAssemblyContaining(typeof(HospitalMS.BL.Validators.DoctorCreateValidator));
 builder.Services.AddControllers(options =>
 {
-    options.Filters.Add<GlobalExceptionFilter>();
     options.Filters.Add<ValidateModelFilter>();
 });
 builder.Services.AddApiVersioning(options =>
@@ -90,7 +90,8 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll", policy => policy
             .WithOrigins("http://localhost:3000", "https://localhost:7058", "http://localhost:5000", "https://localhost:5001")
             .AllowAnyMethod()
-            .AllowAnyHeader());
+            .AllowAnyHeader()
+            .AllowCredentials());
 });
 
 var app = builder.Build();

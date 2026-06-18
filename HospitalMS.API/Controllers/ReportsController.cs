@@ -1,4 +1,5 @@
 using HospitalMS.BL.Common;
+using HospitalMS.BL.DTOs.Reports;
 using HospitalMS.BL.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -42,7 +43,8 @@ public class ReportsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult<ApiResponse<DoctorPerformanceReportDto>>> GetDoctorPerformanceReport(int doctorId)
     {
-        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        if (!int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+            return Unauthorized();
         var role = User.FindFirstValue(ClaimTypes.Role);
         if (role == "Doctor")
         {
@@ -63,7 +65,8 @@ public class ReportsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse<DoctorPerformanceReportDto>>> GetMyPerformanceReport()
     {
-        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        if (!int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+            return Unauthorized();
         var doctor = await _appointmentService.GetDoctorByUserIdAsync(userId);
         if (doctor == null)
         {
@@ -104,7 +107,8 @@ public class ReportsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse<DashboardStatsDto>>> GetDashboardStats()
     {
-        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        if (!int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+            return Unauthorized();
         var role = User.FindFirstValue(ClaimTypes.Role);
         DashboardStatsDto stats;
         if (role == "Admin")
@@ -183,7 +187,8 @@ public class ReportsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse<DoctorDashboardApiDto>>> GetDoctorDashboard()
     {
-        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        if (!int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+            return Unauthorized();
         var doctor = await _doctorService.GetByUserIdAsync(userId);
 
         if (doctor == null)
@@ -226,7 +231,8 @@ public class ReportsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse<PatientDashboardApiDto>>> GetPatientDashboard()
     {
-        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        if (!int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+            return Unauthorized();
         var patient = await _appointmentService.GetPatientByUserIdAsync(userId);
 
         if (patient == null)
@@ -356,96 +362,4 @@ public class ReportsController : ControllerBase
         _logger.LogInformation("Full report snapshot generated");
         return Ok(ApiResponse<FullReportApiDto>.SuccessResponse(dto));
     }
-}
-
-public class RecentAppointmentSummaryDto
-{
-    public int Id { get; set; }
-    public string PatientName { get; set; } = string.Empty;
-    public string DoctorName { get; set; } = string.Empty;
-    public string Status { get; set; } = string.Empty;
-    public DateTime AppointmentDate { get; set; }
-}
-
-public class AdminDashboardApiDto
-{
-    public int TotalDoctors { get; set; }
-    public int TotalPatients { get; set; }
-    public int TotalAppointments { get; set; }
-    public int AppointmentsToday { get; set; }
-    public int PendingApprovals { get; set; }
-    public decimal CompletionRate { get; set; }
-    public decimal NoShowRate { get; set; }
-    public List<RecentAppointmentSummaryDto> RecentAppointments { get; set; } = new();
-}
-
-public class DoctorDashboardApiDto
-{
-    public int DoctorId { get; set; }
-    public string DoctorName { get; set; } = string.Empty;
-    public string Specialization { get; set; } = string.Empty;
-    public bool IsAvailable { get; set; }
-    public int TodayAppointmentsCount { get; set; }
-    public int PendingApprovalsCount { get; set; }
-    public int TotalAppointments { get; set; }
-    public int CompletedAppointments { get; set; }
-    public decimal ApprovalRate { get; set; }
-    public int PatientsServed { get; set; }
-    public List<RecentAppointmentSummaryDto> UpcomingAppointments { get; set; } = new();
-}
-
-public class PatientDashboardApiDto
-{
-    public int PatientId { get; set; }
-    public string PatientName { get; set; } = string.Empty;
-    public int TotalAppointments { get; set; }
-    public int UpcomingAppointmentsCount { get; set; }
-    public int CompletedAppointmentsCount { get; set; }
-    public int CancelledAppointmentsCount { get; set; }
-    public int PendingApprovalsCount { get; set; }
-    public List<RecentAppointmentSummaryDto> RecentAppointments { get; set; } = new();
-}
-
-public class DoctorSummaryDto
-{
-    public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
-    public string Specialization { get; set; } = string.Empty;
-    public int YearsOfExperience { get; set; }
-    public string Phone { get; set; } = string.Empty;
-}
-
-public class PatientSummaryDto
-{
-    public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
-    public string Phone { get; set; } = string.Empty;
-    public string BloodGroup { get; set; } = string.Empty;
-    public DateTime DateOfBirth { get; set; }
-}
-
-public class FullReportApiDto
-{
-    public AppointmentReportDto Stats { get; set; } = new();
-    public List<DoctorSummaryDto> Doctors { get; set; } = new();
-    public List<PatientSummaryDto> Patients { get; set; } = new();
-    public List<RecentAppointmentSummaryDto> TodayAppointments { get; set; } = new();
-    public DateTime GeneratedAt { get; set; }
-}
-
-public class DashboardStatsDto
-{
-    public int TotalDoctors { get; set; }
-    public int TotalPatients { get; set; }
-    public int TotalAppointments { get; set; }
-    public int AppointmentsToday { get; set; }
-    public int UpcomingAppointments { get; set; }
-    public int CompletedAppointments { get; set; }
-    public int PendingApprovals { get; set; }
-    public decimal CompletionRate { get; set; }
-    public decimal NoShowRate { get; set; }
-    public decimal ApprovalRate { get; set; }
-    public int PatientsServed { get; set; }
-}
+}

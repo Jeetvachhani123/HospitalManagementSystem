@@ -104,7 +104,7 @@ public class AppointmentsController : ControllerBase
     {
         if (startDate > endDate)
             return BadRequest(ApiResponse<IEnumerable<AppointmentResponseDto>>.ErrorResponse("Start date must be before or equal to end date."));
-        var appointments = await _appointmentService.GetByDateRangeAsync(startDate, endDate, cancellationToken);
+        var appointments = await _appointmentService.GetByDateRangeAsync(startDate, endDate, null, cancellationToken);
 
         return Ok(ApiResponse<IEnumerable<AppointmentResponseDto>>.SuccessResponse(appointments));
     }
@@ -400,7 +400,7 @@ public class AppointmentsController : ControllerBase
 
     private async Task<IEnumerable<AppointmentResponseDto>> GetFilteredAsync(int? patientId, int? doctorId, CancellationToken ct)
     {
-        var (items, _) = await _appointmentService.SearchAsync(searchTerm: null, doctorId: doctorId, patientId: patientId, fromDate: null, toDate: null, status: null, page: 1, pageSize: int.MaxValue, cancellationToken: ct);
+        var (items, _) = await _appointmentService.SearchAsync(searchTerm: null, doctorId: doctorId, patientId: patientId, fromDate: null, toDate: null, status: null, page: 1, pageSize: 10000, cancellationToken: ct);
 
         return items;
     }
@@ -413,13 +413,4 @@ public class AppointmentsController : ControllerBase
         v = v.Replace("\"", "\"\"");
         return v.IndexOfAny(new[] { ',', '"', '\n', '\r' }) >= 0 ? $"\"{v}\"" : v;
     }
-}
-
-// Inline request model (same file, no extra file needed) 
-public sealed record AppointmentConflictRequest(
-    int DoctorId,
-    DateTime AppointmentDate,
-    TimeSpan StartTime,
-    TimeSpan EndTime,
-    int? ExcludeAppointmentId = null
-);
+}

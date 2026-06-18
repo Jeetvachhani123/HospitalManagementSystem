@@ -6,12 +6,12 @@ namespace HospitalMS.DATA.Repositories;
 
 public interface IInvoiceRepository
 {
-    Task<Invoice?> GetByIdAsync(int id);
-    Task<IEnumerable<Invoice>> GetAllAsync();
-    Task<IEnumerable<Invoice>> GetByPatientIdAsync(int patientId);
-    Task<Invoice?> GetByAppointmentIdAsync(int appointmentId);
-    Task<IEnumerable<Invoice>> GetPendingByPatientIdAsync(int patientId);
-    Task AddAsync(Invoice invoice);
+    Task<Invoice?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
+    Task<IEnumerable<Invoice>> GetAllAsync(CancellationToken cancellationToken = default);
+    Task<IEnumerable<Invoice>> GetByPatientIdAsync(int patientId, CancellationToken cancellationToken = default);
+    Task<Invoice?> GetByAppointmentIdAsync(int appointmentId, CancellationToken cancellationToken = default);
+    Task<IEnumerable<Invoice>> GetPendingByPatientIdAsync(int patientId, CancellationToken cancellationToken = default);
+    Task AddAsync(Invoice invoice, CancellationToken cancellationToken = default);
     void Update(Invoice invoice);
     void Delete(Invoice invoice);
 }
@@ -24,7 +24,7 @@ public class InvoiceRepository : IInvoiceRepository
         _context = context;
     }
 
-    public async Task<Invoice?> GetByIdAsync(int id)
+    public async Task<Invoice?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
         return await _context.Invoices
             .Include(i => i.Patient)
@@ -32,10 +32,10 @@ public class InvoiceRepository : IInvoiceRepository
             .Include(i => i.Appointment)
                 .ThenInclude(a => a.Doctor)
                     .ThenInclude(d => d.User)
-            .FirstOrDefaultAsync(i => i.Id == id);
+            .FirstOrDefaultAsync(i => i.Id == id, cancellationToken);
     }
 
-    public async Task<IEnumerable<Invoice>> GetAllAsync()
+    public async Task<IEnumerable<Invoice>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         return await _context.Invoices
             .Include(i => i.Patient)
@@ -44,10 +44,10 @@ public class InvoiceRepository : IInvoiceRepository
                 .ThenInclude(a => a.Doctor)
                     .ThenInclude(d => d.User)
             .OrderByDescending(i => i.IssueDate)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<Invoice>> GetByPatientIdAsync(int patientId)
+    public async Task<IEnumerable<Invoice>> GetByPatientIdAsync(int patientId, CancellationToken cancellationToken = default)
     {
         return await _context.Invoices
             .Include(i => i.Patient)
@@ -57,18 +57,18 @@ public class InvoiceRepository : IInvoiceRepository
                     .ThenInclude(d => d.User)
             .Where(i => i.PatientId == patientId)
             .OrderByDescending(i => i.IssueDate)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 
-    public async Task<Invoice?> GetByAppointmentIdAsync(int appointmentId)
+    public async Task<Invoice?> GetByAppointmentIdAsync(int appointmentId, CancellationToken cancellationToken = default)
     {
         return await _context.Invoices
             .Include(i => i.Patient)
                 .ThenInclude(p => p.User)
-            .FirstOrDefaultAsync(i => i.AppointmentId == appointmentId);
+            .FirstOrDefaultAsync(i => i.AppointmentId == appointmentId, cancellationToken);
     }
 
-    public async Task<IEnumerable<Invoice>> GetPendingByPatientIdAsync(int patientId)
+    public async Task<IEnumerable<Invoice>> GetPendingByPatientIdAsync(int patientId, CancellationToken cancellationToken = default)
     {
         return await _context.Invoices
             .Include(i => i.Patient)
@@ -78,12 +78,12 @@ public class InvoiceRepository : IInvoiceRepository
                     .ThenInclude(d => d.User)
             .Where(i => i.PatientId == patientId && !i.IsPaid)
             .OrderBy(i => i.DueDate)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 
-    public async Task AddAsync(Invoice invoice)
+    public async Task AddAsync(Invoice invoice, CancellationToken cancellationToken = default)
     {
-        await _context.Invoices.AddAsync(invoice);
+        await _context.Invoices.AddAsync(invoice, cancellationToken);
     }
 
     public void Update(Invoice invoice)

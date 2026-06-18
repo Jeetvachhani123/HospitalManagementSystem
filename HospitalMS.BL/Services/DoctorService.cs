@@ -1,10 +1,9 @@
 using AutoMapper;
+using HospitalMS.BL.Common;
 using HospitalMS.BL.DTOs.Doctor;
 using HospitalMS.DATA.UnitOfWork;
 using HospitalMS.Models.Entities;
 using HospitalMS.Models.Enums;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace HospitalMS.BL.Services;
 
@@ -25,10 +24,12 @@ public class DoctorService : IDoctorService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
-    public DoctorService(IUnitOfWork unitOfWork, IMapper mapper)
+    private readonly IPasswordHasher _passwordHasher;
+    public DoctorService(IUnitOfWork unitOfWork, IMapper mapper, IPasswordHasher passwordHasher)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
+        _passwordHasher = passwordHasher;
     }
 
     public async Task<DoctorResponseDto?> GetByIdAsync(int id)
@@ -76,7 +77,7 @@ public class DoctorService : IDoctorService
 
         return await _unitOfWork.ExecuteInTransactionAsync(async () =>
         {
-            var user = new User { Email = doctorDto.Email, PasswordHash = HashPassword(doctorDto.Password), FirstName = doctorDto.FirstName, LastName = doctorDto.LastName, PhoneNumber = doctorDto.PhoneNumber, Role = UserRole.Doctor, IsActive = true };
+            var user = new User { Email = doctorDto.Email, PasswordHash = _passwordHasher.HashPassword(doctorDto.Password), FirstName = doctorDto.FirstName, LastName = doctorDto.LastName, PhoneNumber = doctorDto.PhoneNumber, Role = UserRole.Doctor, IsActive = true };
             await _unitOfWork.Users.AddAsync(user);
             await _unitOfWork.SaveChangesAsync();
             var doctor = new Doctor { UserId = user.Id, Specialization = doctorDto.Specialization, LicenseNumber = doctorDto.LicenseNumber, YearsOfExperience = doctorDto.YearsOfExperience, Qualifications = doctorDto.Qualifications, Bio = doctorDto.Bio, ConsultationFee = doctorDto.ConsultationFee, IsAvailable = true };
@@ -176,10 +177,5 @@ public class DoctorService : IDoctorService
             CreatedBy = doctor.CreatedBy,
             UpdatedBy = doctor.UpdatedBy
         };
-    }
-
-    private string HashPassword(string password)
-    {
-        return BCrypt.Net.BCrypt.HashPassword(password, workFactor: 12);
     }
 }

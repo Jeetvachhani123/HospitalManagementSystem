@@ -52,7 +52,7 @@ public class DoctorsController : ControllerBase
     }
 
     [HttpGet("{id}/calendar")]
-    public async Task<ActionResult<ApiResponse<object>>> GetCalendar(int id, [FromQuery] int? month, [FromQuery] int? year)
+    public async Task<ActionResult<ApiResponse<object>>> GetCalendar(int id, [FromQuery] int? month, [FromQuery] int? year, CancellationToken ct)
     {
         var doctor = await _doctorService.GetByIdAsync(id);
 
@@ -63,14 +63,13 @@ public class DoctorsController : ControllerBase
         var targetYear = year ?? DateTime.Today.Year;
         var startDate = new DateTime(targetYear, targetMonth, 1);
         var endDate = startDate.AddMonths(1).AddDays(-1);
-        var appointments = await _appointmentService.GetByDoctorIdAsync(id);
-        var filteredAppointments = appointments.Where(a => a.AppointmentDate.Date >= startDate && a.AppointmentDate.Date <= endDate);
+        var appointments = await _appointmentService.GetByDateRangeAsync(startDate, endDate, id, ct);
 
         return Ok(ApiResponse<object>.SuccessResponse(new
         {
             Month = targetMonth,
             Year = targetYear,
-            Appointments = filteredAppointments.OrderBy(a => a.AppointmentDate).ThenBy(a => a.StartTime).Select(a => new
+            Appointments = appointments.Select(a => new
             {
                 a.Id, a.PatientName, a.AppointmentDate,
                 a.StartTime, a.EndTime, a.Status, a.ApprovalStatus
@@ -109,7 +108,10 @@ public class DoctorsController : ControllerBase
     [Authorize(Roles = "Admin,Doctor")]
     public async Task<ActionResult<ApiResponse<DoctorResponseDto>>> Update(int id, [FromBody] DoctorUpdateDto doctorDto)
     {
-        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        if (!int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+        {
+            return Unauthorized();
+        }
         var role = User.FindFirstValue(ClaimTypes.Role);
         if (role == "Doctor")
         {

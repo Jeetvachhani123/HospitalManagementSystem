@@ -26,24 +26,18 @@ public class AppointmentWorkflowController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ApiResponse<AppointmentResponseDto>>> RequestAppointment([FromBody] AppointmentCreateDto dto)
     {
-        try
-        {
-            var patientId = GetPatientIdFromClaims();
-            var result = await _workflowService.RequestAppointmentAsync(dto, patientId);
-            if (result == null)
-            {
-                _logger.LogWarning($"Patient {patientId} appointment request failed");
-                return BadRequest(ApiResponse<AppointmentResponseDto>.ErrorResponse("Failed to request appointment. Please verify doctor availability and time slot."));
-            }
+        var userId = GetCurrentUserId();
+        if (userId == null) return Unauthorized();
 
-            _logger.LogInformation($"Appointment {result.Id} requested by patient {patientId}");
-            return Ok(ApiResponse<AppointmentResponseDto>.SuccessResponse(result, "Appointment requested successfully. Awaiting doctor approval."));
-        }
-        catch (Exception ex)
+        var result = await _workflowService.RequestAppointmentAsync(dto, userId.Value);
+        if (result == null)
         {
-            _logger.LogError(ex, "Error requesting appointment");
-            return BadRequest(ApiResponse<AppointmentResponseDto>.ErrorResponse("An error occurred while processing your request."));
+            _logger.LogWarning("Patient userId {UserId} appointment request failed", userId);
+            return BadRequest(ApiResponse<AppointmentResponseDto>.ErrorResponse("Failed to request appointment. Please verify doctor availability and time slot."));
         }
+
+        _logger.LogInformation("Appointment {AppointmentId} requested by userId {UserId}", result.Id, userId);
+        return Ok(ApiResponse<AppointmentResponseDto>.SuccessResponse(result, "Appointment requested successfully. Awaiting doctor approval."));
     }
 
     [HttpPost("{appointmentId}/approve")]
@@ -53,24 +47,18 @@ public class AppointmentWorkflowController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse<AppointmentResponseDto>>> ApproveAppointment(int appointmentId)
     {
-        try
-        {
-            var doctorId = GetDoctorIdFromClaims();
-            var result = await _workflowService.ApproveAppointmentAsync(appointmentId, doctorId);
-            if (result == null)
-            {
-                _logger.LogWarning($"Doctor {doctorId} failed to approve appointment {appointmentId}");
-                return BadRequest(ApiResponse<AppointmentResponseDto>.ErrorResponse("Failed to approve appointment. It may not be pending or you may not be the assigned doctor."));
-            }
+        var userId = GetCurrentUserId();
+        if (userId == null) return Unauthorized();
 
-            _logger.LogInformation($"Appointment {appointmentId} approved by doctor {doctorId}");
-            return Ok(ApiResponse<AppointmentResponseDto>.SuccessResponse(result, "Appointment approved successfully."));
-        }
-        catch (Exception ex)
+        var result = await _workflowService.ApproveAppointmentAsync(appointmentId, userId.Value);
+        if (result == null)
         {
-            _logger.LogError(ex, $"Error approving appointment {appointmentId}");
-            return BadRequest(ApiResponse<AppointmentResponseDto>.ErrorResponse("An error occurred while approving the appointment."));
+            _logger.LogWarning("Doctor userId {UserId} failed to approve appointment {AppointmentId}", userId, appointmentId);
+            return BadRequest(ApiResponse<AppointmentResponseDto>.ErrorResponse("Failed to approve appointment. It may not be pending or you may not be the assigned doctor."));
         }
+
+        _logger.LogInformation("Appointment {AppointmentId} approved by doctor userId {UserId}", appointmentId, userId);
+        return Ok(ApiResponse<AppointmentResponseDto>.SuccessResponse(result, "Appointment approved successfully."));
     }
 
     [HttpPost("{appointmentId}/reject")]
@@ -80,24 +68,18 @@ public class AppointmentWorkflowController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse<AppointmentResponseDto>>> RejectAppointment(int appointmentId, [FromBody] RejectAppointmentDto dto)
     {
-        try
-        {
-            var doctorId = GetDoctorIdFromClaims();
-            var result = await _workflowService.RejectAppointmentAsync(appointmentId, doctorId, dto.RejectionReason);
-            if (result == null)
-            {
-                _logger.LogWarning($"Doctor {doctorId} failed to reject appointment {appointmentId}");
-                return BadRequest(ApiResponse<AppointmentResponseDto>.ErrorResponse("Failed to reject appointment. It may not be pending or you may not be the assigned doctor."));
-            }
+        var userId = GetCurrentUserId();
+        if (userId == null) return Unauthorized();
 
-            _logger.LogInformation($"Appointment {appointmentId} rejected by doctor {doctorId}");
-            return Ok(ApiResponse<AppointmentResponseDto>.SuccessResponse(result, "Appointment rejected. Patient will be notified of the reason."));
-        }
-        catch (Exception ex)
+        var result = await _workflowService.RejectAppointmentAsync(appointmentId, userId.Value, dto.RejectionReason);
+        if (result == null)
         {
-            _logger.LogError(ex, $"Error rejecting appointment {appointmentId}");
-            return BadRequest(ApiResponse<AppointmentResponseDto>.ErrorResponse("An error occurred while rejecting the appointment."));
+            _logger.LogWarning("Doctor userId {UserId} failed to reject appointment {AppointmentId}", userId, appointmentId);
+            return BadRequest(ApiResponse<AppointmentResponseDto>.ErrorResponse("Failed to reject appointment. It may not be pending or you may not be the assigned doctor."));
         }
+
+        _logger.LogInformation("Appointment {AppointmentId} rejected by doctor userId {UserId}", appointmentId, userId);
+        return Ok(ApiResponse<AppointmentResponseDto>.SuccessResponse(result, "Appointment rejected. Patient will be notified of the reason."));
     }
 
     [HttpPost("{appointmentId}/complete")]
@@ -107,24 +89,18 @@ public class AppointmentWorkflowController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse<AppointmentResponseDto>>> CompleteAppointment(int appointmentId, [FromBody] CompleteAppointmentDto dto)
     {
-        try
-        {
-            var doctorId = GetDoctorIdFromClaims();
-            var result = await _workflowService.CompleteAppointmentAsync(appointmentId, doctorId, dto.Diagnosis, dto.Prescription, dto.Notes);
-            if (result == null)
-            {
-                _logger.LogWarning($"Doctor {doctorId} failed to complete appointment {appointmentId}");
-                return BadRequest(ApiResponse<AppointmentResponseDto>.ErrorResponse("Failed to complete appointment. It may not be in approved state or you may not be the assigned doctor."));
-            }
+        var userId = GetCurrentUserId();
+        if (userId == null) return Unauthorized();
 
-            _logger.LogInformation($"Appointment {appointmentId} marked as completed by doctor {doctorId}");
-            return Ok(ApiResponse<AppointmentResponseDto>.SuccessResponse(result, "Appointment completed successfully with consultation notes saved."));
-        }
-        catch (Exception ex)
+        var result = await _workflowService.CompleteAppointmentAsync(appointmentId, userId.Value, dto.Diagnosis, dto.Prescription, dto.Notes);
+        if (result == null)
         {
-            _logger.LogError(ex, $"Error completing appointment {appointmentId}");
-            return BadRequest(ApiResponse<AppointmentResponseDto>.ErrorResponse("An error occurred while completing the appointment."));
+            _logger.LogWarning("Doctor userId {UserId} failed to complete appointment {AppointmentId}", userId, appointmentId);
+            return BadRequest(ApiResponse<AppointmentResponseDto>.ErrorResponse("Failed to complete appointment. It may not be in approved state or you may not be the assigned doctor."));
         }
+
+        _logger.LogInformation("Appointment {AppointmentId} marked as completed by doctor userId {UserId}", appointmentId, userId);
+        return Ok(ApiResponse<AppointmentResponseDto>.SuccessResponse(result, "Appointment completed successfully with consultation notes saved."));
     }
 
     [HttpPost("{appointmentId}/cancel")]
@@ -133,25 +109,19 @@ public class AppointmentWorkflowController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse<bool>>> CancelAppointment(int appointmentId, [FromBody] CancelAppointmentDto dto)
     {
-        try
-        {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
-            var userEmail = User.FindFirstValue(ClaimTypes.Email) ?? "Unknown";
-            var result = await _workflowService.CancelAppointmentAsync(appointmentId, userId, userEmail, dto.CancellationReason);
-            if (!result)
-            {
-                _logger.LogWarning($"Failed to cancel appointment {appointmentId} by user {userId}");
-                return BadRequest(ApiResponse<bool>.ErrorResponse("Failed to cancel appointment. It may already be completed, cancelled, or you don't have permission."));
-            }
+        var userId = GetCurrentUserId();
+        if (userId == null) return Unauthorized();
 
-            _logger.LogInformation($"Appointment {appointmentId} cancelled by {userEmail}");
-            return Ok(ApiResponse<bool>.SuccessResponse(true, "Appointment cancelled successfully."));
-        }
-        catch (Exception ex)
+        var userEmail = User.FindFirstValue(ClaimTypes.Email) ?? "Unknown";
+        var result = await _workflowService.CancelAppointmentAsync(appointmentId, userId.Value, userEmail, dto.CancellationReason);
+        if (!result)
         {
-            _logger.LogError(ex, $"Error cancelling appointment {appointmentId}");
-            return BadRequest(ApiResponse<bool>.ErrorResponse("An error occurred while cancelling the appointment."));
+            _logger.LogWarning("Failed to cancel appointment {AppointmentId} by user {UserId}", appointmentId, userId);
+            return BadRequest(ApiResponse<bool>.ErrorResponse("Failed to cancel appointment. It may already be completed, cancelled, or you don't have permission."));
         }
+
+        _logger.LogInformation("Appointment {AppointmentId} cancelled by {UserEmail}", appointmentId, userEmail);
+        return Ok(ApiResponse<bool>.SuccessResponse(true, "Appointment cancelled successfully."));
     }
 
     [HttpPost("{appointmentId}/reschedule")]
@@ -160,24 +130,18 @@ public class AppointmentWorkflowController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse<AppointmentResponseDto>>> RescheduleAppointment(int appointmentId, [FromBody] RescheduleAppointmentDto dto)
     {
-        try
-        {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
-            var result = await _workflowService.RescheduleAppointmentAsync(appointmentId, userId, dto.NewDate, dto.NewStartTime, dto.NewEndTime);
-            if (result == null)
-            {
-                _logger.LogWarning($"Failed to reschedule appointment {appointmentId} by user {userId}");
-                return BadRequest(ApiResponse<AppointmentResponseDto>.ErrorResponse("Failed to reschedule appointment. The new time slot may be unavailable, appointment may be in final state, or you don't have permission."));
-            }
+        var userId = GetCurrentUserId();
+        if (userId == null) return Unauthorized();
 
-            _logger.LogInformation($"Appointment {appointmentId} rescheduled to {dto.NewDate} {dto.NewStartTime}");
-            return Ok(ApiResponse<AppointmentResponseDto>.SuccessResponse(result, "Appointment rescheduled successfully."));
-        }
-        catch (Exception ex)
+        var result = await _workflowService.RescheduleAppointmentAsync(appointmentId, userId.Value, dto.NewDate, dto.NewStartTime, dto.NewEndTime);
+        if (result == null)
         {
-            _logger.LogError(ex, $"Error rescheduling appointment {appointmentId}");
-            return BadRequest(ApiResponse<AppointmentResponseDto>.ErrorResponse("An error occurred while rescheduling the appointment."));
+            _logger.LogWarning("Failed to reschedule appointment {AppointmentId} by user {UserId}", appointmentId, userId);
+            return BadRequest(ApiResponse<AppointmentResponseDto>.ErrorResponse("Failed to reschedule appointment. The new time slot may be unavailable, appointment may be in final state, or you don't have permission."));
         }
+
+        _logger.LogInformation("Appointment {AppointmentId} rescheduled to {NewDate} {NewStartTime}", appointmentId, dto.NewDate, dto.NewStartTime);
+        return Ok(ApiResponse<AppointmentResponseDto>.SuccessResponse(result, "Appointment rescheduled successfully."));
     }
 
     [HttpPost("{appointmentId}/no-show")]
@@ -186,23 +150,15 @@ public class AppointmentWorkflowController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse<bool>>> MarkAsNoShow(int appointmentId)
     {
-        try
+        var result = await _workflowService.MarkAsNoShowAsync(appointmentId);
+        if (!result)
         {
-            var result = await _workflowService.MarkAsNoShowAsync(appointmentId);
-            if (!result)
-            {
-                _logger.LogWarning($"Failed to mark appointment {appointmentId} as no-show");
-                return NotFound(ApiResponse<bool>.ErrorResponse("Appointment not found."));
-            }
+            _logger.LogWarning("Failed to mark appointment {AppointmentId} as no-show", appointmentId);
+            return NotFound(ApiResponse<bool>.ErrorResponse("Appointment not found."));
+        }
 
-            _logger.LogInformation($"Appointment {appointmentId} marked as no-show");
-            return Ok(ApiResponse<bool>.SuccessResponse(true, "Appointment marked as no-show."));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Error marking appointment {appointmentId} as no-show");
-            return BadRequest(ApiResponse<bool>.ErrorResponse("An error occurred while marking the appointment as no-show."));
-        }
+        _logger.LogInformation("Appointment {AppointmentId} marked as no-show", appointmentId);
+        return Ok(ApiResponse<bool>.SuccessResponse(true, "Appointment marked as no-show."));
     }
 
     [HttpGet("pending-approvals")]
@@ -210,19 +166,13 @@ public class AppointmentWorkflowController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse<IEnumerable<AppointmentResponseDto>>>> GetPendingApprovals()
     {
-        try
-        {
-            var doctorId = GetDoctorIdFromClaims();
-            var result = await _workflowService.GetPendingApprovalsAsync(doctorId);
-            _logger.LogInformation($"Retrieved {result.Count()} pending approvals for doctor {doctorId}");
+        var userId = GetCurrentUserId();
+        if (userId == null) return Unauthorized();
 
-            return Ok(ApiResponse<IEnumerable<AppointmentResponseDto>>.SuccessResponse(result));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error retrieving pending approvals");
-            return Ok(ApiResponse<IEnumerable<AppointmentResponseDto>>.SuccessResponse(new List<AppointmentResponseDto>(), "No pending approvals."));
-        }
+        var result = await _workflowService.GetPendingApprovalsAsync(userId.Value);
+        _logger.LogInformation("Retrieved {Count} pending approvals for doctor userId {UserId}", result.Count(), userId);
+
+        return Ok(ApiResponse<IEnumerable<AppointmentResponseDto>>.SuccessResponse(result));
     }
 
     [HttpGet("doctors/{doctorId}/available-slots")]
@@ -230,22 +180,14 @@ public class AppointmentWorkflowController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse<IEnumerable<TimeSlotDto>>>> GetAvailableSlots(int doctorId, [FromQuery] DateTime date)
     {
-        try
+        if (date.Date < DateTime.UtcNow.Date)
         {
-            if (date.Date < DateTime.UtcNow.Date)
-            {
-                return BadRequest(ApiResponse<IEnumerable<TimeSlotDto>>.ErrorResponse("Cannot request slots for past dates."));
-            }
+            return BadRequest(ApiResponse<IEnumerable<TimeSlotDto>>.ErrorResponse("Cannot request slots for past dates."));
+        }
 
-            var result = await _workflowService.GetAvailableSlotsAsync(doctorId, date);
-            _logger.LogInformation($"Retrieved {result.Count()} available slots for doctor {doctorId} on {date:yyyy-MM-dd}");
-            return Ok(ApiResponse<IEnumerable<TimeSlotDto>>.SuccessResponse(result));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Error retrieving available slots for doctor {doctorId}");
-            return Ok(ApiResponse<IEnumerable<TimeSlotDto>>.SuccessResponse(new List<TimeSlotDto>(), "No available slots for the selected date."));
-        }
+        var result = await _workflowService.GetAvailableSlotsAsync(doctorId, date);
+        _logger.LogInformation("Retrieved {Count} available slots for doctor {DoctorId} on {Date}", result.Count(), doctorId, date.ToString("yyyy-MM-dd"));
+        return Ok(ApiResponse<IEnumerable<TimeSlotDto>>.SuccessResponse(result));
     }
 
     [HttpGet("{appointmentId}/status-history")]
@@ -253,33 +195,20 @@ public class AppointmentWorkflowController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse<IEnumerable<AppointmentStatusHistoryDto>>>> GetStatusHistory(int appointmentId)
     {
-        try
+        var result = await _workflowService.GetStatusHistoryAsync(appointmentId);
+        if (result == null || !result.Any())
         {
-            var result = await _workflowService.GetStatusHistoryAsync(appointmentId);
-            if (result == null || !result.Any())
-            {
-                return NotFound(ApiResponse<IEnumerable<AppointmentStatusHistoryDto>>.ErrorResponse("Appointment not found or has no status history."));
-            }
+            return NotFound(ApiResponse<IEnumerable<AppointmentStatusHistoryDto>>.ErrorResponse("Appointment not found or has no status history."));
+        }
 
-            _logger.LogInformation($"Retrieved status history for appointment {appointmentId}");
-            return Ok(ApiResponse<IEnumerable<AppointmentStatusHistoryDto>>.SuccessResponse(result));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Error retrieving status history for appointment {appointmentId}");
-            return NotFound(ApiResponse<IEnumerable<AppointmentStatusHistoryDto>>.ErrorResponse("Failed to retrieve status history."));
-        }
+        _logger.LogInformation("Retrieved status history for appointment {AppointmentId}", appointmentId);
+        return Ok(ApiResponse<IEnumerable<AppointmentStatusHistoryDto>>.SuccessResponse(result));
     }
 
-    private int GetPatientIdFromClaims()
+    private int? GetCurrentUserId()
     {
-        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        return int.Parse(userIdClaim ?? "0");
-    }
-
-    private int GetDoctorIdFromClaims()
-    {
-        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        return int.Parse(userIdClaim ?? "0");
+        if (int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+            return userId;
+        return null;
     }
 }

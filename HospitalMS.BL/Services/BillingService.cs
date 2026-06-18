@@ -7,14 +7,14 @@ namespace HospitalMS.BL.Services;
 
 public interface IBillingService
 {
-    Task<Invoice?> GetInvoiceByIdAsync(int id);
-    Task<Invoice?> GetInvoiceByAppointmentIdAsync(int appointmentId);
-    Task<IEnumerable<Invoice>> GetAllInvoicesAsync();
-    Task<IEnumerable<Invoice>> GetPatientInvoicesAsync(int patientId);
-    Task<IEnumerable<Invoice>> GetPendingInvoicesAsync(int patientId);
-    Task<Invoice> GenerateInvoiceAsync(int appointmentId, decimal amount, DateTime dueDate);
-    Task<bool> ProcessPaymentAsync(int invoiceId, string paymentMethod);
-    Task<bool> CancelInvoiceAsync(int invoiceId);
+    Task<Invoice?> GetInvoiceByIdAsync(int id, CancellationToken cancellationToken = default);
+    Task<Invoice?> GetInvoiceByAppointmentIdAsync(int appointmentId, CancellationToken cancellationToken = default);
+    Task<IEnumerable<Invoice>> GetAllInvoicesAsync(CancellationToken cancellationToken = default);
+    Task<IEnumerable<Invoice>> GetPatientInvoicesAsync(int patientId, CancellationToken cancellationToken = default);
+    Task<IEnumerable<Invoice>> GetPendingInvoicesAsync(int patientId, CancellationToken cancellationToken = default);
+    Task<Invoice> GenerateInvoiceAsync(int appointmentId, decimal amount, DateTime dueDate, CancellationToken cancellationToken = default);
+    Task<bool> ProcessPaymentAsync(int invoiceId, string paymentMethod, CancellationToken cancellationToken = default);
+    Task<bool> CancelInvoiceAsync(int invoiceId, CancellationToken cancellationToken = default);
 }
 
 public class BillingService : IBillingService
@@ -27,51 +27,51 @@ public class BillingService : IBillingService
         _logger = logger;
     }
 
-    public async Task<Invoice?> GetInvoiceByIdAsync(int id)
+    public async Task<Invoice?> GetInvoiceByIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        return await _unitOfWork.Invoices.GetByIdAsync(id);
+        return await _unitOfWork.Invoices.GetByIdAsync(id, cancellationToken);
     }
 
-    public async Task<Invoice?> GetInvoiceByAppointmentIdAsync(int appointmentId)
+    public async Task<Invoice?> GetInvoiceByAppointmentIdAsync(int appointmentId, CancellationToken cancellationToken = default)
     {
-        return await _unitOfWork.Invoices.GetByAppointmentIdAsync(appointmentId);
+        return await _unitOfWork.Invoices.GetByAppointmentIdAsync(appointmentId, cancellationToken);
     }
 
-    public async Task<IEnumerable<Invoice>> GetAllInvoicesAsync()
+    public async Task<IEnumerable<Invoice>> GetAllInvoicesAsync(CancellationToken cancellationToken = default)
     {
-        return await _unitOfWork.Invoices.GetAllAsync();
+        return await _unitOfWork.Invoices.GetAllAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<Invoice>> GetPatientInvoicesAsync(int patientId)
+    public async Task<IEnumerable<Invoice>> GetPatientInvoicesAsync(int patientId, CancellationToken cancellationToken = default)
     {
-        return await _unitOfWork.Invoices.GetByPatientIdAsync(patientId);
+        return await _unitOfWork.Invoices.GetByPatientIdAsync(patientId, cancellationToken);
     }
 
-    public async Task<IEnumerable<Invoice>> GetPendingInvoicesAsync(int patientId)
+    public async Task<IEnumerable<Invoice>> GetPendingInvoicesAsync(int patientId, CancellationToken cancellationToken = default)
     {
-        return await _unitOfWork.Invoices.GetPendingByPatientIdAsync(patientId);
+        return await _unitOfWork.Invoices.GetPendingByPatientIdAsync(patientId, cancellationToken);
     }
 
-    public async Task<Invoice> GenerateInvoiceAsync(int appointmentId, decimal amount, DateTime dueDate)
+    public async Task<Invoice> GenerateInvoiceAsync(int appointmentId, decimal amount, DateTime dueDate, CancellationToken cancellationToken = default)
     {
-        var existingInvoice = await _unitOfWork.Invoices.GetByAppointmentIdAsync(appointmentId);
+        var existingInvoice = await _unitOfWork.Invoices.GetByAppointmentIdAsync(appointmentId, cancellationToken);
         if (existingInvoice != null)
             throw new InvalidOperationException($"Invoice already exists for appointment {appointmentId}");
 
-        var appointment = await _unitOfWork.Appointments.GetByIdAsync(appointmentId);
+        var appointment = await _unitOfWork.Appointments.GetByIdAsync(appointmentId, cancellationToken);
         if (appointment == null)
             throw new InvalidOperationException($"Appointment {appointmentId} not found");
 
         var invoice = new Invoice { AppointmentId = appointmentId, PatientId = appointment.PatientId, Amount = amount, IssueDate = DateTime.UtcNow, DueDate = dueDate, IsPaid = false };
-        await _unitOfWork.Invoices.AddAsync(invoice);
-        await _unitOfWork.SaveChangesAsync();
+        await _unitOfWork.Invoices.AddAsync(invoice, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
         _logger.LogInformation("Invoice {InvoiceId} generated for Appointment {AppointmentId}", invoice.Id, appointmentId);
         return invoice;
     }
 
-    public async Task<bool> ProcessPaymentAsync(int invoiceId, string paymentMethod)
+    public async Task<bool> ProcessPaymentAsync(int invoiceId, string paymentMethod, CancellationToken cancellationToken = default)
     {
-        var invoice = await _unitOfWork.Invoices.GetByIdAsync(invoiceId);
+        var invoice = await _unitOfWork.Invoices.GetByIdAsync(invoiceId, cancellationToken);
         if (invoice == null)
             return false;
 
@@ -86,7 +86,7 @@ public class BillingService : IBillingService
         invoice.PaymentMethod = paymentMethod;
         try
         {
-            await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
             _logger.LogInformation("Invoice {InvoiceId} paid via {PaymentMethod}", invoiceId, paymentMethod);
             return true;
         }
@@ -97,9 +97,9 @@ public class BillingService : IBillingService
         }
     }
 
-    public async Task<bool> CancelInvoiceAsync(int invoiceId)
+    public async Task<bool> CancelInvoiceAsync(int invoiceId, CancellationToken cancellationToken = default)
     {
-        var invoice = await _unitOfWork.Invoices.GetByIdAsync(invoiceId);
+        var invoice = await _unitOfWork.Invoices.GetByIdAsync(invoiceId, cancellationToken);
         if (invoice == null)
             return false;
 
@@ -109,7 +109,7 @@ public class BillingService : IBillingService
             return false;
         }
         _unitOfWork.Invoices.Delete(invoice);
-        await _unitOfWork.SaveChangesAsync();
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
         _logger.LogInformation("Invoice {InvoiceId} cancelled", invoiceId);
         return true;
     }

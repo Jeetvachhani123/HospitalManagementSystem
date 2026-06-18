@@ -20,6 +20,7 @@ builder.Services.AddSignalR();
 builder.Services.AddSession();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, HospitalMS.Web.Services.CurrentUserService>();
+builder.Services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
 builder.Services.AddHospitalServices(builder.Configuration);
 builder.Services.AddScoped<IExportService, ExportService>();
 builder.Services.AddScoped<IReportingService, ReportingService>();

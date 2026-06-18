@@ -12,7 +12,7 @@ public interface IAppointmentRepository
     Task<IEnumerable<Appointment>> GetAllAsync(CancellationToken cancellationToken = default);
     Task<IEnumerable<Appointment>> GetByPatientIdAsync(int patientId, CancellationToken cancellationToken = default);
     Task<IEnumerable<Appointment>> GetByDoctorIdAsync(int doctorId, CancellationToken cancellationToken = default);
-    Task<IEnumerable<Appointment>> GetByDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default);
+    Task<IEnumerable<Appointment>> GetByDateRangeAsync(DateTime startDate, DateTime endDate, int? doctorId = null, CancellationToken cancellationToken = default);
     Task<IEnumerable<Appointment>> GetByStatusAsync(AppointmentStatus status, CancellationToken cancellationToken = default);
     Task<IEnumerable<Appointment>> GetPendingApprovalsAsync(int doctorId, CancellationToken cancellationToken = default);
     Task<IEnumerable<Appointment>> GetTodaysAppointmentsAsync(CancellationToken cancellationToken = default);
@@ -92,16 +92,23 @@ public class AppointmentRepository : IAppointmentRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<Appointment>> GetByDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Appointment>> GetByDateRangeAsync(DateTime startDate, DateTime endDate, int? doctorId = null, CancellationToken cancellationToken = default)
     {
-        return await _context.Appointments
+        var query = _context.Appointments
             .AsNoTracking()
             .Include(a => a.Patient)
                 .ThenInclude(p => p.User)
             .Include(a => a.Doctor)
                 .ThenInclude(d => d.User)
             .AsSplitQuery()
-            .Where(a => a.AppointmentDate >= startDate && a.AppointmentDate <= endDate)
+            .Where(a => a.AppointmentDate >= startDate && a.AppointmentDate <= endDate);
+
+        if (doctorId.HasValue)
+        {
+            query = query.Where(a => a.DoctorId == doctorId.Value);
+        }
+
+        return await query
             .OrderBy(a => a.AppointmentDate)
             .ThenBy(a => a.StartTime)
             .ToListAsync(cancellationToken);

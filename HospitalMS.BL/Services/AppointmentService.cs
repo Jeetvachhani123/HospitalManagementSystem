@@ -16,7 +16,7 @@ public interface IAppointmentService
     Task<IEnumerable<AppointmentResponseDto>> GetAllAsync(CancellationToken cancellationToken = default);
     Task<IEnumerable<AppointmentResponseDto>> GetByPatientIdAsync(int patientId, CancellationToken cancellationToken = default);
     Task<IEnumerable<AppointmentResponseDto>> GetByDoctorIdAsync(int doctorId, CancellationToken cancellationToken = default);
-    Task<IEnumerable<AppointmentResponseDto>> GetByDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default);
+    Task<IEnumerable<AppointmentResponseDto>> GetByDateRangeAsync(DateTime startDate, DateTime endDate, int? doctorId = null, CancellationToken cancellationToken = default);
     Task<IEnumerable<AppointmentResponseDto>> GetByStatusAsync(AppointmentStatus status, CancellationToken cancellationToken = default);
     Task<AppointmentResponseDto> CreateAsync(AppointmentCreateDto appointmentDto, CancellationToken cancellationToken = default);
     Task<AppointmentResponseDto?> UpdateAsync(int id, AppointmentUpdateDto appointmentDto, CancellationToken cancellationToken = default);
@@ -72,12 +72,12 @@ public class AppointmentService : IAppointmentService
         return appointments.Select(MapToAppointmentResponse);
     }
 
-    public async Task<IEnumerable<AppointmentResponseDto>> GetByDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<AppointmentResponseDto>> GetByDateRangeAsync(DateTime startDate, DateTime endDate, int? doctorId = null, CancellationToken cancellationToken = default)
     {
         if (startDate > endDate)
             throw new ValidationException("Start date must be before or equal to end date");
 
-        var appointments = await _unitOfWork.Appointments.GetByDateRangeAsync(startDate, endDate, cancellationToken);
+        var appointments = await _unitOfWork.Appointments.GetByDateRangeAsync(startDate, endDate, doctorId, cancellationToken);
         return appointments.Select(MapToAppointmentResponse);
     }
 
