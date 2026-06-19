@@ -30,7 +30,6 @@ public class AppointmentsController : ControllerBase
         _logger = logger;
     }
 
-    //  GET api/appointments  (role-based filtering)
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse<IEnumerable<AppointmentResponseDto>>>> GetAll(CancellationToken cancellationToken)
@@ -53,7 +52,6 @@ public class AppointmentsController : ControllerBase
         return Ok(ApiResponse<IEnumerable<AppointmentResponseDto>>.SuccessResponse(appointments));
     }
 
-    //  GET api/appointments/{id}  (ownership validation) 
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -78,7 +76,6 @@ public class AppointmentsController : ControllerBase
         return Ok(ApiResponse<AppointmentResponseDto>.SuccessResponse(appointment));
     }
 
-    //  GET api/appointments/patient/{patientId} 
     [HttpGet("patient/{patientId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse<IEnumerable<AppointmentResponseDto>>>> GetByPatientId(int patientId, CancellationToken cancellationToken)
@@ -87,7 +84,6 @@ public class AppointmentsController : ControllerBase
         return Ok(ApiResponse<IEnumerable<AppointmentResponseDto>>.SuccessResponse(appointments));
     }
 
-    //  GET api/appointments/doctor/{doctorId} 
     [HttpGet("doctor/{doctorId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse<IEnumerable<AppointmentResponseDto>>>> GetByDoctorId(int doctorId, CancellationToken cancellationToken)
@@ -96,7 +92,6 @@ public class AppointmentsController : ControllerBase
         return Ok(ApiResponse<IEnumerable<AppointmentResponseDto>>.SuccessResponse(appointments));
     }
 
-    // GET api/appointments/date-range
     [HttpGet("date-range")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -109,7 +104,6 @@ public class AppointmentsController : ControllerBase
         return Ok(ApiResponse<IEnumerable<AppointmentResponseDto>>.SuccessResponse(appointments));
     }
 
-    // GET api/appointments/status/{status} 
     [HttpGet("status/{status}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse<IEnumerable<AppointmentResponseDto>>>> GetByStatus(AppointmentStatus status, CancellationToken cancellationToken)
@@ -118,7 +112,6 @@ public class AppointmentsController : ControllerBase
         return Ok(ApiResponse<IEnumerable<AppointmentResponseDto>>.SuccessResponse(appointments));
     }
 
-    // Get my appointments by status category
     [HttpGet("my")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse<IEnumerable<AppointmentResponseDto>>>> GetMyByStatus([FromQuery] string status, CancellationToken cancellationToken)
@@ -147,7 +140,8 @@ public class AppointmentsController : ControllerBase
                 status switch
                 {
                     "Upcoming" => (a.Status == "Scheduled" || a.Status == "Confirmed") && a.ApprovalStatus == "Approved" && a.AppointmentDate.Date >= DateTime.Today,
-                    "Pending" => a.ApprovalStatus == "Pending" && a.Status == "Scheduled", "Completed" => a.Status == "Completed",
+                    "Pending" => a.ApprovalStatus == "Pending" && a.Status == "Scheduled",
+                    "Completed" => a.Status == "Completed",
                     "Cancelled" => a.Status == "Cancelled" || a.Status == "NoShow" || a.ApprovalStatus == "Rejected",
                     _ => a.Status.Equals(status, StringComparison.OrdinalIgnoreCase) || a.ApprovalStatus.Equals(status, StringComparison.OrdinalIgnoreCase)
                 });
@@ -156,7 +150,6 @@ public class AppointmentsController : ControllerBase
         return Ok(ApiResponse<IEnumerable<AppointmentResponseDto>>.SuccessResponse(appointments.OrderByDescending(a => a.AppointmentDate)));
     }
 
-    //  POST api/appointments  (create)
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -169,7 +162,6 @@ public class AppointmentsController : ControllerBase
             ApiResponse<AppointmentResponseDto>.SuccessResponse(appointment, "Appointment created successfully."));
     }
 
-    // PUT api/appointments/{id}  (update) 
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -184,7 +176,6 @@ public class AppointmentsController : ControllerBase
         return Ok(ApiResponse<AppointmentResponseDto>.SuccessResponse(appointment, "Appointment updated successfully."));
     }
 
-    //  PATCH api/appointments/{id}/status  (Admin / Doctor only) 
     [HttpPatch("{id}/status")]
     [Authorize(Roles = "Admin,Doctor")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -202,7 +193,6 @@ public class AppointmentsController : ControllerBase
         return Ok(ApiResponse<AppointmentResponseDto>.SuccessResponse(appointment, "Appointment status updated successfully."));
     }
 
-    // DELETE api/appointments/{id}  (cancel)
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -215,7 +205,6 @@ public class AppointmentsController : ControllerBase
         return Ok(ApiResponse<bool>.SuccessResponse(result, "Appointment cancelled successfully."));
     }
 
-    //  POST api/appointments/check-conflict 
     [HttpPost("check-conflict")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -228,7 +217,6 @@ public class AppointmentsController : ControllerBase
         return Ok(ApiResponse<bool>.SuccessResponse(hasConflict, hasConflict ? "A scheduling conflict exists for the requested slot." : "The time slot is available."));
     }
 
-    //  GET api/appointments/export/csv 
     [HttpGet("export/csv")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> ExportCsv([FromQuery] int? patientId = null, [FromQuery] int? doctorId = null, CancellationToken cancellationToken = default)
@@ -250,7 +238,6 @@ public class AppointmentsController : ControllerBase
         return File(bytes, "text/csv", $"appointments_{DateTime.UtcNow:yyyyMMdd_HHmm}.csv");
     }
 
-    //  GET api/appointments/export/excel 
     [HttpGet("export/excel")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> ExportExcel([FromQuery] int? patientId = null, [FromQuery] int? doctorId = null, CancellationToken cancellationToken = default)
@@ -297,7 +284,6 @@ public class AppointmentsController : ControllerBase
         return File(ms.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"appointments_{DateTime.UtcNow:yyyyMMdd_HHmm}.xlsx");
     }
 
-    //  GET api/appointments/export/pdf 
     [HttpGet("export/pdf")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> ExportPdf([FromQuery] int? patientId = null, [FromQuery] int? doctorId = null, CancellationToken cancellationToken = default)
@@ -359,7 +345,6 @@ public class AppointmentsController : ControllerBase
         return File(ms.ToArray(), "application/pdf", $"appointments_{DateTime.UtcNow:yyyyMMdd_HHmm}.pdf");
     }
 
-    //  GET api/appointments/upcoming 
     [HttpGet("upcoming")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse<IEnumerable<AppointmentResponseDto>>>> GetUpcoming([FromQuery] int? patientId = null, [FromQuery] int? doctorId = null, CancellationToken cancellationToken = default)
@@ -376,7 +361,6 @@ public class AppointmentsController : ControllerBase
         return Ok(ApiResponse<IEnumerable<AppointmentResponseDto>>.SuccessResponse(upcoming));
     }
 
-    //  GET api/appointments/history 
     [HttpGet("history")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse<IEnumerable<AppointmentResponseDto>>>> GetHistory([FromQuery] int? patientId = null, [FromQuery] int? doctorId = null, CancellationToken cancellationToken = default)
@@ -413,4 +397,4 @@ public class AppointmentsController : ControllerBase
         v = v.Replace("\"", "\"\"");
         return v.IndexOfAny(new[] { ',', '"', '\n', '\r' }) >= 0 ? $"\"{v}\"" : v;
     }
-}
+}

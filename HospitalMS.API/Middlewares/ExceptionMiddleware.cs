@@ -17,7 +17,6 @@ public class ExceptionMiddleware
         _environment = environment;
     }
 
-    // invoke middleware pipeline
     public async Task InvokeAsync(HttpContext context)
     {
         try
@@ -31,7 +30,6 @@ public class ExceptionMiddleware
         }
     }
 
-    // format error response with proper HTTP status codes
     private Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
         context.Response.ContentType = "application/json";
@@ -49,7 +47,6 @@ public class ExceptionMiddleware
 
         context.Response.StatusCode = (int)statusCode;
 
-        // Only include exception details in development
         var errorDetails = _environment.IsDevelopment() ? exception.Message : null;
         var response = statusCode == HttpStatusCode.InternalServerError
             ? ApiResponse<object>.ErrorResponse(message, errorDetails)

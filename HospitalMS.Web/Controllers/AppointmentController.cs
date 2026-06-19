@@ -30,7 +30,6 @@ public class AppointmentController : Controller
         _logger = logger;
     }
 
-    // list appointments
     public async Task<IActionResult> Index(string? searchQuery, DateTime? fromDate, DateTime? toDate, int page = 1, int pageSize = 10)
     {
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -76,7 +75,6 @@ public class AppointmentController : Controller
         return View(model);
     }
 
-    // pending doctor approvals
     [Authorize(Roles = "Doctor")]
     public async Task<IActionResult> PendingApprovals()
     {
@@ -100,7 +98,6 @@ public class AppointmentController : Controller
         return View(model);
     }
 
-    // get available slots (AJAX)
     [AllowAnonymous]
     [HttpGet]
     public async Task<IActionResult> GetAvailableSlots(int doctorId, DateTime date)
@@ -130,7 +127,6 @@ public class AppointmentController : Controller
         }
     }
 
-    // get appointments by status popup (AJAX)
     [HttpGet]
     [Authorize(Roles = "Patient")]
     public async Task<IActionResult> GetByStatusPopup(string status)
@@ -171,7 +167,6 @@ public class AppointmentController : Controller
         }));
     }
 
-    // format time as AM/PM
     private string FormatTimeDisplay(TimeSpan time)
     {
         var hours = time.Hours;
@@ -183,7 +178,6 @@ public class AppointmentController : Controller
         return $"{displayHours:D2}:{minutes:D2} {ampm}";
     }
 
-    // show appointment request form
     [HttpGet]
     [ActionName("Request")]
     [Authorize(Roles = "Patient")]
@@ -204,7 +198,6 @@ public class AppointmentController : Controller
         return View(model);
     }
 
-    // submit appointment request
     [HttpPost]
     [ActionName("Request")]
     [Authorize(Roles = "Patient")]
@@ -257,7 +250,6 @@ public class AppointmentController : Controller
         }
     }
 
-    // reload doctor info helper
     private async Task ReloadDoctorData(AppointmentRequestViewModel model)
     {
         var doctor = await _doctorService.GetByIdAsync(model.DoctorId);
@@ -269,8 +261,6 @@ public class AppointmentController : Controller
         }
     }
 
-
-    // approve appointment
     [HttpPost]
     [Authorize(Roles = "Doctor")]
     public async Task<IActionResult> Approve(int appointmentId)
@@ -321,7 +311,6 @@ public class AppointmentController : Controller
         }
     }
 
-    // reject appointment
     [HttpPost]
     [Authorize(Roles = "Doctor")]
     public async Task<IActionResult> Reject(int appointmentId, string rejectionReason)
@@ -370,7 +359,6 @@ public class AppointmentController : Controller
         }
     }
 
-    // complete appointment
     [HttpPost]
     [Authorize(Roles = "Doctor")]
     public async Task<IActionResult> Complete(int appointmentId, string? diagnosis, string? prescription, string? notes)
@@ -394,7 +382,6 @@ public class AppointmentController : Controller
         return RedirectToAction(nameof(Details), new { id = appointmentId });
     }
 
-    // cancel appointment
     [HttpPost]
     public async Task<IActionResult> Cancel(int appointmentId, string? reason)
     {
@@ -411,7 +398,6 @@ public class AppointmentController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    // show reschedule form
     [HttpGet]
     public async Task<IActionResult> Reschedule(int id)
     {
@@ -440,7 +426,6 @@ public class AppointmentController : Controller
         return View(model);
     }
 
-    // reschedule appointment (submit)
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Reschedule(RescheduleAppointmentViewModel model)
@@ -466,7 +451,6 @@ public class AppointmentController : Controller
         return RedirectToAction(nameof(Details), new { id = model.AppointmentId });
     }
 
-    // appointment details
     [HttpGet]
     public async Task<IActionResult> Details(int id)
     {
@@ -499,7 +483,6 @@ public class AppointmentController : Controller
         return View(model);
     }
 
-    // mark as no-show
     [HttpPost]
     [Authorize(Roles = "Doctor")]
     public async Task<IActionResult> MarkNoShow(int appointmentId)
@@ -515,7 +498,6 @@ public class AppointmentController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    // view appointment history
     [HttpGet]
     public async Task<IActionResult> History(string? status, DateTime? fromDate, DateTime? toDate, string? doctorName)
     {
@@ -578,7 +560,6 @@ public class AppointmentController : Controller
         return View(model);
     }
 
-    // appointment status tracking view
     [HttpGet]
     public async Task<IActionResult> StatusTracking(int id)
     {
@@ -605,7 +586,6 @@ public class AppointmentController : Controller
         return View(model);
     }
 
-    // view audit trail
     [HttpGet]
     public async Task<IActionResult> AuditTrail(int id)
     {
@@ -633,7 +613,6 @@ public class AppointmentController : Controller
         return View(model);
     }
 
-    // export to CSV
     [HttpGet]
     public async Task<IActionResult> ExportToCSV()
     {
@@ -658,7 +637,6 @@ public class AppointmentController : Controller
         return File(csvBytes, "text/csv", $"appointments_{DateTime.Now:yyyyMMdd}.csv");
     }
 
-    // export to excel
     [HttpGet]
     public async Task<IActionResult> ExportToExcel()
     {
@@ -683,7 +661,6 @@ public class AppointmentController : Controller
         return File(excelBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"appointments_{DateTime.Now:yyyyMMdd}.xlsx");
     }
 
-    // export to pdf
     [HttpGet]
     public async Task<IActionResult> ExportToPDF()
     {

@@ -48,7 +48,8 @@ public class AppointmentWorkflowController : ControllerBase
     public async Task<ActionResult<ApiResponse<AppointmentResponseDto>>> ApproveAppointment(int appointmentId)
     {
         var userId = GetCurrentUserId();
-        if (userId == null) return Unauthorized();
+        if (userId == null)
+            return Unauthorized();
 
         var result = await _workflowService.ApproveAppointmentAsync(appointmentId, userId.Value);
         if (result == null)
@@ -69,7 +70,8 @@ public class AppointmentWorkflowController : ControllerBase
     public async Task<ActionResult<ApiResponse<AppointmentResponseDto>>> RejectAppointment(int appointmentId, [FromBody] RejectAppointmentDto dto)
     {
         var userId = GetCurrentUserId();
-        if (userId == null) return Unauthorized();
+        if (userId == null)
+            return Unauthorized();
 
         var result = await _workflowService.RejectAppointmentAsync(appointmentId, userId.Value, dto.RejectionReason);
         if (result == null)
@@ -90,7 +92,8 @@ public class AppointmentWorkflowController : ControllerBase
     public async Task<ActionResult<ApiResponse<AppointmentResponseDto>>> CompleteAppointment(int appointmentId, [FromBody] CompleteAppointmentDto dto)
     {
         var userId = GetCurrentUserId();
-        if (userId == null) return Unauthorized();
+        if (userId == null)
+            return Unauthorized();
 
         var result = await _workflowService.CompleteAppointmentAsync(appointmentId, userId.Value, dto.Diagnosis, dto.Prescription, dto.Notes);
         if (result == null)
@@ -110,7 +113,8 @@ public class AppointmentWorkflowController : ControllerBase
     public async Task<ActionResult<ApiResponse<bool>>> CancelAppointment(int appointmentId, [FromBody] CancelAppointmentDto dto)
     {
         var userId = GetCurrentUserId();
-        if (userId == null) return Unauthorized();
+        if (userId == null)
+            return Unauthorized();
 
         var userEmail = User.FindFirstValue(ClaimTypes.Email) ?? "Unknown";
         var result = await _workflowService.CancelAppointmentAsync(appointmentId, userId.Value, userEmail, dto.CancellationReason);
@@ -131,7 +135,8 @@ public class AppointmentWorkflowController : ControllerBase
     public async Task<ActionResult<ApiResponse<AppointmentResponseDto>>> RescheduleAppointment(int appointmentId, [FromBody] RescheduleAppointmentDto dto)
     {
         var userId = GetCurrentUserId();
-        if (userId == null) return Unauthorized();
+        if (userId == null)
+            return Unauthorized();
 
         var result = await _workflowService.RescheduleAppointmentAsync(appointmentId, userId.Value, dto.NewDate, dto.NewStartTime, dto.NewEndTime);
         if (result == null)
@@ -167,7 +172,8 @@ public class AppointmentWorkflowController : ControllerBase
     public async Task<ActionResult<ApiResponse<IEnumerable<AppointmentResponseDto>>>> GetPendingApprovals()
     {
         var userId = GetCurrentUserId();
-        if (userId == null) return Unauthorized();
+        if (userId == null)
+            return Unauthorized();
 
         var result = await _workflowService.GetPendingApprovalsAsync(userId.Value);
         _logger.LogInformation("Retrieved {Count} pending approvals for doctor userId {UserId}", result.Count(), userId);

@@ -148,8 +148,6 @@ public class ReportsController : ControllerBase
         return Ok(ApiResponse<DashboardStatsDto>.SuccessResponse(stats));
     }
 
-
-    // Admin Dashboard data
     [HttpGet("dashboard/admin")]
     [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -180,7 +178,6 @@ public class ReportsController : ControllerBase
         return Ok(ApiResponse<AdminDashboardApiDto>.SuccessResponse(dto));
     }
 
-    // Doctor Dashboard data
     [HttpGet("dashboard/doctor")]
     [Authorize(Roles = "Doctor")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -224,7 +221,6 @@ public class ReportsController : ControllerBase
         return Ok(ApiResponse<DoctorDashboardApiDto>.SuccessResponse(dto));
     }
 
-    // Patient Dashboard data
     [HttpGet("dashboard/patient")]
     [Authorize(Roles = "Patient")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -265,7 +261,6 @@ public class ReportsController : ControllerBase
         return Ok(ApiResponse<PatientDashboardApiDto>.SuccessResponse(dto));
     }
 
-    // Quick card data
     [HttpGet("cards")]
     [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -278,23 +273,31 @@ public class ReportsController : ControllerBase
                 var doctors = await _doctorService.GetAllAsync();
                 return Ok(ApiResponse<object>.SuccessResponse(doctors.Select(d => new
                 {
-                    d.Id, name = d.FullName, d.Email,
-                    d.Specialization, experience = d.YearsOfExperience, d.IsAvailable
+                    d.Id,
+                    name = d.FullName,
+                    d.Email,
+                    d.Specialization,
+                    experience = d.YearsOfExperience,
+                    d.IsAvailable
                 })));
 
             case "Patients":
                 var patients = await _patientService.GetAllAsync();
                 return Ok(ApiResponse<object>.SuccessResponse(patients.Select(p => new
                 {
-                    p.Id, name = p.FullName, p.Email,
-                    phone = p.PhoneNumber, p.BloodGroup
+                    p.Id,
+                    name = p.FullName,
+                    p.Email,
+                    phone = p.PhoneNumber,
+                    p.BloodGroup
                 })));
 
             case "TodayAppointments":
                 var todayAppts = await _appointmentService.GetTodaysAppointmentsAsync();
                 return Ok(ApiResponse<object>.SuccessResponse(todayAppts.Select(a => new
                 {
-                    patient = a.PatientName, doctor = a.DoctorName,
+                    patient = a.PatientName,
+                    doctor = a.DoctorName,
                     date = a.AppointmentDate.ToString("MMM dd, yyyy"),
                     time = a.StartTime.ToString(@"hh\:mm"),
                     a.Status
@@ -305,7 +308,8 @@ public class ReportsController : ControllerBase
                 var pending = all.Where(a => a.ApprovalStatus == "Pending" && a.Status == "Scheduled");
                 return Ok(ApiResponse<object>.SuccessResponse(pending.Select(a => new
                 {
-                    patient = a.PatientName, doctor = a.DoctorName,
+                    patient = a.PatientName,
+                    doctor = a.DoctorName,
                     date = a.AppointmentDate.ToString("MMM dd, yyyy"),
                     a.Status
                 })));
@@ -315,7 +319,6 @@ public class ReportsController : ControllerBase
         }
     }
 
-    // Full combined snapshot
     [HttpGet("full")]
     [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -362,4 +365,4 @@ public class ReportsController : ControllerBase
         _logger.LogInformation("Full report snapshot generated");
         return Ok(ApiResponse<FullReportApiDto>.SuccessResponse(dto));
     }
-}
+}
