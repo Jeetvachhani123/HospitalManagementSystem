@@ -9,7 +9,7 @@ public interface IAppointmentRepository
 {
     Task<Appointment?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
     Task<Appointment?> GetByIdForReadAsync(int id, CancellationToken cancellationToken = default);
-    Task<IEnumerable<Appointment>> GetAllAsync(CancellationToken cancellationToken = default);
+    Task<IEnumerable<Appointment>> GetAllAsync(int page = 1, int pageSize = 100, CancellationToken cancellationToken = default);
     Task<IEnumerable<Appointment>> GetByPatientIdAsync(int patientId, CancellationToken cancellationToken = default);
     Task<IEnumerable<Appointment>> GetByDoctorIdAsync(int doctorId, CancellationToken cancellationToken = default);
     Task<IEnumerable<Appointment>> GetByDateRangeAsync(DateTime startDate, DateTime endDate, int? doctorId = null, CancellationToken cancellationToken = default);
@@ -24,6 +24,7 @@ public interface IAppointmentRepository
     Task<int> CountAsync(System.Linq.Expressions.Expression<Func<Appointment, bool>>? predicate = null, CancellationToken cancellationToken = default);
     Task<IEnumerable<Appointment>> GetRecentAsync(int count, CancellationToken cancellationToken = default);
     Task<(IEnumerable<Appointment> Items, int TotalCount)> SearchAsync(string? searchTerm, int? doctorId, int? patientId, DateTime? fromDate, DateTime? toDate, AppointmentStatus? status, int page, int pageSize, CancellationToken cancellationToken = default);
+    Task<IEnumerable<(int Year, int Month, int Total, int Completed, int Cancelled)>> GetMonthlyTrendAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default);
 }
 
 public class AppointmentRepository : IAppointmentRepository
@@ -32,6 +33,27 @@ public class AppointmentRepository : IAppointmentRepository
     public AppointmentRepository(HospitalDbContext context)
     {
         _context = context;
+    }
+
+    public async Task<IEnumerable<(int Year, int Month, int Total, int Completed, int Cancelled)>> GetMonthlyTrendAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
+    {
+        var data = await _context.Appointments
+            .AsNoTracking()
+            .Where(a => a.AppointmentDate >= startDate && a.AppointmentDate <= endDate)
+            .GroupBy(a => new { a.AppointmentDate.Year, a.AppointmentDate.Month })
+            .Select(g => new
+            {
+                g.Key.Year,
+                g.Key.Month,
+                Total = g.Count(),
+                Completed = g.Count(a => a.Status == AppointmentStatus.Completed),
+                Cancelled = g.Count(a => a.Status == AppointmentStatus.Cancelled)
+            })
+            .OrderBy(x => x.Year)
+            .ThenBy(x => x.Month)
+            .ToListAsync(cancellationToken);
+
+        return data.Select(x => (x.Year, x.Month, x.Total, x.Completed, x.Cancelled));
     }
 
     public async Task<Appointment?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
@@ -57,7 +79,7 @@ public class AppointmentRepository : IAppointmentRepository
             .FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
     }
 
-    public async Task<IEnumerable<Appointment>> GetAllAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Appointment>> GetAllAsync(int page = 1, int pageSize = 100, CancellationToken cancellationToken = default)
     {
         return await _context.Appointments
             .AsNoTracking()
@@ -67,6 +89,8 @@ public class AppointmentRepository : IAppointmentRepository
                 .ThenInclude(d => d.User)
             .AsSplitQuery()
             .OrderByDescending(a => a.AppointmentDate)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync(cancellationToken);
     }
 

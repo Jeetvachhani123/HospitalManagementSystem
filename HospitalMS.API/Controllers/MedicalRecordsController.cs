@@ -38,6 +38,34 @@ public class MedicalRecordsController : ControllerBase
                 return Forbid();
             }
         }
+        else if (role == "Doctor")
+        {
+            var doctor = await _appointmentService.GetDoctorByUserIdAsync(userId);
+            if (doctor == null)
+            {
+                return Forbid();
+            }
+
+            var (_, totalCount) = await _appointmentService.SearchAsync(
+                searchTerm: null,
+                doctorId: doctor.Id,
+                patientId: patientId,
+                fromDate: null,
+                toDate: null,
+                status: null,
+                page: 1,
+                pageSize: 1
+            );
+            if (totalCount == 0)
+            {
+                _logger.LogWarning("Doctor {UserId} attempted to access records of patient {PatientId} without an appointment relationship", userId, patientId);
+                return Forbid();
+            }
+        }
+        else if (role != "Admin")
+        {
+            return Forbid();
+        }
 
         var records = await _medicalRecordService.GetByPatientIdAsync(patientId);
         _logger.LogInformation("Medical records accessed for patient {PatientId} by user {UserId}", patientId, userId);
@@ -123,9 +151,33 @@ public class MedicalRecordsController : ControllerBase
         else if (role == "Doctor")
         {
             var doctor = await _appointmentService.GetDoctorByUserIdAsync(userId);
-            if (doctor == null || record.DoctorId != doctor.Id)
+            if (doctor == null)
             {
+                return Forbid();
             }
+
+            if (record.DoctorId != doctor.Id)
+            {
+                var (_, totalCount) = await _appointmentService.SearchAsync(
+                    searchTerm: null,
+                    doctorId: doctor.Id,
+                    patientId: record.PatientId,
+                    fromDate: null,
+                    toDate: null,
+                    status: null,
+                    page: 1,
+                    pageSize: 1
+                );
+                if (totalCount == 0)
+                {
+                    _logger.LogWarning("Doctor {UserId} attempted to access medical record {RecordId} without authorization", userId, id);
+                    return Forbid();
+                }
+            }
+        }
+        else if (role != "Admin")
+        {
+            return Forbid();
         }
 
         _logger.LogInformation("Medical record {RecordId} accessed by user {UserId}", id, userId);

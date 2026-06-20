@@ -1,6 +1,7 @@
 using HospitalMS.DATA.Context;
 using HospitalMS.Models.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace HospitalMS.DATA.Repositories;
 
@@ -13,6 +14,7 @@ public interface IPatientRepository
     void Update(Patient patient);
     void Delete(Patient patient);
     Task<(IEnumerable<Patient> Items, int TotalCount)> SearchAsync(string? searchTerm, int page, int pageSize, CancellationToken cancellationToken = default);
+    Task<int> CountAsync(Expression<Func<Patient, bool>>? predicate = null, CancellationToken cancellationToken = default);
 }
 
 public class PatientRepository : IPatientRepository
@@ -21,6 +23,16 @@ public class PatientRepository : IPatientRepository
     public PatientRepository(HospitalDbContext context)
     {
         _context = context;
+    }
+
+    public async Task<int> CountAsync(Expression<Func<Patient, bool>>? predicate = null, CancellationToken cancellationToken = default)
+    {
+        var query = _context.Patients.AsNoTracking();
+        if (predicate != null)
+        {
+            query = query.Where(predicate);
+        }
+        return await query.CountAsync(cancellationToken);
     }
 
     public async Task<Patient?> GetByIdAsync(int id, CancellationToken cancellationToken = default)

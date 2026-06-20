@@ -52,7 +52,8 @@ public class ReportingService : IReportingService
         var doctorGroups = appointmentList.GroupBy(a => a.DoctorId);
         foreach (var group in doctorGroups)
         {
-            var doctor = await _doctorRepository.GetByIdAsync(group.Key);
+            var firstAppointment = group.FirstOrDefault();
+            var doctor = firstAppointment?.Doctor;
             if (doctor != null)
             {
                 var doctorAppointments = group.ToList();
@@ -98,8 +99,8 @@ public class ReportingService : IReportingService
 
     public async Task<SystemStatisticsDto> GetSystemStatisticsAsync()
     {
-        var totalDoctors = await _doctorRepository.GetAllAsync();
-        var totalPatients = await _patientRepository.GetAllAsync();
+        var totalDoctors = await _doctorRepository.CountAsync();
+        var totalPatients = await _patientRepository.CountAsync();
         var today = DateTime.UtcNow.Date;
         var totalAppointments = await _appointmentRepository.CountAsync();
         var appointmentsToday = await _appointmentRepository.CountAsync(a => a.AppointmentDate >= DateTime.Today && a.AppointmentDate < DateTime.Today.AddDays(1));
@@ -109,8 +110,8 @@ public class ReportingService : IReportingService
 
         return new SystemStatisticsDto
         {
-            TotalDoctors = totalDoctors.Count(),
-            TotalPatients = totalPatients.Count(),
+            TotalDoctors = totalDoctors,
+            TotalPatients = totalPatients,
             TotalAppointments = totalAppointments,
             AppointmentsToday = appointmentsToday,
             PendingApprovals = pendingApprovals,
@@ -122,19 +123,14 @@ public class ReportingService : IReportingService
     public async Task<MonthlyTrendDto> GetMonthlyTrendAsync(int months = 12)
     {
         var startDate = DateTime.Now.AddMonths(-months);
-        var appointments = await _appointmentRepository.GetByDateRangeAsync(startDate, DateTime.Now);
-        var appointmentList = appointments.ToList();
-        var monthlyData = appointmentList
-            .GroupBy(a => new { a.AppointmentDate.Year, a.AppointmentDate.Month })
-            .OrderBy(g => g.Key.Year)
-            .ThenBy(g => g.Key.Month)
-            .Select(g => new MonthDataDto
-            {
-                Month = $"{g.Key.Year}-{g.Key.Month:D2}",
-                TotalAppointments = g.Count(),
-                CompletedAppointments = g.Count(a => a.Status == AppointmentStatus.Completed),
-                CancelledAppointments = g.Count(a => a.Status == AppointmentStatus.Cancelled)
-            }).ToList();
+        var data = await _appointmentRepository.GetMonthlyTrendAsync(startDate, DateTime.Now);
+        var monthlyData = data.Select(x => new MonthDataDto
+        {
+            Month = $"{x.Year}-{x.Month:D2}",
+            TotalAppointments = x.Total,
+            CompletedAppointments = x.Completed,
+            CancelledAppointments = x.Cancelled
+        }).ToList();
 
         return new MonthlyTrendDto
         {

@@ -120,7 +120,7 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error requesting appointment");
-            return null;
+            throw;
         }
     }
 
@@ -184,7 +184,7 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error approving appointment {AppointmentId}", appointmentId);
-            return null;
+            throw;
         }
     }
 
@@ -250,7 +250,7 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error rejecting appointment {AppointmentId}", appointmentId);
-            return null;
+            throw;
         }
     }
 
@@ -334,7 +334,7 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error completing appointment {AppointmentId}", appointmentId);
-            return null;
+            throw;
         }
     }
 
@@ -391,7 +391,7 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error cancelling appointment {AppointmentId}", appointmentId);
-            return false;
+            throw;
         }
     }
 
@@ -462,7 +462,7 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error rescheduling appointment {AppointmentId}", appointmentId);
-            return null;
+            throw;
         }
     }
 
@@ -495,7 +495,7 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error marking appointment {AppointmentId} as no-show", appointmentId);
-            return false;
+            throw;
         }
     }
 
@@ -513,7 +513,7 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error getting pending approvals for userId {UserId}", userId);
-            return new List<AppointmentResponseDto>();
+            throw;
         }
     }
 
@@ -537,7 +537,7 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error getting status history for appointment {AppointmentId}", appointmentId);
-            return new List<AppointmentStatusHistoryDto>();
+            throw;
         }
     }
 
@@ -551,7 +551,7 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error getting available slots for doctor {DoctorId}", doctorId);
-            return new List<TimeSlotDto>();
+            throw;
         }
     }
 
@@ -575,7 +575,7 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error validating doctor working hours for doctor {DoctorId}", doctorId);
-            return false;
+            throw;
         }
     }
 
@@ -583,8 +583,10 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
     {
         try
         {
-            var stats = await _reportingService.GetSystemStatisticsAsync();
-            await _realTimeNotificationService.BroadcastDashboardUpdate(stats.TotalAppointments, stats.AppointmentsToday, stats.PendingApprovals);
+            var totalAppointments = await _unitOfWork.Appointments.CountAsync();
+            var appointmentsToday = await _unitOfWork.Appointments.CountAsync(a => a.AppointmentDate >= DateTime.Today && a.AppointmentDate < DateTime.Today.AddDays(1));
+            var pendingApprovals = await _unitOfWork.Appointments.CountAsync(a => a.ApprovalStatus == AppointmentApprovalStatus.Pending && a.Status == AppointmentStatus.Scheduled);
+            await _realTimeNotificationService.BroadcastDashboardUpdate(totalAppointments, appointmentsToday, pendingApprovals);
         }
         catch (Exception ex)
         {

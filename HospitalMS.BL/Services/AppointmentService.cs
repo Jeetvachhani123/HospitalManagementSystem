@@ -13,7 +13,7 @@ namespace HospitalMS.BL.Services;
 public interface IAppointmentService
 {
     Task<AppointmentResponseDto?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
-    Task<IEnumerable<AppointmentResponseDto>> GetAllAsync(CancellationToken cancellationToken = default);
+    Task<IEnumerable<AppointmentResponseDto>> GetAllAsync(int page = 1, int pageSize = 100, CancellationToken cancellationToken = default);
     Task<IEnumerable<AppointmentResponseDto>> GetByPatientIdAsync(int patientId, CancellationToken cancellationToken = default);
     Task<IEnumerable<AppointmentResponseDto>> GetByDoctorIdAsync(int doctorId, CancellationToken cancellationToken = default);
     Task<IEnumerable<AppointmentResponseDto>> GetByDateRangeAsync(DateTime startDate, DateTime endDate, int? doctorId = null, CancellationToken cancellationToken = default);
@@ -54,9 +54,9 @@ public class AppointmentService : IAppointmentService
         return appointment == null ? null : MapToAppointmentResponse(appointment);
     }
 
-    public async Task<IEnumerable<AppointmentResponseDto>> GetAllAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<AppointmentResponseDto>> GetAllAsync(int page = 1, int pageSize = 100, CancellationToken cancellationToken = default)
     {
-        var appointments = await _unitOfWork.Appointments.GetAllAsync(cancellationToken);
+        var appointments = await _unitOfWork.Appointments.GetAllAsync(page, pageSize, cancellationToken);
         return appointments.Select(MapToAppointmentResponse);
     }
 

@@ -32,14 +32,14 @@ public class AppointmentsController : ControllerBase
 
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<ApiResponse<IEnumerable<AppointmentResponseDto>>>> GetAll(CancellationToken cancellationToken)
+    public async Task<ActionResult<ApiResponse<IEnumerable<AppointmentResponseDto>>>> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 100, CancellationToken cancellationToken = default)
     {
         var role = User.FindFirstValue(ClaimTypes.Role);
         IEnumerable<AppointmentResponseDto> appointments;
 
         if (role == "Admin" || role == "Doctor")
         {
-            appointments = await _appointmentService.GetAllAsync(cancellationToken);
+            appointments = await _appointmentService.GetAllAsync(page, pageSize, cancellationToken);
         }
         else
         {
@@ -78,16 +78,48 @@ public class AppointmentsController : ControllerBase
 
     [HttpGet("patient/{patientId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult<ApiResponse<IEnumerable<AppointmentResponseDto>>>> GetByPatientId(int patientId, CancellationToken cancellationToken)
     {
+        var role = User.FindFirstValue(ClaimTypes.Role);
+        if (role != "Admin")
+        {
+            if (role == "Patient")
+            {
+                var patient = await _appointmentService.GetPatientByUserIdAsync(GetCurrentUserId(), cancellationToken);
+                if (patient == null || patient.Id != patientId)
+                    return Forbid();
+            }
+            else
+            {
+                return Forbid();
+            }
+        }
+
         var appointments = await _appointmentService.GetByPatientIdAsync(patientId, cancellationToken);
         return Ok(ApiResponse<IEnumerable<AppointmentResponseDto>>.SuccessResponse(appointments));
     }
 
     [HttpGet("doctor/{doctorId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult<ApiResponse<IEnumerable<AppointmentResponseDto>>>> GetByDoctorId(int doctorId, CancellationToken cancellationToken)
     {
+        var role = User.FindFirstValue(ClaimTypes.Role);
+        if (role != "Admin")
+        {
+            if (role == "Doctor")
+            {
+                var doctor = await _appointmentService.GetDoctorByUserIdAsync(GetCurrentUserId(), cancellationToken);
+                if (doctor == null || doctor.Id != doctorId)
+                    return Forbid();
+            }
+            else
+            {
+                return Forbid();
+            }
+        }
+
         var appointments = await _appointmentService.GetByDoctorIdAsync(doctorId, cancellationToken);
         return Ok(ApiResponse<IEnumerable<AppointmentResponseDto>>.SuccessResponse(appointments));
     }
@@ -132,7 +164,7 @@ public class AppointmentsController : ControllerBase
         }
         else
         {
-            appointments = await _appointmentService.GetAllAsync(cancellationToken);
+            appointments = await _appointmentService.GetAllAsync(cancellationToken: cancellationToken);
         }
         if (!string.IsNullOrEmpty(status))
         {
