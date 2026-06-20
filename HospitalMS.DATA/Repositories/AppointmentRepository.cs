@@ -193,7 +193,7 @@ public class AppointmentRepository : IAppointmentRepository
 
     public async Task<IEnumerable<TimeSpan>> GetAvailableSlotsAsync(int doctorId, DateTime date, int slotDurationMinutes = 30, CancellationToken cancellationToken = default)
     {
-        var today = DateTime.Today;
+        var today = DateTime.UtcNow.Date;
         if (date.Date < today)
             return new List<TimeSpan>();
 
@@ -227,7 +227,7 @@ public class AppointmentRepository : IAppointmentRepository
             .ToListAsync(cancellationToken);
         var availableSlots = new List<TimeSpan>();
         var currentTime = workingHours.StartTime;
-        var now = DateTime.Now;
+        var now = DateTime.UtcNow;
         while (currentTime.Add(TimeSpan.FromMinutes(slotDurationMinutes)) <= workingHours.EndTime)
         {
             var slotEndTime = currentTime.Add(TimeSpan.FromMinutes(slotDurationMinutes));

@@ -28,8 +28,8 @@ public class ReportingService : IReportingService
 
     public async Task<AppointmentReportDto> GenerateAppointmentReportAsync(DateTime? startDate = null, DateTime? endDate = null)
     {
-        var start = startDate ?? DateTime.Now.AddMonths(-1);
-        var end = endDate ?? DateTime.Now;
+        var start = startDate ?? DateTime.UtcNow.AddMonths(-1);
+        var end = endDate ?? DateTime.UtcNow;
         var appointments = await _appointmentRepository.GetByDateRangeAsync(start, end);
         var appointmentList = appointments.ToList();
         var totalCount = appointmentList.Count;
@@ -103,7 +103,7 @@ public class ReportingService : IReportingService
         var totalPatients = await _patientRepository.CountAsync();
         var today = DateTime.UtcNow.Date;
         var totalAppointments = await _appointmentRepository.CountAsync();
-        var appointmentsToday = await _appointmentRepository.CountAsync(a => a.AppointmentDate >= DateTime.Today && a.AppointmentDate < DateTime.Today.AddDays(1));
+        var appointmentsToday = await _appointmentRepository.CountAsync(a => a.AppointmentDate >= today && a.AppointmentDate < today.AddDays(1));
         var pendingApprovals = await _appointmentRepository.CountAsync(a => a.ApprovalStatus == AppointmentApprovalStatus.Pending && a.Status == AppointmentStatus.Scheduled);
         var completedCount = await _appointmentRepository.CountAsync(a => a.Status == AppointmentStatus.Completed);
         var noShowCount = await _appointmentRepository.CountAsync(a => a.Status == AppointmentStatus.NoShow);
@@ -122,8 +122,8 @@ public class ReportingService : IReportingService
 
     public async Task<MonthlyTrendDto> GetMonthlyTrendAsync(int months = 12)
     {
-        var startDate = DateTime.Now.AddMonths(-months);
-        var data = await _appointmentRepository.GetMonthlyTrendAsync(startDate, DateTime.Now);
+        var startDate = DateTime.UtcNow.AddMonths(-months);
+        var data = await _appointmentRepository.GetMonthlyTrendAsync(startDate, DateTime.UtcNow);
         var monthlyData = data.Select(x => new MonthDataDto
         {
             Month = $"{x.Year}-{x.Month:D2}",

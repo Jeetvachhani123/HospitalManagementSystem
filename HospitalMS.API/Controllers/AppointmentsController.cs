@@ -171,7 +171,7 @@ public class AppointmentsController : ControllerBase
             appointments = appointments.Where(a =>
                 status switch
                 {
-                    "Upcoming" => (a.Status == "Scheduled" || a.Status == "Confirmed") && a.ApprovalStatus == "Approved" && a.AppointmentDate.Date >= DateTime.Today,
+                    "Upcoming" => (a.Status == "Scheduled" || a.Status == "Confirmed") && a.ApprovalStatus == "Approved" && a.AppointmentDate.Date >= DateTime.UtcNow.Date,
                     "Pending" => a.ApprovalStatus == "Pending" && a.Status == "Scheduled",
                     "Completed" => a.Status == "Completed",
                     "Cancelled" => a.Status == "Cancelled" || a.Status == "NoShow" || a.ApprovalStatus == "Rejected",

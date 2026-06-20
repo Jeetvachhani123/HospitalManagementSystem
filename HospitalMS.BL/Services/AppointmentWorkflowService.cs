@@ -584,7 +584,8 @@ public class AppointmentWorkflowService : IAppointmentWorkflowService
         try
         {
             var totalAppointments = await _unitOfWork.Appointments.CountAsync();
-            var appointmentsToday = await _unitOfWork.Appointments.CountAsync(a => a.AppointmentDate >= DateTime.Today && a.AppointmentDate < DateTime.Today.AddDays(1));
+            var today = DateTime.UtcNow.Date;
+            var appointmentsToday = await _unitOfWork.Appointments.CountAsync(a => a.AppointmentDate >= today && a.AppointmentDate < today.AddDays(1));
             var pendingApprovals = await _unitOfWork.Appointments.CountAsync(a => a.ApprovalStatus == AppointmentApprovalStatus.Pending && a.Status == AppointmentStatus.Scheduled);
             await _realTimeNotificationService.BroadcastDashboardUpdate(totalAppointments, appointmentsToday, pendingApprovals);
         }
