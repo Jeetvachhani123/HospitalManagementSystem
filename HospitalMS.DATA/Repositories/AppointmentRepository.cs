@@ -25,6 +25,9 @@ public interface IAppointmentRepository
     Task<IEnumerable<Appointment>> GetRecentAsync(int count, CancellationToken cancellationToken = default);
     Task<(IEnumerable<Appointment> Items, int TotalCount)> SearchAsync(string? searchTerm, int? doctorId, int? patientId, DateTime? fromDate, DateTime? toDate, AppointmentStatus? status, int page, int pageSize, CancellationToken cancellationToken = default);
     Task<IEnumerable<(int Year, int Month, int Total, int Completed, int Cancelled)>> GetMonthlyTrendAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default);
+    Task<IEnumerable<Appointment>> GetAllPendingApprovalsAsync(CancellationToken cancellationToken = default);
+    Task<int> GetPatientAppointmentsCountAsync(int patientId, AppointmentStatus[]? statuses = null, AppointmentApprovalStatus[]? approvalStatuses = null, DateTime? fromDate = null, bool isUpcomingDashboard = false, bool isCancelledOrRejected = false, CancellationToken cancellationToken = default);
+    Task<IEnumerable<Appointment>> GetRecentAppointmentsForPatientAsync(int patientId, int count, CancellationToken cancellationToken = default);
 }
 
 public class AppointmentRepository : IAppointmentRepository
@@ -352,5 +355,66 @@ public class AppointmentRepository : IAppointmentRepository
             .ToListAsync(cancellationToken);
 
         return (items, totalCount);
+    }
+
+    public async Task<IEnumerable<Appointment>> GetAllPendingApprovalsAsync(CancellationToken cancellationToken = default)
+    {
+        return await _context.Appointments
+            .AsNoTracking()
+            .Include(a => a.Patient)
+                .ThenInclude(p => p.User)
+            .Include(a => a.Doctor)
+                .ThenInclude(d => d.User)
+            .AsSplitQuery()
+            .Where(a => a.ApprovalStatus == AppointmentApprovalStatus.Pending && a.Status == AppointmentStatus.Scheduled)
+            .OrderBy(a => a.AppointmentDate)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<int> GetPatientAppointmentsCountAsync(int patientId, AppointmentStatus[]? statuses = null, AppointmentApprovalStatus[]? approvalStatuses = null, DateTime? fromDate = null, bool isUpcomingDashboard = false, bool isCancelledOrRejected = false, CancellationToken cancellationToken = default)
+    {
+        var query = _context.Appointments.AsNoTracking().Where(a => a.PatientId == patientId);
+
+        if (isUpcomingDashboard)
+        {
+            var today = DateTime.UtcNow.Date;
+            query = query.Where(a => (a.Status == AppointmentStatus.Scheduled || a.Status == AppointmentStatus.Confirmed) && a.ApprovalStatus == AppointmentApprovalStatus.Approved && a.AppointmentDate >= today);
+        }
+        else if (isCancelledOrRejected)
+        {
+            query = query.Where(a => a.Status == AppointmentStatus.Cancelled || a.Status == AppointmentStatus.NoShow || a.ApprovalStatus == AppointmentApprovalStatus.Rejected);
+        }
+        else
+        {
+            if (statuses != null && statuses.Length > 0)
+            {
+                query = query.Where(a => statuses.Contains(a.Status));
+            }
+            if (approvalStatuses != null && approvalStatuses.Length > 0)
+            {
+                query = query.Where(a => approvalStatuses.Contains(a.ApprovalStatus));
+            }
+            if (fromDate.HasValue)
+            {
+                query = query.Where(a => a.AppointmentDate >= fromDate.Value);
+            }
+        }
+
+        return await query.CountAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<Appointment>> GetRecentAppointmentsForPatientAsync(int patientId, int count, CancellationToken cancellationToken = default)
+    {
+        return await _context.Appointments
+            .AsNoTracking()
+            .Include(a => a.Patient)
+                .ThenInclude(p => p.User)
+            .Include(a => a.Doctor)
+                .ThenInclude(d => d.User)
+            .AsSplitQuery()
+            .Where(a => a.PatientId == patientId)
+            .OrderByDescending(a => a.AppointmentDate)
+            .Take(count)
+            .ToListAsync(cancellationToken);
     }
 }

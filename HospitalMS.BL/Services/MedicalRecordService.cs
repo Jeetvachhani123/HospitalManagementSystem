@@ -63,8 +63,7 @@ public class MedicalRecordService : IMedicalRecordService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error creating medical record");
-
-            return null;
+            throw;
         }
     }
 
@@ -102,7 +101,7 @@ public class MedicalRecordService : IMedicalRecordService
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Error deleting medical record {id}");
-            return false;
+            throw;
         }
     }
 }

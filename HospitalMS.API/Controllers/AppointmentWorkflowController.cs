@@ -27,7 +27,8 @@ public class AppointmentWorkflowController : ControllerBase
     public async Task<ActionResult<ApiResponse<AppointmentResponseDto>>> RequestAppointment([FromBody] AppointmentCreateDto dto)
     {
         var userId = GetCurrentUserId();
-        if (userId == null) return Unauthorized();
+        if (userId == null)
+            return Unauthorized();
 
         var result = await _workflowService.RequestAppointmentAsync(dto, userId.Value);
         if (result == null)

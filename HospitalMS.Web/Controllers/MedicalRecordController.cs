@@ -185,5 +185,80 @@ namespace HospitalMS.Web.Controllers
 
             return RedirectToAction(nameof(Index), new { patientId });
         }
+
+        [HttpGet("/medicalrecords/download/{patientId:int}/{fileName}")]
+        public async Task<IActionResult> Download(int patientId, string fileName, [FromServices] IAppointmentService appointmentService)
+        {
+            if (string.IsNullOrWhiteSpace(fileName) || fileName.Contains("..") || fileName.Contains("/") || fileName.Contains("\\"))
+            {
+                return BadRequest("Invalid file name.");
+            }
+
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdStr, out var userId))
+            {
+                return Unauthorized();
+            }
+
+            var role = User.FindFirstValue(ClaimTypes.Role);
+
+            if (role == "Patient")
+            {
+                var patient = await _patientService.GetByUserIdAsync(userId);
+                if (patient == null || patient.Id != patientId)
+                {
+                    _logger.LogWarning("Patient {UserId} attempted to download record of patient {PatientId}", userId, patientId);
+                    return Forbid();
+                }
+            }
+            else if (role == "Doctor")
+            {
+                var doctor = await _doctorService.GetByUserIdAsync(userId);
+                if (doctor == null)
+                {
+                    return Forbid();
+                }
+
+                var (_, totalCount) = await appointmentService.SearchAsync(
+                    searchTerm: null,
+                    doctorId: doctor.Id,
+                    patientId: patientId,
+                    fromDate: null,
+                    toDate: null,
+                    status: null,
+                    page: 1,
+                    pageSize: 1
+                );
+
+                if (totalCount == 0)
+                {
+                    _logger.LogWarning("Doctor {UserId} attempted to download record of patient {PatientId} without an appointment relationship", userId, patientId);
+                    return Forbid();
+                }
+            }
+            else if (role != "Admin")
+            {
+                return Forbid();
+            }
+
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "App_Data", "medical_records", patientId.ToString());
+            var filePath = Path.Combine(uploadsFolder, fileName);
+
+            if (!System.IO.File.Exists(filePath))
+            {
+                return NotFound("File not found.");
+            }
+
+            var extension = Path.GetExtension(fileName).ToLowerInvariant();
+            var contentType = extension switch
+            {
+                ".pdf" => "application/pdf",
+                ".jpg" or ".jpeg" => "image/jpeg",
+                ".png" => "image/png",
+                _ => "application/octet-stream"
+            };
+
+            return PhysicalFile(filePath, contentType, fileName);
+        }
     }
 }

@@ -263,6 +263,7 @@ public class AppointmentController : Controller
 
     [HttpPost]
     [Authorize(Roles = "Doctor")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Approve(int appointmentId)
     {
         try
@@ -313,6 +314,7 @@ public class AppointmentController : Controller
 
     [HttpPost]
     [Authorize(Roles = "Doctor")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Reject(int appointmentId, string rejectionReason)
     {
         try
@@ -361,6 +363,7 @@ public class AppointmentController : Controller
 
     [HttpPost]
     [Authorize(Roles = "Doctor")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Complete(int appointmentId, string? diagnosis, string? prescription, string? notes)
     {
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -383,6 +386,7 @@ public class AppointmentController : Controller
     }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Cancel(int appointmentId, string? reason)
     {
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -485,6 +489,7 @@ public class AppointmentController : Controller
 
     [HttpPost]
     [Authorize(Roles = "Doctor")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> MarkNoShow(int appointmentId)
     {
         var result = await _workflowService.MarkAsNoShowAsync(appointmentId);

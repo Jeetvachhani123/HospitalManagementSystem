@@ -15,6 +15,7 @@ public interface IPatientRepository
     void Delete(Patient patient);
     Task<(IEnumerable<Patient> Items, int TotalCount)> SearchAsync(string? searchTerm, int page, int pageSize, CancellationToken cancellationToken = default);
     Task<int> CountAsync(Expression<Func<Patient, bool>>? predicate = null, CancellationToken cancellationToken = default);
+    Task<IEnumerable<Patient>> SearchPatientsAsync(string searchTerm, int? page = null, int? pageSize = null, CancellationToken cancellationToken = default);
 }
 
 public class PatientRepository : IPatientRepository
@@ -96,5 +97,25 @@ public class PatientRepository : IPatientRepository
             .ToListAsync(cancellationToken);
 
         return (items, totalCount);
+    }
+
+    public async Task<IEnumerable<Patient>> SearchPatientsAsync(string searchTerm, int? page = null, int? pageSize = null, CancellationToken cancellationToken = default)
+    {
+        var query = _context.Patients
+            .Include(p => p.User)
+            .AsNoTracking();
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            var lowerQuery = searchTerm.ToLower();
+            query = query.Where(p => p.User.FirstName.ToLower().Contains(lowerQuery) || p.User.LastName.ToLower().Contains(lowerQuery) || p.User.Email.ToLower().Contains(lowerQuery) || (p.User.PhoneNumber != null && p.User.PhoneNumber.Contains(searchTerm)));
+        }
+
+        if (page.HasValue && pageSize.HasValue)
+        {
+            query = query.Skip((page.Value - 1) * pageSize.Value).Take(pageSize.Value);
+        }
+
+        return await query.ToListAsync(cancellationToken);
     }
 }

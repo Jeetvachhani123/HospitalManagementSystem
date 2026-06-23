@@ -18,6 +18,7 @@ public interface IDoctorRepository
     void Delete(Doctor doctor);
     Task<bool> LicenseNumberExistsAsync(string licenseNumber);
     Task<int> CountAsync(Expression<Func<Doctor, bool>>? predicate = null, CancellationToken cancellationToken = default);
+    Task<IEnumerable<Doctor>> SearchDoctorsAsync(string searchTerm, int? page = null, int? pageSize = null, CancellationToken cancellationToken = default);
 }
 
 public class DoctorRepository : IDoctorRepository
@@ -130,5 +131,26 @@ public class DoctorRepository : IDoctorRepository
     public async Task<bool> LicenseNumberExistsAsync(string licenseNumber)
     {
         return await _context.Doctors.AnyAsync(d => d.LicenseNumber == licenseNumber);
+    }
+
+    public async Task<IEnumerable<Doctor>> SearchDoctorsAsync(string searchTerm, int? page = null, int? pageSize = null, CancellationToken cancellationToken = default)
+    {
+        var query = _context.Doctors
+            .Include(d => d.User)
+            .Include(d => d.Department)
+            .AsNoTracking();
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            var lowerQuery = searchTerm.ToLower();
+            query = query.Where(d => d.User.FirstName.ToLower().Contains(lowerQuery) || d.User.LastName.ToLower().Contains(lowerQuery) || d.Specialization.ToLower().Contains(lowerQuery) || d.LicenseNumber.ToLower().Contains(lowerQuery));
+        }
+
+        if (page.HasValue && pageSize.HasValue)
+        {
+            query = query.Skip((page.Value - 1) * pageSize.Value).Take(pageSize.Value);
+        }
+
+        return await query.ToListAsync(cancellationToken);
     }
 }

@@ -99,4 +99,19 @@ public static class InputSanitizer
 
         return input.Trim();
     }
+
+    public static string SanitizeForCsv(string? input)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+            return string.Empty;
+
+        var sanitized = input.Trim();
+
+        if (sanitized.Length > 0 && "=+-@".Contains(sanitized[0]))
+        {
+            sanitized = "'" + sanitized;
+        }
+
+        return sanitized;
+    }
 }

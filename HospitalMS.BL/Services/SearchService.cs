@@ -6,8 +6,8 @@ namespace HospitalMS.BL.Services;
 public interface ISearchService
 {
     Task<(IEnumerable<AppointmentSearchResultDto> Items, int TotalCount)> SearchAppointmentsAsync(string query, int? doctorId, int? patientId, DateTime? fromDate, DateTime? toDate, AppointmentStatus? status, int page, int pageSize);
-    Task<List<DoctorSearchResultDto>> SearchDoctorsAsync(string query);
-    Task<List<PatientSearchResultDto>> SearchPatientsAsync(string query);
+    Task<List<DoctorSearchResultDto>> SearchDoctorsAsync(string query, int? page = null, int? pageSize = null);
+    Task<List<PatientSearchResultDto>> SearchPatientsAsync(string query, int? page = null, int? pageSize = null);
 }
 
 public class AppointmentSearchResultDto
@@ -61,16 +61,14 @@ public class SearchService : ISearchService
         return (dtos, result.TotalCount);
     }
 
-    public async Task<List<DoctorSearchResultDto>> SearchDoctorsAsync(string query)
+    public async Task<List<DoctorSearchResultDto>> SearchDoctorsAsync(string query, int? page = null, int? pageSize = null)
     {
         if (string.IsNullOrWhiteSpace(query))
             return new List<DoctorSearchResultDto>();
 
-        var doctors = await _doctorRepository.GetAllAsync();
-        var lowerQuery = query.ToLower();
-        var results = doctors.Where(d => d.User.FirstName.ToLower().Contains(lowerQuery) || d.User.LastName.ToLower().Contains(lowerQuery) || d.Specialization.ToLower().Contains(lowerQuery) || d.LicenseNumber.ToLower().Contains(lowerQuery));
+        var doctors = await _doctorRepository.SearchDoctorsAsync(query, page, pageSize);
 
-        return results.Select(d => new DoctorSearchResultDto
+        return doctors.Select(d => new DoctorSearchResultDto
         {
             Id = d.Id,
             Name = $"{d.User.FirstName} {d.User.LastName}",
@@ -79,15 +77,14 @@ public class SearchService : ISearchService
         }).ToList();
     }
 
-    public async Task<List<PatientSearchResultDto>> SearchPatientsAsync(string query)
+    public async Task<List<PatientSearchResultDto>> SearchPatientsAsync(string query, int? page = null, int? pageSize = null)
     {
         if (string.IsNullOrWhiteSpace(query))
             return new List<PatientSearchResultDto>();
-        var patients = await _patientRepository.GetAllAsync();
-        var lowerQuery = query.ToLower();
-        var results = patients.Where(p => p.User.FirstName.ToLower().Contains(lowerQuery) || p.User.LastName.ToLower().Contains(lowerQuery) || p.User.Email.ToLower().Contains(lowerQuery) || (p.User.PhoneNumber != null && p.User.PhoneNumber.Contains(query)));
 
-        return results.Select(p => new PatientSearchResultDto
+        var patients = await _patientRepository.SearchPatientsAsync(query, page, pageSize);
+
+        return patients.Select(p => new PatientSearchResultDto
         {
             Id = p.Id,
             Name = $"{p.User.FirstName} {p.User.LastName}",

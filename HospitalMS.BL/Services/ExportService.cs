@@ -38,6 +38,21 @@ public class ExportService : IExportService
         QuestPDF.Settings.License = LicenseType.Community;
     }
 
+    private static string SanitizeForCsv(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return string.Empty;
+
+        var sanitized = value.Trim();
+
+        if (sanitized.Length > 0 && "=+-@".Contains(sanitized[0]))
+        {
+            sanitized = "'" + sanitized;
+        }
+
+        return sanitized;
+    }
+
     public Task<byte[]> ExportAppointmentsToCSVAsync(List<AppointmentExportDto> appointments)
     {
         static string Q(string? s) =>
@@ -63,14 +78,14 @@ public class ExportService : IExportService
             sb.AppendLine(string.Join(",", new[]
             {
                 Q(no++.ToString()),
-                Q(apt.PatientName),
-                Q(apt.DoctorName),
+                Q(SanitizeForCsv(apt.PatientName)),
+                Q(SanitizeForCsv(apt.DoctorName)),
                 Q(apt.AppointmentDate.ToString("dd MMM yyyy")),
                 Q(apt.StartTime.ToString(@"hh\:mm")),
                 Q(apt.EndTime.ToString(@"hh\:mm")),
-                Q(apt.Status),
-                Q(apt.Reason),
-                Q(apt.Diagnosis ?? "")
+                Q(SanitizeForCsv(apt.Status)),
+                Q(SanitizeForCsv(apt.Reason)),
+                Q(SanitizeForCsv(apt.Diagnosis ?? ""))
             }));
         }
         sb.AppendLine(E);
@@ -141,9 +156,9 @@ public class ExportService : IExportService
             }
             ws.Cell(row, 1).Value = row - 4;
             StyleDataCell(ws.Cell(row, 1), XLAlignmentHorizontalValues.Center);
-            ws.Cell(row, 2).Value = apt.PatientName;
+            ws.Cell(row, 2).Value = SanitizeForCsv(apt.PatientName);
             StyleDataCell(ws.Cell(row, 2));
-            ws.Cell(row, 3).Value = apt.DoctorName;
+            ws.Cell(row, 3).Value = SanitizeForCsv(apt.DoctorName);
             StyleDataCell(ws.Cell(row, 3));
             ws.Cell(row, 4).Value = apt.AppointmentDate.ToString("dd MMM yyyy");
             StyleDataCell(ws.Cell(row, 4), XLAlignmentHorizontalValues.Center);
@@ -151,7 +166,7 @@ public class ExportService : IExportService
             StyleDataCell(ws.Cell(row, 5), XLAlignmentHorizontalValues.Center);
             ws.Cell(row, 6).Value = apt.EndTime.ToString(@"hh\:mm");
             StyleDataCell(ws.Cell(row, 6), XLAlignmentHorizontalValues.Center);
-            ws.Cell(row, 7).Value = apt.Status;
+            ws.Cell(row, 7).Value = SanitizeForCsv(apt.Status);
             StyleDataCell(ws.Cell(row, 7), XLAlignmentHorizontalValues.Center);
             ws.Cell(row, 7).Style.Font.SetBold(true);
             ws.Cell(row, 7).Style.Font.SetFontColor(apt.Status switch
@@ -162,9 +177,9 @@ public class ExportService : IExportService
                 "NoShow" => XLColor.FromHtml("#FFC107"),
                 _ => XLColor.FromHtml("#333333")
             });
-            ws.Cell(row, 8).Value = apt.Reason ?? "";
+            ws.Cell(row, 8).Value = SanitizeForCsv(apt.Reason ?? "");
             StyleDataCell(ws.Cell(row, 8));
-            ws.Cell(row, 9).Value = apt.Diagnosis ?? "";
+            ws.Cell(row, 9).Value = SanitizeForCsv(apt.Diagnosis ?? "");
             StyleDataCell(ws.Cell(row, 9));
             ws.Row(row).Height = 18;
             row++;
@@ -279,13 +294,13 @@ public class ExportService : IExportService
                             _ => "#333333"
                         };
                         DataCell(no++.ToString(), center: true);
-                        DataCell(apt.PatientName);
-                        DataCell(apt.DoctorName);
+                        DataCell(SanitizeForCsv(apt.PatientName));
+                        DataCell(SanitizeForCsv(apt.DoctorName));
                         DataCell(apt.AppointmentDate.ToString("dd MMM yyyy"), center: true);
                         DataCell(apt.StartTime.ToString(@"hh\:mm"), center: true);
                         DataCell(apt.EndTime.ToString(@"hh\:mm"), center: true);
-                        DataCellBold(apt.Status, center: true, color: statusColor);
-                        DataCell(apt.Reason ?? "");
+                        DataCellBold(SanitizeForCsv(apt.Status), center: true, color: statusColor);
+                        DataCell(SanitizeForCsv(apt.Reason ?? ""));
                     }
                 });
                 page.Footer().BorderTop(1).BorderColor("#DDDDDD").PaddingTop(5).Row(r =>

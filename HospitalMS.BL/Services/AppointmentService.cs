@@ -34,6 +34,9 @@ public interface IAppointmentService
     Task<int> GetAppointmentsCountAsync(int doctorId, AppointmentStatus? status = null, DateTime? date = null, CancellationToken cancellationToken = default);
     Task<(IEnumerable<AppointmentResponseDto> Items, int TotalCount)> SearchAsync(string? searchTerm, int? doctorId, int? patientId, DateTime? fromDate, DateTime? toDate, AppointmentStatus? status, int page, int pageSize, CancellationToken cancellationToken = default);
     Task<IEnumerable<AppointmentResponseDto>> GetUpcomingByDoctorIdAsync(int doctorId, int count, CancellationToken cancellationToken = default);
+    Task<IEnumerable<AppointmentResponseDto>> GetAllPendingApprovalsAsync(CancellationToken cancellationToken = default);
+    Task<int> GetPatientAppointmentsCountAsync(int patientId, AppointmentStatus[]? statuses = null, AppointmentApprovalStatus[]? approvalStatuses = null, DateTime? fromDate = null, bool isUpcomingDashboard = false, bool isCancelledOrRejected = false, CancellationToken cancellationToken = default);
+    Task<IEnumerable<AppointmentResponseDto>> GetRecentAppointmentsForPatientAsync(int patientId, int count, CancellationToken cancellationToken = default);
 }
 
 public class AppointmentService : IAppointmentService
@@ -519,5 +522,22 @@ public class AppointmentService : IAppointmentService
         var today = DateTime.UtcNow.Date;
         var (items, _) = await _unitOfWork.Appointments.SearchAsync(null, doctorId, null, today, null, AppointmentStatus.Scheduled, 1, count, cancellationToken);
         return items.Select(MapToAppointmentResponse);
+    }
+
+    public async Task<IEnumerable<AppointmentResponseDto>> GetAllPendingApprovalsAsync(CancellationToken cancellationToken = default)
+    {
+        var appointments = await _unitOfWork.Appointments.GetAllPendingApprovalsAsync(cancellationToken);
+        return appointments.Select(MapToAppointmentResponse);
+    }
+
+    public async Task<int> GetPatientAppointmentsCountAsync(int patientId, AppointmentStatus[]? statuses = null, AppointmentApprovalStatus[]? approvalStatuses = null, DateTime? fromDate = null, bool isUpcomingDashboard = false, bool isCancelledOrRejected = false, CancellationToken cancellationToken = default)
+    {
+        return await _unitOfWork.Appointments.GetPatientAppointmentsCountAsync(patientId, statuses, approvalStatuses, fromDate, isUpcomingDashboard, isCancelledOrRejected, cancellationToken);
+    }
+
+    public async Task<IEnumerable<AppointmentResponseDto>> GetRecentAppointmentsForPatientAsync(int patientId, int count, CancellationToken cancellationToken = default)
+    {
+        var appointments = await _unitOfWork.Appointments.GetRecentAppointmentsForPatientAsync(patientId, count, cancellationToken);
+        return appointments.Select(MapToAppointmentResponse);
     }
 }

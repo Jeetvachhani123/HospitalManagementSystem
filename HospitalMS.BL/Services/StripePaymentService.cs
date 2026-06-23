@@ -90,12 +90,12 @@ public class StripePaymentService : IPaymentService
         catch (StripeException ex)
         {
             _logger.LogError(ex, "Stripe webhook error");
-            return false;
+            throw;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error handling Stripe webhook");
-            return false;
+            throw;
         }
     }
 }

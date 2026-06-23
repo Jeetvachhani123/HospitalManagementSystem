@@ -124,8 +124,7 @@ public class ReportsController : ControllerBase
                 return NotFound(ApiResponse<DashboardStatsDto>.ErrorResponse("Doctor profile not found"));
             }
             var performance = await _reportingService.GenerateDoctorPerformanceReportAsync(doctor.Id);
-            var todayAppointments = await _appointmentService.GetByDoctorIdAsync(doctor.Id);
-            var today = todayAppointments.Count(a => a.AppointmentDate.Date == DateTime.UtcNow.Date);
+            var today = await _appointmentService.GetAppointmentsCountAsync(doctor.Id, null, DateTime.UtcNow.Date);
             stats = new DashboardStatsDto { TotalAppointments = performance.TotalAppointments, CompletedAppointments = performance.CompletedAppointments, AppointmentsToday = today, ApprovalRate = performance.ApprovalRate, PatientsServed = performance.PatientsServed };
         }
         else if (role == "Patient")
@@ -135,10 +134,10 @@ public class ReportsController : ControllerBase
             {
                 return NotFound(ApiResponse<DashboardStatsDto>.ErrorResponse("Patient profile not found"));
             }
-            var appointments = await _appointmentService.GetByPatientIdAsync(patient.Id);
-            var upcoming = appointments.Count(a => a.AppointmentDate >= DateTime.UtcNow && a.Status == "Scheduled");
-            var completed = appointments.Count(a => a.Status == "Completed");
-            stats = new DashboardStatsDto { TotalAppointments = appointments.Count(), UpcomingAppointments = upcoming, CompletedAppointments = completed };
+            var total = await _appointmentService.GetPatientAppointmentsCountAsync(patient.Id);
+            var upcoming = await _appointmentService.GetPatientAppointmentsCountAsync(patient.Id, statuses: new[] { HospitalMS.Models.Enums.AppointmentStatus.Scheduled }, fromDate: DateTime.UtcNow);
+            var completed = await _appointmentService.GetPatientAppointmentsCountAsync(patient.Id, statuses: new[] { HospitalMS.Models.Enums.AppointmentStatus.Completed });
+            stats = new DashboardStatsDto { TotalAppointments = total, UpcomingAppointments = upcoming, CompletedAppointments = completed };
         }
         else
         {
@@ -234,27 +233,30 @@ public class ReportsController : ControllerBase
         if (patient == null)
             return NotFound(ApiResponse<PatientDashboardApiDto>.ErrorResponse("Patient profile not found"));
 
-        var appointments = (await _appointmentService.GetByPatientIdAsync(patient.Id)).ToList();
+        var total = await _appointmentService.GetPatientAppointmentsCountAsync(patient.Id);
+        var upcoming = await _appointmentService.GetPatientAppointmentsCountAsync(patient.Id, isUpcomingDashboard: true);
+        var completed = await _appointmentService.GetPatientAppointmentsCountAsync(patient.Id, statuses: new[] { HospitalMS.Models.Enums.AppointmentStatus.Completed });
+        var cancelled = await _appointmentService.GetPatientAppointmentsCountAsync(patient.Id, isCancelledOrRejected: true);
+        var pending = await _appointmentService.GetPatientAppointmentsCountAsync(patient.Id, statuses: new[] { HospitalMS.Models.Enums.AppointmentStatus.Scheduled }, approvalStatuses: new[] { HospitalMS.Models.Enums.AppointmentApprovalStatus.Pending });
+        var recent = await _appointmentService.GetRecentAppointmentsForPatientAsync(patient.Id, 5);
+
         var dto = new PatientDashboardApiDto
         {
             PatientId = patient.Id,
             PatientName = patient.FullName,
-            UpcomingAppointmentsCount = appointments.Count(a => (a.Status == "Scheduled" || a.Status == "Confirmed") && a.ApprovalStatus == "Approved" && a.AppointmentDate.Date >= DateTime.UtcNow.Date),
-            CompletedAppointmentsCount = appointments.Count(a => a.Status == "Completed"),
-            CancelledAppointmentsCount = appointments.Count(a => a.Status == "Cancelled" || a.Status == "NoShow" || a.ApprovalStatus == "Rejected"),
-            PendingApprovalsCount = appointments.Count(a => a.ApprovalStatus == "Pending" && a.Status == "Scheduled"),
-            TotalAppointments = appointments.Count,
-            RecentAppointments = appointments
-                .OrderByDescending(a => a.AppointmentDate)
-                .Take(5)
-                .Select(a => new RecentAppointmentSummaryDto
-                {
-                    Id = a.Id,
-                    PatientName = a.PatientName,
-                    DoctorName = a.DoctorName,
-                    Status = a.Status,
-                    AppointmentDate = a.AppointmentDate
-                }).ToList()
+            UpcomingAppointmentsCount = upcoming,
+            CompletedAppointmentsCount = completed,
+            CancelledAppointmentsCount = cancelled,
+            PendingApprovalsCount = pending,
+            TotalAppointments = total,
+            RecentAppointments = recent.Select(a => new RecentAppointmentSummaryDto
+            {
+                Id = a.Id,
+                PatientName = a.PatientName,
+                DoctorName = a.DoctorName,
+                Status = a.Status,
+                AppointmentDate = a.AppointmentDate
+            }).ToList()
         };
 
         _logger.LogInformation("Patient dashboard data retrieved for patient {PatientId}", patient.Id);
@@ -304,8 +306,7 @@ public class ReportsController : ControllerBase
                 })));
 
             case "PendingApprovals":
-                var all = await _appointmentService.GetAllAsync();
-                var pending = all.Where(a => a.ApprovalStatus == "Pending" && a.Status == "Scheduled");
+                var pending = await _appointmentService.GetAllPendingApprovalsAsync();
                 return Ok(ApiResponse<object>.SuccessResponse(pending.Select(a => new
                 {
                     patient = a.PatientName,

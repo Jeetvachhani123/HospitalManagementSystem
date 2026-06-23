@@ -135,6 +135,7 @@
                     </div>
                     <div class="card-body p-4">
                         <form asp-action="Complete" method="post">
+                            @Html.AntiForgeryToken()
                             <input type="hidden" name="appointmentId" value="@Model.Id" />
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Clinical Diagnosis <span class="text-danger">*</span></label>
@@ -249,6 +250,7 @@
                             <i class="bi bi-calendar2-week me-2"></i> Reschedule
                         </a>
                         <form asp-action="Cancel" method="post" class="d-grid" onsubmit="return confirm('Are you sure you want to cancel this appointment? This cannot be undone.');">
+                            @Html.AntiForgeryToken()
                             <input type="hidden" name="appointmentId" value="@Model.Id" />
                             <button type="submit" class="btn btn-outline-danger">
                                 <i class="bi bi-x-circle me-2"></i> Cancel Appointment

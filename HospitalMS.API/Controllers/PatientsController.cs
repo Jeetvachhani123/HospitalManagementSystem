@@ -35,9 +35,7 @@ public class PatientsController : ControllerBase
             return NotFound(ApiResponse<PatientResponseDto>.ErrorResponse(Constants.Messages.PatientNotFound));
         }
 
-        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
-        var role = User.FindFirstValue(ClaimTypes.Role);
-        if (role == "Patient" && patient.UserId != userId)
+        if (!IsAuthorizedToAccessPatient(patient.UserId))
         {
             return Forbid();
         }
@@ -54,7 +52,26 @@ public class PatientsController : ControllerBase
             return NotFound(ApiResponse<PatientResponseDto>.ErrorResponse(Constants.Messages.PatientNotFound));
         }
 
+        if (!IsAuthorizedToAccessPatient(patient.UserId))
+        {
+            return Forbid();
+        }
+
         return Ok(ApiResponse<PatientResponseDto>.SuccessResponse(patient));
+    }
+
+    private bool IsAuthorizedToAccessPatient(int patientUserId)
+    {
+        var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        var role = User.FindFirstValue(ClaimTypes.Role);
+
+        if (role == "Admin")
+            return true;
+
+        if (role == "Patient" && patientUserId == currentUserId)
+            return true;
+
+        return false;
     }
 
     [HttpPost]

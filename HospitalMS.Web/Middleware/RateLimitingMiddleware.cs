@@ -38,10 +38,12 @@ public class RateLimitingMiddleware
         {
             requestInfo.RequestCount = 0;
             requestInfo.LoginAttempts = 0;
+            requestInfo.RegisterAttempts = 0;
             requestInfo.WindowStart = DateTime.UtcNow;
         }
 
         requestInfo.RequestCount++;
+
         if (path.Contains("/account/login") && context.Request.Method == "POST")
         {
             requestInfo.LoginAttempts++;
@@ -52,6 +54,20 @@ public class RateLimitingMiddleware
                 _logger.LogWarning("Too many login attempts from IP: {IpAddress}. Blocking for {Minutes} minutes", ipAddress, BlockDurationMinutes);
                 context.Response.StatusCode = StatusCodes.Status429TooManyRequests;
                 await context.Response.WriteAsync("Too many login attempts. Please try again later.");
+                return;
+            }
+        }
+
+        if (path.Contains("/account/register") && context.Request.Method == "POST")
+        {
+            requestInfo.RegisterAttempts++;
+            if (requestInfo.RegisterAttempts > MaxLoginAttemptsPerMinute)
+            {
+                requestInfo.IsBlocked = true;
+                requestInfo.BlockedUntil = DateTime.UtcNow.AddMinutes(BlockDurationMinutes);
+                _logger.LogWarning("Too many registration attempts from IP: {IpAddress}. Blocking for {Minutes} minutes", ipAddress, BlockDurationMinutes);
+                context.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+                await context.Response.WriteAsync("Too many registration attempts. Please try again later.");
                 return;
             }
         }
@@ -111,6 +127,7 @@ public class RateLimitingMiddleware
     {
         public int RequestCount { get; set; }
         public int LoginAttempts { get; set; }
+        public int RegisterAttempts { get; set; }
         public DateTime WindowStart { get; set; } = DateTime.UtcNow;
         public bool IsBlocked { get; set; }
         public DateTime BlockedUntil { get; set; }

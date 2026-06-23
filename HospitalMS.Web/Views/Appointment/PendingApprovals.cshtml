@@ -124,7 +124,7 @@
         $(document).ready(function() {
             let currentApptId = null;
             const rejectModal = new bootstrap.Modal(document.getElementById('rejectModal'));
-            const antiForgeryToken = '@Guid.NewGuid().ToString()';
+            const antiForgeryToken = $('input[name="__RequestVerificationToken"]').val();
             function showAlert(msg, type) {
                 const icon = type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill';
                 const html = `
@@ -140,7 +140,10 @@
                 const id = btn.data('id');
                 if(!confirm('Confirm approval?')) return;
                 btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span>');
-                $.post('@Url.Action("Approve", "Appointment")', { appointmentId: id }, function(res) {
+                $.post('@Url.Action("Approve", "Appointment")', {
+                    appointmentId: id,
+                    __RequestVerificationToken: antiForgeryToken
+                }, function(res) {
                     if(res.success || res.status === 200) {
                         showAlert('Appointment approved successfully.', 'success');
                         $('#appointment-' + id).fadeOut(function() { $(this).remove(); checkEmpty(); });
@@ -167,7 +170,11 @@
                 }
                 const btn = $(this);
                 btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span>');
-                $.post('@Url.Action("Reject", "Appointment")', { appointmentId: currentApptId, rejectionReason: reason }, function(res) {
+                $.post('@Url.Action("Reject", "Appointment")', {
+                    appointmentId: currentApptId,
+                    rejectionReason: reason,
+                    __RequestVerificationToken: antiForgeryToken
+                }, function(res) {
                     rejectModal.hide();
                     if(res.success || res.status === 200) {
                         showAlert('Appointment rejected.', 'success');

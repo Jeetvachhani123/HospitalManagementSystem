@@ -12,8 +12,6 @@ public interface IReportingService
     Task<MonthlyTrendDto> GetMonthlyTrendAsync(int months = 12);
 }
 
-
-
 public class ReportingService : IReportingService
 {
     private readonly IAppointmentRepository _appointmentRepository;

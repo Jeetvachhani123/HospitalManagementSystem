@@ -88,13 +88,7 @@ public class AdminController : Controller
             case "PendingApprovals":
                 var appointments = await _appointmentService.GetAllAsync();
                 var pending = appointments
-                    .Where(a =>
-                        a.ApprovalStatusEnum ==
-                            HospitalMS.Models.Enums.AppointmentApprovalStatus.Pending
-                        &&
-                        a.StatusEnum ==
-                            HospitalMS.Models.Enums.AppointmentStatus.Scheduled
-                    );
+                    .Where(a => a.ApprovalStatusEnum == HospitalMS.Models.Enums.AppointmentApprovalStatus.Pending && a.StatusEnum == HospitalMS.Models.Enums.AppointmentStatus.Scheduled);
                 return Json(pending.Select(a => new
                 {
                     patient = a.PatientName,
