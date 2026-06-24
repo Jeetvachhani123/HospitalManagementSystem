@@ -251,9 +251,12 @@ public class AppointmentsController : ControllerBase
 
     [HttpGet("export/csv")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> ExportCsv([FromQuery] int? patientId = null, [FromQuery] int? doctorId = null, CancellationToken cancellationToken = default)
     {
-        var data = await GetFilteredAsync(patientId, doctorId, cancellationToken);
+        var (data, error) = await GetFilteredAsync(patientId, doctorId, cancellationToken);
+        if (error != null)
+            return error;
         var sb = new StringBuilder();
         sb.AppendLine("Id,PatientId,PatientName,DoctorId,DoctorName,Specialization,Date,StartTime,EndTime,Status,ApprovalStatus,Reason,Diagnosis,Prescription,Notes,CreatedAt");
         foreach (var a in data)
@@ -272,9 +275,14 @@ public class AppointmentsController : ControllerBase
 
     [HttpGet("export/excel")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> ExportExcel([FromQuery] int? patientId = null, [FromQuery] int? doctorId = null, CancellationToken cancellationToken = default)
     {
-        var data = (await GetFilteredAsync(patientId, doctorId, cancellationToken)).ToList();
+        var (filtered, error) = await GetFilteredAsync(patientId, doctorId, cancellationToken);
+        if (error != null)
+            return error;
+
+        var data = filtered.ToList();
         using var wb = new XLWorkbook();
         var ws = wb.Worksheets.Add("Appointments");
         var headers = new[] { "ID", "Patient", "Doctor", "Specialization", "Date", "Start", "End", "Status", "Approval", "Reason", "Diagnosis", "Prescription", "Notes", "Created At" };
@@ -318,9 +326,14 @@ public class AppointmentsController : ControllerBase
 
     [HttpGet("export/pdf")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> ExportPdf([FromQuery] int? patientId = null, [FromQuery] int? doctorId = null, CancellationToken cancellationToken = default)
     {
-        var data = (await GetFilteredAsync(patientId, doctorId, cancellationToken)).ToList();
+        var (filtered, error) = await GetFilteredAsync(patientId, doctorId, cancellationToken);
+        if (error != null)
+            return error;
+
+        var data = filtered.ToList();
         var boldFont = PdfFontFactory.CreateFont(StandardFonts.HELVETICA_BOLD);
         var normalFont = PdfFontFactory.CreateFont(StandardFonts.HELVETICA);
         using var ms = new MemoryStream();
@@ -414,11 +427,39 @@ public class AppointmentsController : ControllerBase
     private int GetCurrentUserId()
         => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
 
-    private async Task<IEnumerable<AppointmentResponseDto>> GetFilteredAsync(int? patientId, int? doctorId, CancellationToken ct)
+    private async Task<(IEnumerable<AppointmentResponseDto> Data, IActionResult? Error)> GetFilteredAsync(int? patientId, int? doctorId, CancellationToken ct)
     {
+        var role = User.FindFirstValue(ClaimTypes.Role);
+        var userId = GetCurrentUserId();
+
+        if (role == "Patient")
+        {
+            var patient = await _appointmentService.GetPatientByUserIdAsync(userId, ct);
+            if (patient == null)
+                return (Enumerable.Empty<AppointmentResponseDto>(), null);
+
+            if (patientId.HasValue && patientId.Value != patient.Id)
+                return (Enumerable.Empty<AppointmentResponseDto>(), Forbid());
+
+            patientId = patient.Id;
+        }
+        else if (role == "Doctor")
+        {
+            if (doctorId.HasValue)
+            {
+                var doctor = await _appointmentService.GetDoctorByUserIdAsync(userId, ct);
+                if (doctor == null || doctor.Id != doctorId.Value)
+                    return (Enumerable.Empty<AppointmentResponseDto>(), Forbid());
+            }
+        }
+        else if (role != "Admin")
+        {
+            return (Enumerable.Empty<AppointmentResponseDto>(), Forbid());
+        }
+
         var (items, _) = await _appointmentService.SearchAsync(searchTerm: null, doctorId: doctorId, patientId: patientId, fromDate: null, toDate: null, status: null, page: 1, pageSize: 10000, cancellationToken: ct);
 
-        return items;
+        return (items, null);
     }
 
     private static string Csv(string? v)

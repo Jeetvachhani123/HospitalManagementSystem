@@ -13,7 +13,7 @@ public interface IBillingService
     Task<IEnumerable<Invoice>> GetPatientInvoicesAsync(int patientId, CancellationToken cancellationToken = default);
     Task<IEnumerable<Invoice>> GetPendingInvoicesAsync(int patientId, CancellationToken cancellationToken = default);
     Task<Invoice> GenerateInvoiceAsync(int appointmentId, decimal amount, DateTime dueDate, CancellationToken cancellationToken = default);
-    Task<bool> ProcessPaymentAsync(int invoiceId, string paymentMethod, CancellationToken cancellationToken = default);
+    Task<bool> CompleteStripePaymentAsync(int invoiceId, CancellationToken cancellationToken = default);
     Task<bool> CancelInvoiceAsync(int invoiceId, CancellationToken cancellationToken = default);
 }
 
@@ -69,7 +69,7 @@ public class BillingService : IBillingService
         return invoice;
     }
 
-    public async Task<bool> ProcessPaymentAsync(int invoiceId, string paymentMethod, CancellationToken cancellationToken = default)
+    public async Task<bool> CompleteStripePaymentAsync(int invoiceId, CancellationToken cancellationToken = default)
     {
         var invoice = await _unitOfWork.Invoices.GetByIdAsync(invoiceId, cancellationToken);
         if (invoice == null)
@@ -83,11 +83,11 @@ public class BillingService : IBillingService
 
         invoice.IsPaid = true;
         invoice.PaidAt = DateTime.UtcNow;
-        invoice.PaymentMethod = paymentMethod;
+        invoice.PaymentMethod = "Stripe";
         try
         {
             await _unitOfWork.SaveChangesAsync(cancellationToken);
-            _logger.LogInformation("Invoice {InvoiceId} paid via {PaymentMethod}", invoiceId, paymentMethod);
+            _logger.LogInformation("Invoice {InvoiceId} paid via Stripe", invoiceId);
             return true;
         }
         catch (Exception ex) when (ex.GetType().Name == "DbUpdateConcurrencyException")

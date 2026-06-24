@@ -36,9 +36,4 @@ public class PayInvoiceViewModel
     public int InvoiceId { get; set; }
     public decimal Amount { get; set; }
     public string PatientName { get; set; } = string.Empty;
-    [Required(ErrorMessage = "Please select a payment method")]
-    public string PaymentMethod { get; set; } = string.Empty;
-    public string CardNumber { get; set; } = string.Empty;
-    public string ExpiryDate { get; set; } = string.Empty;
-    public string CVV { get; set; } = string.Empty;
 }

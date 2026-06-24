@@ -35,41 +35,12 @@
                         <input type="hidden" asp-for="InvoiceId" />
                         <input type="hidden" asp-for="PatientName" />
                         <input type="hidden" asp-for="Amount" />
-                        <div class="mb-4">
-                            <label asp-for="PaymentMethod" class="form-label fw-bold text-muted small text-uppercase">Payment Method</label>
-                            <select asp-for="PaymentMethod" class="form-select form-select-lg bg-light-subtle rounded-3" id="paymentMethodSelect">
-                                <option value="">Select Method...</option>
-                                <option value="Credit Card">Credit / Debit Card</option>
-                                <option value="Insurance">Insurance Coverage</option>
-                                <option value="Cash">Cash (In-Clinic)</option>
-                            </select>
-                            <span asp-validation-for="PaymentMethod" class="text-danger small mt-1 d-block"></span>
-                        </div>
-                        <div id="cardDetails" class="d-none bg-light p-3 rounded-3 mb-4 border">
-                            <div class="mb-3">
-                                <label class="form-label small fw-bold text-muted text-uppercase">Card Number</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-credit-card"></i></span>
-                                    <input type="text" class="form-control border-start-0" placeholder="0000 0000 0000 0000" maxlength="19">
-                                </div>
-                            </div>
-                            <div class="row g-3">
-                                <div class="col-6">
-                                    <label class="form-label small fw-bold text-muted text-uppercase">Expiry</label>
-                                    <input type="text" class="form-control" placeholder="MM/YY" maxlength="5">
-                                </div>
-                                <div class="col-6">
-                                    <label class="form-label small fw-bold text-muted text-uppercase">CVC</label>
-                                    <div class="input-group">
-                                        <input type="text" class="form-control border-end-0" placeholder="123" maxlength="3">
-                                        <span class="input-group-text bg-white border-start-0 text-muted"><i class="bi bi-question-circle"></i></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <p class="text-muted small mb-4 text-center">
+                            You will be redirected to Stripe to complete payment securely with a credit or debit card.
+                        </p>
                         <div class="d-grid gap-3">
                             <button type="submit" class="btn btn-dark btn-lg py-3 rounded-pill shadow-lg hover-lift transition-all fw-bold">
-                                <i class="bi bi-lock-fill me-2"></i> Confirm Payment
+                                <i class="bi bi-lock-fill me-2"></i> Pay with Card
                             </button>
                             <a asp-action="Index" class="btn btn-link text-decoration-none text-muted small fw-bold">Cancel Transaction</a>
                         </div>
@@ -89,17 +60,6 @@
 </div>
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-    <script>
-        $(document).ready(function() {
-            $('#paymentMethodSelect').change(function() {
-                if($(this).val() === 'Credit Card') {
-                    $('#cardDetails').removeClass('d-none').hide().slideDown();
-                } else {
-                    $('#cardDetails').slideUp();
-                }
-            });
-        });
-    </script>
     <style>
         .grayscale {
             filter: grayscale(100%);

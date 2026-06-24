@@ -73,9 +73,7 @@ public class AdminController : Controller
                 }));
 
             case "TodayAppointments":
-                var all = await _appointmentService.GetAllAsync();
-                var todayUtc = DateTime.UtcNow.Date;
-                var todays = all.Where(a => a.AppointmentDate.Date == todayUtc);
+                var todays = await _appointmentService.GetTodaysAppointmentsAsync();
                 return Json(todays.Select(a => new
                 {
                     patient = a.PatientName,
@@ -86,9 +84,7 @@ public class AdminController : Controller
                 }));
 
             case "PendingApprovals":
-                var appointments = await _appointmentService.GetAllAsync();
-                var pending = appointments
-                    .Where(a => a.ApprovalStatusEnum == HospitalMS.Models.Enums.AppointmentApprovalStatus.Pending && a.StatusEnum == HospitalMS.Models.Enums.AppointmentStatus.Scheduled);
+                var pending = await _appointmentService.GetAllPendingApprovalsAsync();
                 return Json(pending.Select(a => new
                 {
                     patient = a.PatientName,
@@ -130,10 +126,7 @@ public class AdminController : Controller
             bloodGroup = p.BloodGroup,
             dateOfBirth = p.DateOfBirth.ToString("MMM dd, yyyy")
         }).ToList();
-        var allAppointments = await _appointmentService.GetAllAsync();
-        var todayUtc = DateTime.UtcNow.Date;
-        var todayAppointments = allAppointments
-            .Where(a => a.AppointmentDate.Date == todayUtc)
+        var todayAppointments = (await _appointmentService.GetTodaysAppointmentsAsync())
             .Select(a => new
             {
                 patient = a.PatientName,

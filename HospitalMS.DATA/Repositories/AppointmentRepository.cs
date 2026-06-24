@@ -5,6 +5,22 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HospitalMS.DATA.Repositories;
 
+public record AppointmentReportAggregate(
+    int TotalAppointments,
+    int CompletedCount,
+    int ScheduledCount,
+    int CancelledCount,
+    int NoShowCount,
+    IReadOnlyList<DoctorAppointmentReportAggregate> DoctorStats);
+
+public record DoctorAppointmentReportAggregate(
+    int DoctorId,
+    string DoctorName,
+    string Specialization,
+    int TotalAppointments,
+    int CompletedAppointments,
+    int NonRejectedCount);
+
 public interface IAppointmentRepository
 {
     Task<Appointment?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
@@ -26,6 +42,7 @@ public interface IAppointmentRepository
     Task<(IEnumerable<Appointment> Items, int TotalCount)> SearchAsync(string? searchTerm, int? doctorId, int? patientId, DateTime? fromDate, DateTime? toDate, AppointmentStatus? status, int page, int pageSize, CancellationToken cancellationToken = default);
     Task<IEnumerable<(int Year, int Month, int Total, int Completed, int Cancelled)>> GetMonthlyTrendAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default);
     Task<IEnumerable<Appointment>> GetAllPendingApprovalsAsync(CancellationToken cancellationToken = default);
+    Task<AppointmentReportAggregate> GetAppointmentReportAggregatesAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default);
     Task<int> GetPatientAppointmentsCountAsync(int patientId, AppointmentStatus[]? statuses = null, AppointmentApprovalStatus[]? approvalStatuses = null, DateTime? fromDate = null, bool isUpcomingDashboard = false, bool isCancelledOrRejected = false, CancellationToken cancellationToken = default);
     Task<IEnumerable<Appointment>> GetRecentAppointmentsForPatientAsync(int patientId, int count, CancellationToken cancellationToken = default);
 }
@@ -369,6 +386,51 @@ public class AppointmentRepository : IAppointmentRepository
             .Where(a => a.ApprovalStatus == AppointmentApprovalStatus.Pending && a.Status == AppointmentStatus.Scheduled)
             .OrderBy(a => a.AppointmentDate)
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task<AppointmentReportAggregate> GetAppointmentReportAggregatesAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
+    {
+        var filtered = _context.Appointments
+            .AsNoTracking()
+            .Where(a => a.AppointmentDate >= startDate && a.AppointmentDate <= endDate);
+
+        var statusCounts = await filtered
+            .GroupBy(_ => 1)
+            .Select(g => new
+            {
+                Total = g.Count(),
+                Completed = g.Count(a => a.Status == AppointmentStatus.Completed),
+                Scheduled = g.Count(a => a.Status == AppointmentStatus.Scheduled),
+                Cancelled = g.Count(a => a.Status == AppointmentStatus.Cancelled),
+                NoShow = g.Count(a => a.Status == AppointmentStatus.NoShow)
+            })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        var doctorStats = await (
+            from a in _context.Appointments.AsNoTracking()
+            join d in _context.Doctors.AsNoTracking() on a.DoctorId equals d.Id
+            join u in _context.Users.AsNoTracking() on d.UserId equals u.Id
+            where a.AppointmentDate >= startDate && a.AppointmentDate <= endDate
+            group a by new { a.DoctorId, u.FirstName, u.LastName, d.Specialization } into g
+            select new DoctorAppointmentReportAggregate(
+                g.Key.DoctorId,
+                g.Key.FirstName + " " + g.Key.LastName,
+                g.Key.Specialization,
+                g.Count(),
+                g.Count(a => a.Status == AppointmentStatus.Completed),
+                g.Count(a => a.ApprovalStatus != AppointmentApprovalStatus.Rejected))
+        ).ToListAsync(cancellationToken);
+
+        if (statusCounts == null)
+            return new AppointmentReportAggregate(0, 0, 0, 0, 0, doctorStats);
+
+        return new AppointmentReportAggregate(
+            statusCounts.Total,
+            statusCounts.Completed,
+            statusCounts.Scheduled,
+            statusCounts.Cancelled,
+            statusCounts.NoShow,
+            doctorStats);
     }
 
     public async Task<int> GetPatientAppointmentsCountAsync(int patientId, AppointmentStatus[]? statuses = null, AppointmentApprovalStatus[]? approvalStatuses = null, DateTime? fromDate = null, bool isUpcomingDashboard = false, bool isCancelledOrRejected = false, CancellationToken cancellationToken = default)

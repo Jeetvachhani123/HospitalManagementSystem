@@ -67,11 +67,14 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.SlidingExpiration = true;
     });
 var envSecret = Environment.GetEnvironmentVariable("JWT_SECRET");
-if (string.IsNullOrEmpty(envSecret))
+if (!string.IsNullOrEmpty(envSecret))
 {
-    throw new InvalidOperationException("JWT_SECRET environment variable is missing.");
+    builder.Configuration["JwtSettings:Secret"] = envSecret;
 }
-builder.Configuration["JwtSettings:Secret"] = envSecret;
+if (string.IsNullOrEmpty(builder.Configuration["JwtSettings:Secret"]) || builder.Configuration["JwtSettings:Secret"] == "YOUR_JWT_SECRET")
+{
+    throw new InvalidOperationException("JWT_SECRET is missing. Please set it in appsettings.json or environment variables.");
+}
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 builder.Services.Configure<AppointmentSettings>(builder.Configuration.GetSection("AppointmentSettings"));
 builder.Services.AddAntiforgery(options =>

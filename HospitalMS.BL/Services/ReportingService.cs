@@ -28,44 +28,31 @@ public class ReportingService : IReportingService
     {
         var start = startDate ?? DateTime.UtcNow.AddMonths(-1);
         var end = endDate ?? DateTime.UtcNow;
-        var appointments = await _appointmentRepository.GetByDateRangeAsync(start, end);
-        var appointmentList = appointments.ToList();
-        var totalCount = appointmentList.Count;
-        var completedCount = appointmentList.Count(a => a.Status == AppointmentStatus.Completed);
-        var scheduledCount = appointmentList.Count(a => a.Status == AppointmentStatus.Scheduled);
-        var cancelledCount = appointmentList.Count(a => a.Status == AppointmentStatus.Cancelled);
-        var noShowCount = appointmentList.Count(a => a.Status == AppointmentStatus.NoShow);
+        var aggregates = await _appointmentRepository.GetAppointmentReportAggregatesAsync(start, end);
+        var totalCount = aggregates.TotalAppointments;
+        var completedCount = aggregates.CompletedCount;
+        var cancelledCount = aggregates.CancelledCount;
+        var noShowCount = aggregates.NoShowCount;
         var report = new AppointmentReportDto
         {
             TotalAppointments = totalCount,
             CompletedCount = completedCount,
-            ScheduledCount = scheduledCount,
+            ScheduledCount = aggregates.ScheduledCount,
             CancelledCount = cancelledCount,
             NoShowCount = noShowCount,
             CompletionRate = totalCount > 0 ? (decimal)completedCount / totalCount * 100 : 0,
             NoShowRate = totalCount > 0 ? (decimal)noShowCount / totalCount * 100 : 0,
-            CancellationRate = totalCount > 0 ? (decimal)cancelledCount / totalCount * 100 : 0
-        };
-
-        var doctorGroups = appointmentList.GroupBy(a => a.DoctorId);
-        foreach (var group in doctorGroups)
-        {
-            var firstAppointment = group.FirstOrDefault();
-            var doctor = firstAppointment?.Doctor;
-            if (doctor != null)
+            CancellationRate = totalCount > 0 ? (decimal)cancelledCount / totalCount * 100 : 0,
+            DoctorStats = aggregates.DoctorStats.Select(d => new DoctorStatsDto
             {
-                var doctorAppointments = group.ToList();
-                report.DoctorStats.Add(new DoctorStatsDto
-                {
-                    DoctorId = doctor.Id,
-                    DoctorName = $"{doctor.User.FirstName} {doctor.User.LastName}",
-                    Specialization = doctor.Specialization,
-                    TotalAppointments = doctorAppointments.Count,
-                    CompletedAppointments = doctorAppointments.Count(a => a.Status == AppointmentStatus.Completed),
-                    ApprovalRate = doctorAppointments.Count > 0 ? (decimal)doctorAppointments.Count(a => a.ApprovalStatus != AppointmentApprovalStatus.Rejected) / doctorAppointments.Count * 100 : 0
-                });
-            }
-        }
+                DoctorId = d.DoctorId,
+                DoctorName = d.DoctorName,
+                Specialization = d.Specialization,
+                TotalAppointments = d.TotalAppointments,
+                CompletedAppointments = d.CompletedAppointments,
+                ApprovalRate = d.TotalAppointments > 0 ? (decimal)d.NonRejectedCount / d.TotalAppointments * 100 : 0
+            }).ToList()
+        };
 
         return report;
     }

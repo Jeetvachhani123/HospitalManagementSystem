@@ -93,6 +93,8 @@ public class MedicalRecordService : IMedicalRecordService
                 return false;
             }
 
+            TryDeleteAttachmentFile(record.AttachmentPath, record.PatientId);
+
             _unitOfWork.MedicalRecords.Delete(record);
             await _unitOfWork.SaveChangesAsync();
 
@@ -102,6 +104,42 @@ public class MedicalRecordService : IMedicalRecordService
         {
             _logger.LogError(ex, $"Error deleting medical record {id}");
             throw;
+        }
+    }
+
+    private void TryDeleteAttachmentFile(string? attachmentPath, int patientId)
+    {
+        if (string.IsNullOrWhiteSpace(attachmentPath))
+            return;
+
+        var fileName = Path.GetFileName(attachmentPath);
+        if (string.IsNullOrWhiteSpace(fileName) || fileName.Contains(".."))
+        {
+            _logger.LogWarning("Skipped attachment deletion for invalid attachment path {AttachmentPath}", attachmentPath);
+            return;
+        }
+
+        var filePath = Path.Combine(
+            Directory.GetCurrentDirectory(),
+            "App_Data",
+            "medical_records",
+            patientId.ToString(),
+            fileName);
+
+        if (!File.Exists(filePath))
+        {
+            _logger.LogWarning("Attachment file not found for medical record deletion: {FilePath}", filePath);
+            return;
+        }
+
+        try
+        {
+            File.Delete(filePath);
+            _logger.LogInformation("Deleted medical record attachment file {FilePath}", filePath);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to delete medical record attachment file {FilePath}", filePath);
         }
     }
 }

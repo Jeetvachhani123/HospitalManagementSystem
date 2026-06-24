@@ -186,38 +186,25 @@ public class BillingController : Controller
         if (!ModelState.IsValid)
             return View(model);
 
-        if (model.PaymentMethod == "Credit Card")
-        {
-            if (string.IsNullOrWhiteSpace(model.CardNumber) || string.IsNullOrWhiteSpace(model.ExpiryDate) || string.IsNullOrWhiteSpace(model.CVV))
-            {
-                ModelState.AddModelError("", "Please enter card details.");
-                return View(model);
-            }
-        }
+        var invoice = await _billingService.GetInvoiceByIdAsync(model.InvoiceId);
+        if (invoice == null)
+            return NotFound();
+
+        if (invoice.IsPaid)
+            return RedirectToAction(nameof(Details), new { id = model.InvoiceId });
+
+        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var patient = await _patientService.GetByUserIdAsync(userId);
+        if (patient == null || invoice.PatientId != patient.Id)
+            return Forbid();
+
         try
         {
-            if (model.PaymentMethod == "Credit Card")
-            {
-                var successUrl = Url.Action("PaymentSuccess", "Billing", new { id = model.InvoiceId }, Request.Scheme) ?? string.Empty;
-                var cancelUrl = Url.Action("Details", "Billing", new { id = model.InvoiceId }, Request.Scheme) ?? string.Empty;
-                var checkoutUrl = await _paymentService.CreateCheckoutSessionAsync(model.InvoiceId, model.Amount, "usd", successUrl, cancelUrl);
+            var successUrl = Url.Action("PaymentSuccess", "Billing", new { id = model.InvoiceId }, Request.Scheme) ?? string.Empty;
+            var cancelUrl = Url.Action("Details", "Billing", new { id = model.InvoiceId }, Request.Scheme) ?? string.Empty;
+            var checkoutUrl = await _paymentService.CreateCheckoutSessionAsync(model.InvoiceId, invoice.Amount, "usd", successUrl, cancelUrl);
 
-                return Redirect(checkoutUrl);
-            }
-            else
-            {
-                var success = await _billingService.ProcessPaymentAsync(model.InvoiceId, model.PaymentMethod);
-                if (success)
-                {
-                    TempData["SuccessMessage"] = "Payment processed successfully!";
-                    return RedirectToAction(nameof(Index));
-                }
-                else
-                {
-                    ModelState.AddModelError("", "Payment processing failed.");
-                    return View(model);
-                }
-            }
+            return Redirect(checkoutUrl);
         }
         catch (Exception ex)
         {

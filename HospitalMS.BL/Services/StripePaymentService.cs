@@ -79,7 +79,7 @@ public class StripePaymentService : IPaymentService
                 {
                     if (int.TryParse(session.Metadata["InvoiceId"], out int invoiceId))
                     {
-                        await _billingService.ProcessPaymentAsync(invoiceId, "Stripe");
+                        await _billingService.CompleteStripePaymentAsync(invoiceId);
                         _logger.LogInformation("Successfully processed Stripe payment for Invoice {InvoiceId}", invoiceId);
                         return true;
                     }

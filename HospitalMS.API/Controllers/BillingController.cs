@@ -15,11 +15,13 @@ public class BillingController : ControllerBase
 {
     private readonly IBillingService _billingService;
     private readonly IAppointmentService _appointmentService;
+    private readonly IPaymentService _paymentService;
     private readonly ILogger<BillingController> _logger;
-    public BillingController(IBillingService billingService, IAppointmentService appointmentService, ILogger<BillingController> logger)
+    public BillingController(IBillingService billingService, IAppointmentService appointmentService, IPaymentService paymentService, ILogger<BillingController> logger)
     {
         _billingService = billingService;
         _appointmentService = appointmentService;
+        _paymentService = paymentService;
         _logger = logger;
     }
 
@@ -120,12 +122,12 @@ public class BillingController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<ApiResponse<bool>>> ProcessPayment(int id, [FromBody] PaymentRequest request, CancellationToken ct)
+    public async Task<ActionResult<ApiResponse<string>>> ProcessPayment(int id, [FromBody] PaymentRequest request, CancellationToken ct)
     {
         var invoice = await _billingService.GetInvoiceByIdAsync(id, ct);
         if (invoice == null)
         {
-            return NotFound(ApiResponse<bool>.ErrorResponse("Invoice not found"));
+            return NotFound(ApiResponse<string>.ErrorResponse("Invoice not found"));
         }
 
         if (!int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
@@ -138,17 +140,18 @@ public class BillingController : ControllerBase
 
         if (invoice.IsPaid)
         {
-            return BadRequest(ApiResponse<bool>.ErrorResponse("Invoice already paid"));
+            return BadRequest(ApiResponse<string>.ErrorResponse("Invoice already paid"));
         }
 
-        var result = await _billingService.ProcessPaymentAsync(id, request.PaymentMethod, ct);
-        if (!result)
-        {
-            return BadRequest(ApiResponse<bool>.ErrorResponse("Payment processing failed"));
-        }
+        var checkoutUrl = await _paymentService.CreateCheckoutSessionAsync(
+            invoice.Id,
+            invoice.Amount,
+            "usd",
+            request.SuccessUrl,
+            request.CancelUrl);
 
-        _logger.LogInformation("Payment processed for invoice {InvoiceId} by patient {PatientId}", id, patient.Id);
-        return Ok(ApiResponse<bool>.SuccessResponse(true, "Payment processed successfully"));
+        _logger.LogInformation("Stripe checkout session created for invoice {InvoiceId} by patient {PatientId}", id, patient.Id);
+        return Ok(ApiResponse<string>.SuccessResponse(checkoutUrl, "Stripe checkout session created"));
     }
 
     [HttpDelete("{id}")]
