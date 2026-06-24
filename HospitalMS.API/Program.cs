@@ -22,10 +22,11 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 builder.Host.UseSerilog();
 var envSecret = Environment.GetEnvironmentVariable("JWT_SECRET");
-if (!string.IsNullOrEmpty(envSecret))
+if (string.IsNullOrEmpty(envSecret))
 {
-    builder.Configuration["JwtSettings:Secret"] = envSecret;
+    throw new InvalidOperationException("JWT_SECRET environment variable is missing.");
 }
+builder.Configuration["JwtSettings:Secret"] = envSecret;
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.Configure<AppointmentSettings>(builder.Configuration.GetSection("AppointmentSettings"));

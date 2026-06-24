@@ -44,7 +44,11 @@ builder.Services.AddHttpClient<ApiClient>()
     .ConfigureHttpClient((provider, client) =>
     {
         var config = provider.GetRequiredService<IConfiguration>();
-        var apiBaseUrl = config["ApiSettings:BaseUrl"] ?? "https://localhost:7058";
+        var apiBaseUrl = config["ApiSettings:BaseUrl"];
+        if (string.IsNullOrEmpty(apiBaseUrl))
+        {
+            throw new InvalidOperationException("ApiSettings:BaseUrl is missing from configuration.");
+        }
         client.BaseAddress = new Uri(apiBaseUrl);
         client.DefaultRequestHeaders.Add("Accept", "application/json");
     });
@@ -63,10 +67,11 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.SlidingExpiration = true;
     });
 var envSecret = Environment.GetEnvironmentVariable("JWT_SECRET");
-if (!string.IsNullOrEmpty(envSecret))
+if (string.IsNullOrEmpty(envSecret))
 {
-    builder.Configuration["JwtSettings:Secret"] = envSecret;
+    throw new InvalidOperationException("JWT_SECRET environment variable is missing.");
 }
+builder.Configuration["JwtSettings:Secret"] = envSecret;
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 builder.Services.Configure<AppointmentSettings>(builder.Configuration.GetSection("AppointmentSettings"));
 builder.Services.AddAntiforgery(options =>
